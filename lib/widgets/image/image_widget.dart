@@ -33,7 +33,7 @@ class ImageWidget extends StatelessWidget {
             borderRadius != null ? BorderRadius.circular(borderRadius!) : null,
         color: color ?? ColorConfig.darkGrey,
         shape: borderRadius == null ? BoxShape.circle : BoxShape.rectangle,
-        image: imageUrl != null
+        image: imageUrl != null && imageUrl != ''
             ? DecorationImage(
                 image: CachedNetworkImageProvider(imageUrl!),
                 fit: BoxFit.cover,

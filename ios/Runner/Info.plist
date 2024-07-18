@@ -61,5 +61,19 @@
 	<string>Main</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Main</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+    	<dict>
+        	<key>CFBundleURLSchemes</key>
+        	<array>
+            	<string>dongi</string>
+        	</array>
+    	</dict>
+	</array>
+	<!-- <key>LSApplicationQueriesSchemes</key>
+	<array>
+    	<string>heyo</string>
+    	<string>twitter</string>
+	</array> -->
 </dict>
 </plist>

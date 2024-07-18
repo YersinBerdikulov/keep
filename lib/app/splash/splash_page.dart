@@ -32,7 +32,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
         // Push to home
         context.go(RouteName.home);
       } else {
-        context.go(RouteName.signin);
+        context.go(RouteName.onboarding);
       }
     } catch (error) {
       // Handle the error, such as showing an error message

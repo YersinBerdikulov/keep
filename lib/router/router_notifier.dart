@@ -176,7 +176,8 @@ GoRouter _goRouterConfig(StateProviderRef ref) {
     redirect: (context, state) async {
       if (state.location == RouteName.signup ||
           state.location == RouteName.signin ||
-          state.location == RouteName.splash) {
+          state.location == RouteName.splash ||
+          state.location == RouteName.onboarding) {
         //user try to sign in or sign up
         return null;
       }

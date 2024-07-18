@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../constants/color_config.dart';
 import '../../widgets/appbar/appbar.dart';
 import 'home_widget.dart';
+// import 'package:url_launcher/url_launcher_string.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -16,6 +17,13 @@ class HomePage extends ConsumerWidget {
       error: (error, stackTrace) => Center(child: Text(error.toString())),
       data: (data) {
         return Scaffold(
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: () async {
+          //     String appScheme = '';
+          //     String uri = '$appScheme://authentication?key=12345';
+          //     await launchUrlString(uri);
+          //   },
+          // ),
           backgroundColor: ColorConfig.white,
           appBar: AppBarWidget(),
           body: ListView(

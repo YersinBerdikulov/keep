@@ -165,6 +165,8 @@ class CreateGroupAddFriend extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    //final currentUser = ref.read(currentUserProvider);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
       child: Column(
@@ -176,7 +178,7 @@ class CreateGroupAddFriend extends ConsumerWidget {
           ),
           const SizedBox(height: 10),
           Container(
-            padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
+            padding: const EdgeInsets.all(15),
             width: SizeConfig.width(context),
             decoration: BoxDecoration(
               color: ColorConfig.grey,
@@ -188,14 +190,14 @@ class CreateGroupAddFriend extends ConsumerWidget {
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 6,
+                  itemCount: 2,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 4,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                   ),
                   itemBuilder: (context, i) {
-                    return i != 5
+                    return i != 0
                         ? FriendWidget(
                             backgroundColor: ColorConfig.white,
                           )

@@ -19,7 +19,7 @@ class FriendWidget extends Container {
         shape: BoxShape.circle,
         color: backgroundColor ?? ColorConfig.midnight,
         border: Border.all(color: borderColor ?? ColorConfig.midnight),
-        image: image != null
+        image: image != null && image != ''
             ? DecorationImage(image: NetworkImage(image!), fit: BoxFit.cover)
             : null,
       );

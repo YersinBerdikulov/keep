@@ -12,20 +12,21 @@ class OnboardingContents {
 
 List<OnboardingContents> onboardingContents = [
   OnboardingContents(
-    title: "Track Your work and get the result",
+    title: "Welcome to Dongi Expense Tracker!",
     image: "assets/images/image1.png",
-    desc: "Remember to keep track of your professional accomplishments.",
+    desc:
+        "We're thrilled to have you on board. Let's simplify expense tracking together.",
   ),
   OnboardingContents(
-    title: "Stay organized with team",
+    title: "Effortlessly Record Your Expenses",
     image: "assets/images/image2.png",
     desc:
-        "But understanding the contributions our colleagues make to our teams and companies.",
+        "Stay organized by easily logging your expenses and categorizing them.",
   ),
   OnboardingContents(
-    title: "Get notified when work happens",
+    title: "Stay in the Loop with Notifications",
     image: "assets/images/image3.png",
     desc:
-        "Take control of notifications, collaborate live or on your own time.",
+        "Receive timely notifications about your expenses, reminders, and financial updates.",
   ),
 ];

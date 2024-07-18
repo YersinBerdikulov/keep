@@ -63,7 +63,7 @@ class SliverAppBarWidget extends HookWidget {
 
           return Stack(
             children: [
-              image != null
+              image != null && image != ''
                   ? Positioned.fill(
                       child: ColorFiltered(
                         colorFilter: ColorFilter.mode(

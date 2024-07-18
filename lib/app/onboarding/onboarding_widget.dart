@@ -9,16 +9,17 @@ import '../../widgets/button/button.dart';
 class OnboardingWidget {
   title(int index) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           onboardingContents[index].title,
-          style: FontConfig.h4(),
+          style: FontConfig.h6().copyWith(height: 1.4),
         ),
         const SizedBox(height: 10),
         Text(
           onboardingContents[index].desc,
-          style: FontConfig.body2().copyWith(
-            color: ColorConfig.primarySwatch.withOpacity(0.5),
+          style: FontConfig.body1().copyWith(
+            color: ColorConfig.primarySwatch.withOpacity(0.6),
           ),
         ),
       ],
@@ -60,7 +61,7 @@ class OnboardingWidget {
           ? [
               Expanded(
                 child: ButtonWidget(
-                  title: "START",
+                  title: "Start",
                   textColor: ColorConfig.secondary,
                   onPressed: () => context.go(
                     RouteName.signin,
@@ -72,8 +73,8 @@ class OnboardingWidget {
               SizedBox(
                 width: 50,
                 child: ButtonWidget.outline(
-                  title: "SKIP",
-                  textColor: ColorConfig.midnight,
+                  title: "Skip",
+                  textColor: ColorConfig.midnight.withOpacity(0.6),
                   onPressed: () {
                     controller.animateToPage(
                       2,
@@ -87,7 +88,7 @@ class OnboardingWidget {
               Expanded(
                 flex: 3,
                 child: ButtonWidget(
-                  title: "NEXT",
+                  title: "Next",
                   textColor: ColorConfig.secondary,
                   onPressed: () {
                     controller.nextPage(
