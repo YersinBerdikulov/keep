@@ -13,9 +13,27 @@ export default async ({ req, res, log, error }) => {
     try {
         // Check if request method is POST
         if (req.method === 'POST') {
-            const { imageUrl, boxTitle, boxDescription, groupId, creatorId } = req.body;
-            log(imageUrl, boxTitle, boxDescription, groupId, creatorId);
-            console.log(imageUrl, boxTitle, boxDescription, groupId, creatorId);
+            const { 
+              title,
+description,
+creatorId,
+groupId,
+image,
+boxUsers,
+total, 
+             } = req.body;
+
+log(req.body)
+
+            log(
+              title, 
+              description,
+              creatorId,
+              groupId,
+              image,
+              boxUsers,
+              total,
+            );
 
             // Validate input
             if (!boxTitle || !boxDescription || !groupId || !creatorId) {
@@ -23,9 +41,9 @@ export default async ({ req, res, log, error }) => {
             }
 
             // Prepare the box data
-            const boxData = {
-                title: boxTitle,
-                description: boxDescription,
+            const boxData = { 
+              title: boxTitle,
+              description: boxDescription, 
                 creatorId: creatorId,
                 groupId: groupId,
                 image: imageUrl, // Use the image URL provided
