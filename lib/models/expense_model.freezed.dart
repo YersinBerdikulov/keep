@@ -32,6 +32,7 @@ mixin _$ExpenseModel {
   String get boxId => throw _privateConstructorUsedError;
   String get groupId => throw _privateConstructorUsedError;
   String get creatorId => throw _privateConstructorUsedError;
+  String get payerId => throw _privateConstructorUsedError;
   num get cost => throw _privateConstructorUsedError;
   bool get equal => throw _privateConstructorUsedError;
   List<String> get expenseUsers => throw _privateConstructorUsedError;
@@ -58,6 +59,7 @@ abstract class $ExpenseModelCopyWith<$Res> {
       String boxId,
       String groupId,
       String creatorId,
+      String payerId,
       num cost,
       bool equal,
       List<String> expenseUsers});
@@ -85,6 +87,7 @@ class _$ExpenseModelCopyWithImpl<$Res, $Val extends ExpenseModel>
     Object? boxId = null,
     Object? groupId = null,
     Object? creatorId = null,
+    Object? payerId = null,
     Object? cost = null,
     Object? equal = null,
     Object? expenseUsers = null,
@@ -126,6 +129,10 @@ class _$ExpenseModelCopyWithImpl<$Res, $Val extends ExpenseModel>
           ? _value.creatorId
           : creatorId // ignore: cast_nullable_to_non_nullable
               as String,
+      payerId: null == payerId
+          ? _value.payerId
+          : payerId // ignore: cast_nullable_to_non_nullable
+              as String,
       cost: null == cost
           ? _value.cost
           : cost // ignore: cast_nullable_to_non_nullable
@@ -160,6 +167,7 @@ abstract class _$$_ExpenseModelCopyWith<$Res>
       String boxId,
       String groupId,
       String creatorId,
+      String payerId,
       num cost,
       bool equal,
       List<String> expenseUsers});
@@ -185,6 +193,7 @@ class __$$_ExpenseModelCopyWithImpl<$Res>
     Object? boxId = null,
     Object? groupId = null,
     Object? creatorId = null,
+    Object? payerId = null,
     Object? cost = null,
     Object? equal = null,
     Object? expenseUsers = null,
@@ -226,6 +235,10 @@ class __$$_ExpenseModelCopyWithImpl<$Res>
           ? _value.creatorId
           : creatorId // ignore: cast_nullable_to_non_nullable
               as String,
+      payerId: null == payerId
+          ? _value.payerId
+          : payerId // ignore: cast_nullable_to_non_nullable
+              as String,
       cost: null == cost
           ? _value.cost
           : cost // ignore: cast_nullable_to_non_nullable
@@ -255,6 +268,7 @@ class _$_ExpenseModel implements _ExpenseModel {
       required this.boxId,
       required this.groupId,
       required this.creatorId,
+      required this.payerId,
       this.cost = 0,
       this.equal = true,
       final List<String> expenseUsers = const []})
@@ -285,6 +299,8 @@ class _$_ExpenseModel implements _ExpenseModel {
   @override
   final String creatorId;
   @override
+  final String payerId;
+  @override
   @JsonKey()
   final num cost;
   @override
@@ -301,7 +317,7 @@ class _$_ExpenseModel implements _ExpenseModel {
 
   @override
   String toString() {
-    return 'ExpenseModel(id: $id, createdAt: $createdAt, updatedAt: $updatedAt, title: $title, description: $description, categoryId: $categoryId, boxId: $boxId, groupId: $groupId, creatorId: $creatorId, cost: $cost, equal: $equal, expenseUsers: $expenseUsers)';
+    return 'ExpenseModel(id: $id, createdAt: $createdAt, updatedAt: $updatedAt, title: $title, description: $description, categoryId: $categoryId, boxId: $boxId, groupId: $groupId, creatorId: $creatorId, payerId: $payerId, cost: $cost, equal: $equal, expenseUsers: $expenseUsers)';
   }
 
   @override
@@ -323,6 +339,7 @@ class _$_ExpenseModel implements _ExpenseModel {
             (identical(other.groupId, groupId) || other.groupId == groupId) &&
             (identical(other.creatorId, creatorId) ||
                 other.creatorId == creatorId) &&
+            (identical(other.payerId, payerId) || other.payerId == payerId) &&
             (identical(other.cost, cost) || other.cost == cost) &&
             (identical(other.equal, equal) || other.equal == equal) &&
             const DeepCollectionEquality()
@@ -342,6 +359,7 @@ class _$_ExpenseModel implements _ExpenseModel {
       boxId,
       groupId,
       creatorId,
+      payerId,
       cost,
       equal,
       const DeepCollectionEquality().hash(_expenseUsers));
@@ -371,6 +389,7 @@ abstract class _ExpenseModel implements ExpenseModel {
       required final String boxId,
       required final String groupId,
       required final String creatorId,
+      required final String payerId,
       final num cost,
       final bool equal,
       final List<String> expenseUsers}) = _$_ExpenseModel;
@@ -399,6 +418,8 @@ abstract class _ExpenseModel implements ExpenseModel {
   String get groupId;
   @override
   String get creatorId;
+  @override
+  String get payerId;
   @override
   num get cost;
   @override

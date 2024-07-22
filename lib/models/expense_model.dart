@@ -16,6 +16,7 @@ class ExpenseModel with _$ExpenseModel {
     required String boxId,
     required String groupId,
     required String creatorId,
+    required String payerId,
     @Default(0) num cost,
     @Default(true) bool equal,
     @Default([]) List<String> expenseUsers,

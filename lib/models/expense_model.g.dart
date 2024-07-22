@@ -17,6 +17,7 @@ _$_ExpenseModel _$$_ExpenseModelFromJson(Map<String, dynamic> json) =>
       boxId: json['boxId'] as String,
       groupId: json['groupId'] as String,
       creatorId: json['creatorId'] as String,
+      payerId: json['payerId'] as String,
       cost: json['cost'] as num? ?? 0,
       equal: json['equal'] as bool? ?? true,
       expenseUsers: (json['expenseUsers'] as List<dynamic>?)
@@ -36,6 +37,7 @@ Map<String, dynamic> _$$_ExpenseModelToJson(_$_ExpenseModel instance) =>
       'boxId': instance.boxId,
       'groupId': instance.groupId,
       'creatorId': instance.creatorId,
+      'payerId': instance.payerId,
       'cost': instance.cost,
       'equal': instance.equal,
       'expenseUsers': instance.expenseUsers,

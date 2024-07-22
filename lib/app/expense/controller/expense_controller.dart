@@ -46,7 +46,7 @@ final getExpensesDetailProvider =
   return expenseController.getExpenseDetail(expenseId);
 });
 
-final expenseCreatorProvider = StateProvider<String?>((ref) {
+final expensePayerIdProvider = StateProvider<String?>((ref) {
   final user = ref.read(currentUserProvider);
   return user?.$id;
 });
@@ -77,7 +77,7 @@ class ExpenseNotifier extends StateNotifier<ExpenseState> {
   }) async {
     state = const ExpenseState.loading();
     final currentUser = ref.read(currentUserProvider);
-    final creatorUserId = ref.read(expenseCreatorProvider);
+    final payerUserId = ref.read(expensePayerIdProvider);
     final splitUser = ref.read(splitUserProvider.notifier);
     num convertedCost = num.parse(expenseCost.text.replaceAll(',', ''));
     //Because it must be added in the expenseUser,
@@ -103,7 +103,8 @@ class ExpenseNotifier extends StateNotifier<ExpenseState> {
       description: expenseDescription.text,
       boxId: boxModel.id!,
       groupId: groupModel.id!,
-      creatorId: creatorUserId ?? currentUser!.$id,
+      creatorId: currentUser!.$id,
+      payerId: payerUserId ?? currentUser.$id,
       //equal: equal,
       cost: convertedCost,
       expenseUsers: expenseUserIds,
@@ -141,10 +142,10 @@ class ExpenseNotifier extends StateNotifier<ExpenseState> {
 
     final currentUser = ref.read(currentUserProvider);
     final splitUser = ref.read(splitUserProvider.notifier);
-    final creatorUserId = ref.read(expenseCreatorProvider);
+    final payerUserId = ref.read(expensePayerIdProvider);
 
     updateData["\$id"] = expenseModel.id;
-    updateData["creatorId"] = creatorUserId ?? currentUser!.$id;
+    updateData["payerId"] = payerUserId ?? currentUser!.$id;
 
     //ExpenseModel expenseModel = ExpenseModel(
     //  id: expenseId,

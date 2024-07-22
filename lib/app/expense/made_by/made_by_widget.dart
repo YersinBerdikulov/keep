@@ -37,11 +37,11 @@ class MadeByFriendListWidget extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 5, 16, 5),
           child: ListTileCard(
             leading: cardIcon(),
-            borderColor: ref.watch(expenseCreatorProvider) == users[index].id
+            borderColor: ref.watch(expensePayerIdProvider) == users[index].id
                 ? ColorConfig.primarySwatch
                 : Colors.transparent,
             titleString: users[index].userName,
-            onTap: () => ref.read(expenseCreatorProvider.notifier).state =
+            onTap: () => ref.read(expensePayerIdProvider.notifier).state =
                 users[index].id,
           ),
         );
