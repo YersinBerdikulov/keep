@@ -36,7 +36,7 @@ log(req.body)
             );
 
             // Validate input
-            if (!boxTitle || !boxDescription || !groupId || !creatorId) {
+            if (!title || !description || !groupId || !creatorId) {
                 return res.json({ error: 'Missing required fields' }); // Use `res.json()` to set the response and status
             }
 
