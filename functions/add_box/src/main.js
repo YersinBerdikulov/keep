@@ -17,7 +17,7 @@ export default async ({ req, res, log, error }) => {
 
             // Validate input
             if (!boxTitle || !boxDescription || !groupId || !creatorId) {
-                return res.status(400).json({ error: 'Missing required fields' });
+                return res.json({ error: 'Missing required fields' }).status(400); // Use `res.json()` to set the response and status
             }
 
             // Prepare the box data
@@ -33,19 +33,19 @@ export default async ({ req, res, log, error }) => {
 
             // Add box to the database
             const addBoxResult = await databases.createDocument(
-                'database_id',  // Replace with your database ID
-                'collection_id', // Replace with your collection ID
+                '6687c9910025465bb7d3',  // Replace with your database ID
+                '6697b86600200a44a26d', // Replace with your collection ID
                 'unique()', // Document ID
                 boxData
             );
 
             // Respond with the result
-            return res.json(addBoxResult);
+            return res.json(addBoxResult); // Send JSON response
         } else {
-            return res.status(405).json({ error: 'Method Not Allowed' });
+            return res.json({ error: 'Method Not Allowed' }).status(405); // Use `res.json()` to set the response and status
         }
     } catch (err) {
         error(err.message);
-        return res.status(500).json({ error: err.message });
+        return res.json({ error: err.message }).status(500); // Use `res.json()` to set the response and status
     }
 };
