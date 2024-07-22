@@ -42,13 +42,13 @@ log(req.body)
 
             // Prepare the box data
             const boxData = { 
-              title: boxTitle,
-              description: boxDescription, 
-                creatorId: creatorId,
-                groupId: groupId,
-                image: imageUrl, // Use the image URL provided
-                boxUsers: [creatorId],
-                total: 0
+              title:      title, 
+              description:               description,
+                creatorId:               creatorId,
+                groupId:               groupId,
+                image:               image,
+                boxUsers:               boxUsers,
+                total:               total,
             };
 
             // Add box to the database
