@@ -14,6 +14,8 @@ export default async ({ req, res, log, error }) => {
         // Check if request method is POST
         if (req.method === 'POST') {
             const { imageUrl, boxTitle, boxDescription, groupId, creatorId } = req.body;
+            log(imageUrl, boxTitle, boxDescription, groupId, creatorId);
+            console.log(imageUrl, boxTitle, boxDescription, groupId, creatorId);
 
             // Validate input
             if (!boxTitle || !boxDescription || !groupId || !creatorId) {
