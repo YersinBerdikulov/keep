@@ -13,16 +13,11 @@ export default async ({ req, res, log, error }) => {
   try {
     // Check if request method is POST
     if (req.method === 'POST') {
-      // Log the entire request body
-      log('Request:', req);
-
-      log('Request body:', req.body);
-
-      // Correctly destructure req.body
       const { title, description, creatorId, groupId, image, boxUsers, total } =
         req.body;
 
-      // Log each destructured variable
+      log(req.body);
+
       log('Title:', title);
       log('Description:', description);
       log('CreatorId:', creatorId);
