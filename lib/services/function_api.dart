@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 import 'package:dongi/constants/appwrite_config.dart';
 import 'package:dongi/core/core.dart';
 import 'package:dongi/models/box_model.dart';
@@ -17,21 +18,29 @@ final functionAPIProvider = Provider((ref) {
 });
 
 class FunctionAPI {
-  FunctionAPI({required Functions function});
+  final Functions _functions;
+  FunctionAPI({required Functions function}) : _functions = function;
 
   FutureEitherVoid addBox(BoxModel boxModel) async {
     try {
-      final url = Uri.parse('https://669e5df249dd81fb8065.appwrite.global/');
+      // final url = Uri.parse('https://669e5df249dd81fb8065.appwrite.global/');
 
-      final response = await http.post(
-        url,
-        headers: {
-          'X-Appwrite-Project': AppwriteConfig.projectId,
-          'X-Appwrite-API-Key': AppwriteConfig.functionAPIKey,
-        },
-        body: jsonEncode(boxModel.toJson()),
+      final body = jsonEncode(boxModel.toJson());
+
+      Execution response = await _functions.createExecution(
+        functionId: '669e5df1001b2811b1d0',
+        data: body,
       );
-      final jsonResponse = jsonDecode(response.body);
+
+      // final response = await http.post(
+      //   url,
+      //   headers: {
+      //     'X-Appwrite-Project': AppwriteConfig.projectId,
+      //     'X-Appwrite-API-Key': AppwriteConfig.functionAPIKey,
+      //   },
+      //   body: body,
+      // );
+      final jsonResponse = jsonDecode(response.response);
 
       if (response.statusCode == 200 && jsonResponse["status"] == 200) {
         return right(null);
