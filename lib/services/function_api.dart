@@ -30,16 +30,18 @@ class FunctionAPI {
           'X-Appwrite-Project': AppwriteConfig.projectId,
           'X-Appwrite-API-Key': AppwriteConfig.functionAPIKey,
         },
-        body: '{}',
+        body: boxModel.toJson(),
       );
-      if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || jsonResponse["status"]) {
         return right(null);
       } else {
         // Decode the response body to get the error message
-        final errorResponse = jsonDecode(response.body);
+
         return left(
           Failure(
-            errorResponse['error'] ?? 'Can not add box, try later',
+            jsonResponse['error'] ?? 'Can not add box, try later',
             StackTrace.current,
           ),
         );

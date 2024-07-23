@@ -65,12 +65,12 @@ export default async ({ req, res, log, error }) => {
       );
 
       // Respond with the result
-      return res.json(addBoxResult);
+      return res.json({ status: 200, data: addBoxResult });
     } else {
-      return res.json({ error: 'Method Not Allowed' }); // Use `res.json()` to set the response and status
+      return res.json({ status: 401, error: 'Method Not Allowed' }); // Use `res.json()` to set the response and status
     }
   } catch (err) {
     error(err.message);
-    return res.json({ error: err.message }); // Use `res.json()` to set the response and status
+    return res.json({ status: 500, error: err.message }); // Use `res.json()` to set the response and status
   }
 };
