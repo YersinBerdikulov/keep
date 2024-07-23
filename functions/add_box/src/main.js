@@ -13,11 +13,21 @@ export default async ({ req, res, log, error }) => {
   try {
     // Check if request method is POST
     if (req.method === 'POST') {
+      // Log the entire request body
+      log('Request body:', req.body);
+
+      // Correctly destructure req.body
       const { title, description, creatorId, groupId, image, boxUsers, total } =
         req.body;
 
-      log(req.body);
-      log(title, description, creatorId, groupId, image, boxUsers, total);
+      // Log each destructured variable
+      log('Title:', title);
+      log('Description:', description);
+      log('CreatorId:', creatorId);
+      log('GroupId:', groupId);
+      log('Image:', image);
+      log('BoxUsers:', boxUsers);
+      log('Total:', total);
 
       // Validate input
       if (!title || !groupId || !creatorId) {
