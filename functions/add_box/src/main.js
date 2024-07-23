@@ -16,9 +16,11 @@ export default async ({ req, res, log, error }) => {
       const { title, description, creatorId, groupId, image, boxUsers, total } =
         req.body;
 
+      log(req.body);
+
       // Validate input
-      if (!title || !description || !groupId || !creatorId) {
-        return res.json({ error: 'Missing required fields' });
+      if (!title || !groupId || !creatorId) {
+        return res.json({ status: 400, error: 'Missing required fields' });
       }
 
       // Prepare the box data
@@ -67,7 +69,7 @@ export default async ({ req, res, log, error }) => {
       // Respond with the result
       return res.json({ status: 200, data: addBoxResult });
     } else {
-      return res.json({ status: 401, error: 'Method Not Allowed' }); // Use `res.json()` to set the response and status
+      return res.json({ status: 403, error: 'Method Not Allowed' }); // Use `res.json()` to set the response and status
     }
   } catch (err) {
     error(err.message);

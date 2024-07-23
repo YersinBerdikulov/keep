@@ -26,19 +26,16 @@ class FunctionAPI {
       final response = await http.post(
         url,
         headers: {
-          'Content-Type': 'application/json',
           'X-Appwrite-Project': AppwriteConfig.projectId,
           'X-Appwrite-API-Key': AppwriteConfig.functionAPIKey,
         },
-        body: boxModel.toJson(),
+        body: jsonEncode(boxModel.toJson()),
       );
       final jsonResponse = jsonDecode(response.body);
 
-      if (response.statusCode == 200 || jsonResponse["status"]) {
+      if (response.statusCode == 200 && jsonResponse["status"]) {
         return right(null);
       } else {
-        // Decode the response body to get the error message
-
         return left(
           Failure(
             jsonResponse['error'] ?? 'Can not add box, try later',
