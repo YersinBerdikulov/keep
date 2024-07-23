@@ -17,6 +17,7 @@ export default async ({ req, res, log, error }) => {
         req.body;
 
       log(req.body);
+      log(title, description, creatorId, groupId, image, boxUsers, total);
 
       // Validate input
       if (!title || !groupId || !creatorId) {

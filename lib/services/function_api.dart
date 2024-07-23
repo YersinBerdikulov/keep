@@ -33,7 +33,7 @@ class FunctionAPI {
       );
       final jsonResponse = jsonDecode(response.body);
 
-      if (response.statusCode == 200 && jsonResponse["status"]) {
+      if (response.statusCode == 200 && jsonResponse["status"] == 200) {
         return right(null);
       } else {
         return left(
