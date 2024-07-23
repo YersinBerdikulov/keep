@@ -14,6 +14,8 @@ export default async ({ req, res, log, error }) => {
     // Check if request method is POST
     if (req.method === 'POST') {
       // Log the entire request body
+      log('Request:', req);
+
       log('Request body:', req.body);
 
       // Correctly destructure req.body
