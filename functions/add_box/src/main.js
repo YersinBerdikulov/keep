@@ -13,10 +13,15 @@ export default async ({ req, res, log, error }) => {
   try {
     // Check if request method is POST
     if (req.method === 'POST') {
-      const { title, description, creatorId, groupId, image, boxUsers, total } =
-        req.body;
+      let requestBody = req.body;
 
-      log(req.body);
+      let title = requestBody['title'];
+      let description = requestBody['description'];
+      let creatorId = requestBody['creatorId'];
+      let groupId = requestBody['groupId'];
+      let image = requestBody['image'];
+      let boxUsers = requestBody['boxUsers'];
+      let total = requestBody['total'];
 
       log('Title:', title);
       log('Description:', description);
