@@ -13,6 +13,7 @@ export default async ({ req, res, log, error }) => {
   try {
     // Check if request method is POST
     if (req.method === 'POST') {
+      log('Request:', req);
       log('Request body:', req.body);
 
       let requestBody = req.body;

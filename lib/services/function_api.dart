@@ -28,7 +28,7 @@ class FunctionAPI {
       final body = jsonEncode(boxModel.toJson());
 
       Execution response = await _functions.createExecution(
-        functionId: '669e5df1001b2811b1d0',
+        functionId: '66a3ca45001839e3641e',
         data: body,
       );
 
