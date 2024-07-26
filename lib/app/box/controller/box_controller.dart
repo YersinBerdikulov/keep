@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:dongi/services/function_api.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -19,7 +18,7 @@ final boxNotifierProvider = StateNotifierProvider<BoxNotifier, BoxState>(
     return BoxNotifier(
       boxAPI: ref.watch(boxAPIProvider),
       storageAPI: ref.watch(storageAPIProvider),
-      functionAPI: ref.watch(functionAPIProvider),
+      // functionAPI: ref.watch(functionAPIProvider),
       ref: ref,
     );
   },
@@ -67,13 +66,13 @@ class BoxNotifier extends StateNotifier<BoxState> {
     required this.ref,
     required this.boxAPI,
     required this.storageAPI,
-    required this.functionAPI,
+    // required this.functionAPI,
   }) : super(const BoxState.init());
 
   final Ref ref;
   final BoxAPI boxAPI;
   final StorageAPI storageAPI;
-  final FunctionAPI functionAPI;
+  // final FunctionAPI functionAPI;
 
   Future<void> addBox({
     required ValueNotifier<File?> image,
@@ -102,12 +101,17 @@ class BoxNotifier extends StateNotifier<BoxState> {
       total: 0,
     );
 
-    // final res = await boxAPI.addBox(boxModel);
-    final res = await functionAPI.addBox(boxModel);
+    final res = await boxAPI.addBox(boxModel);
 
     state = res.fold(
       (l) => BoxState.error(l.message),
-      (r) => const BoxState.loaded(),
+      (r) {
+        ref.read(groupNotifierProvider.notifier).updateGroup(
+          groupModel: groupModel,
+          boxIds: [...groupModel.boxIds, r.$id],
+        );
+        return const BoxState.loaded();
+      },
     );
   }
 
