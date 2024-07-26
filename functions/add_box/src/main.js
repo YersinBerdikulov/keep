@@ -1,4 +1,4 @@
-import { Client, Databases } from 'node-appwrite';
+import { Client, Databases, ID } from 'node-appwrite';
 
 // Initialize the Appwrite client
 const client = new Client()
@@ -13,23 +13,30 @@ export default async ({ req, res, log, error }) => {
   try {
     // Check if request method is POST
     if (req.method === 'POST') {
+      log('Request body:', req.body);
+
       let requestBody = req.body;
 
-      let title = requestBody['title'];
-      let description = requestBody['description'];
-      let creatorId = requestBody['creatorId'];
-      let groupId = requestBody['groupId'];
-      let image = requestBody['image'];
-      let boxUsers = requestBody['boxUsers'];
-      let total = requestBody['total'];
+      // Ensure requestBody is an object
+      if (typeof requestBody !== 'object' || requestBody === null) {
+        return res.json({ status: 400, error: 'Invalid request body' });
+      }
 
-      log('Title:', title);
-      log('Description:', description);
-      log('CreatorId:', creatorId);
-      log('GroupId:', groupId);
-      log('Image:', image);
-      log('BoxUsers:', boxUsers);
-      log('Total:', total);
+      // Log requestBody to check its structure
+      log('Request body:', requestBody);
+
+      // Destructure the request body
+      const { title, description, creatorId, groupId, image, boxUsers, total } =
+        requestBody;
+
+      // Log each field to ensure they are being accessed correctly
+      log('Title:', typeof title, title);
+      log('Description:', typeof description, description);
+      log('CreatorId:', typeof creatorId, creatorId);
+      log('GroupId:', typeof groupId, groupId);
+      log('Image:', typeof image, image);
+      log('BoxUsers:', typeof boxUsers, boxUsers);
+      log('Total:', typeof total, total);
 
       // Validate input
       if (!title || !groupId || !creatorId) {
@@ -38,20 +45,20 @@ export default async ({ req, res, log, error }) => {
 
       // Prepare the box data
       const boxData = {
-        title: title,
-        description: description,
-        creatorId: creatorId,
-        groupId: groupId,
-        image: image,
-        boxUsers: boxUsers,
-        total: total,
+        title,
+        description,
+        creatorId,
+        groupId,
+        image,
+        boxUsers,
+        total,
       };
 
       // Add box to the database
       const addBoxResult = await databases.createDocument(
         process.env.DATABASE_ID,
         process.env.BOX_COLLECTION_ID,
-        'unique()',
+        ID.unique(),
         boxData
       );
 
@@ -82,10 +89,10 @@ export default async ({ req, res, log, error }) => {
       // Respond with the result
       return res.json({ status: 200, data: addBoxResult });
     } else {
-      return res.json({ status: 403, error: 'Method Not Allowed' }); // Use `res.json()` to set the response and status
+      return res.json({ status: 403, error: 'Method Not Allowed' });
     }
   } catch (err) {
     error(err.message);
-    return res.json({ status: 500, error: err.message }); // Use `res.json()` to set the response and status
+    return res.json({ status: 500, error: err.message });
   }
 };
