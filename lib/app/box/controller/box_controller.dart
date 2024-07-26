@@ -169,7 +169,7 @@ class BoxNotifier extends StateNotifier<BoxState> {
     //remove box from server
     final res = await boxAPI.deleteBox(boxModel.id!);
     //remove box image from storage
-    if (boxModel.image != null) {
+    if (boxModel.image != null && boxModel.image != "") {
       final imageDeleteRes = await storageAPI.deleteImage(boxModel.image!);
       imageDeleteRes.fold(
         (l) => BoxState.error(l.message),

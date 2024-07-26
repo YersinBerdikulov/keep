@@ -146,7 +146,7 @@ class GroupNotifier extends StateNotifier<GroupState> {
     //remove group from server
     final res = await groupAPI.deleteGroup(groupModel.id!);
     //remove group image from storage
-    if (groupModel.image != null) {
+    if (groupModel.image != null && groupModel.image != "") {
       await storageAPI.deleteImage(groupModel.image!);
     }
 
