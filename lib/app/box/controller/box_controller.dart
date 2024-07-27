@@ -164,7 +164,10 @@ class BoxNotifier extends StateNotifier<BoxState> {
     );
   }
 
-  Future<void> deleteBox(BoxModel boxModel) async {
+  Future<void> deleteBox({
+    required BoxModel boxModel,
+    required GroupModel groupModel,
+  }) async {
     state = const BoxState.loading();
     //remove box from server
     final res = await boxAPI.deleteBox(boxModel.id!);
@@ -180,6 +183,14 @@ class BoxNotifier extends StateNotifier<BoxState> {
     state = res.fold(
       (l) => BoxState.error(l.message),
       (r) {
+        //remove boxId from parent group
+        ref.read(groupNotifierProvider.notifier).updateGroup(
+              groupModel: groupModel,
+              boxIds:
+                  groupModel.boxIds.where((id) => id != boxModel.id).toList(),
+            );
+
+        //remove all the expenses in the box
         ref
             .read(expenseNotifierProvider.notifier)
             .deleteAllExpense(boxModel.expenseIds);
