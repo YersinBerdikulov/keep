@@ -5,7 +5,7 @@ import '../../../constants/color_config.dart';
 import '../../../widgets/appbar/sliver_appbar.dart';
 import './friend_review_widget.dart';
 
-class FriendReviewPage extends HookConsumerWidget with FriendReviewWidget {
+class FriendReviewPage extends HookConsumerWidget {
   const FriendReviewPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -16,14 +16,14 @@ class FriendReviewPage extends HookConsumerWidget with FriendReviewWidget {
       ),
       body: SliverAppBarWidget(
         /// * ----- total expense
-        appbarTitle: friendName(context),
+        appbarTitle: const FriendNameWidget(),
         child: ListView(
-          children: [
+          children: const [
             /// * ----- review
-            review(),
+            ReviewSectionWidget(),
 
             /// * ----- expense list
-            expensesList(),
+            ExpensesListWidget(),
           ],
         ),
       ),

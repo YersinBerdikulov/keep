@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../constants/color_config.dart';
 import './new_password_widget.dart';
 
-class NewPasswordPage extends ConsumerWidget with NewPasswordWidget {
+class NewPasswordPage extends ConsumerWidget {
   const NewPasswordPage({super.key});
 
   @override
@@ -23,12 +23,12 @@ class NewPasswordPage extends ConsumerWidget with NewPasswordWidget {
                 topRight: Radius.circular(16),
               ),
             ),
-            child: Column(
+            child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                title(),
-                form(),
-                actionButton(),
+                NewPasswordTitle(),
+                NewPasswordForm(),
+                NewPasswordActionButton(),
               ],
             ),
           ),

@@ -6,33 +6,49 @@ import '../../../constants/font_config.dart';
 import '../../../widgets/button/button.dart';
 import '../../../widgets/text_field/text_field.dart';
 
-class ForgetPasswordWidget {
-  /// * ----- title
-  title() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            ForgetPasswordContents.title,
-            style: FontConfig.h5(),
-          ),
-          Text(
-            ForgetPasswordContents.subTitle,
-            style: FontConfig.body2(),
-          ),
-          const SizedBox(height: 20),
-        ],
-      );
+class ForgetPasswordTitle extends StatelessWidget {
+  const ForgetPasswordTitle({super.key});
 
-  /// * ----- form
-  form() => const Padding(
-        padding: EdgeInsets.only(bottom: 20),
-        child: TextFieldWidget(hintText: 'phone number'),
-      );
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          ForgetPasswordContents.title,
+          style: FontConfig.h5(),
+        ),
+        Text(
+          ForgetPasswordContents.subTitle,
+          style: FontConfig.body2(),
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+}
 
-  /// * ----- action buttons
-  actionButton() => ButtonWidget(
-        onPressed: () {},
-        title: 'Next',
-        textColor: ColorConfig.secondary,
-      );
+class ForgetPasswordForm extends StatelessWidget {
+  const ForgetPasswordForm({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.only(bottom: 20),
+      child: TextFieldWidget(hintText: 'phone number'),
+    );
+  }
+}
+
+class ForgetPasswordActionButton extends StatelessWidget {
+  const ForgetPasswordActionButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ButtonWidget(
+      onPressed: () {},
+      title: 'Next',
+      textColor: ColorConfig.secondary,
+    );
+  }
 }

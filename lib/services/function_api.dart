@@ -1,13 +1,12 @@
-import 'dart:convert';
+// import 'dart:convert';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-import 'package:dongi/constants/appwrite_config.dart';
+// import 'package:dongi/constants/appwrite_config.dart';
 import 'package:dongi/core/core.dart';
 import 'package:dongi/models/box_model.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:http/http.dart' as http;
 
 import '../providers/appwrite_provider.dart';
 
@@ -25,11 +24,10 @@ class FunctionAPI {
     try {
       // final url = Uri.parse('https://669e5df249dd81fb8065.appwrite.global/');
 
-      final body = jsonEncode(boxModel.toJson());
+      // final body = jsonEncode(boxModel.toJson());
 
       Execution response = await _functions.createExecution(
         functionId: '66a3ca45001839e3641e',
-        data: body,
       );
 
       // final response = await http.post(
@@ -40,14 +38,13 @@ class FunctionAPI {
       //   },
       //   body: body,
       // );
-      final jsonResponse = jsonDecode(response.response);
 
-      if (response.statusCode == 200 && jsonResponse["status"] == 200) {
+      if (response.status == "200") {
         return right(null);
       } else {
         return left(
           Failure(
-            jsonResponse['error'] ?? 'Can not add box, try later',
+            'Can not add box, try later',
             StackTrace.current,
           ),
         );

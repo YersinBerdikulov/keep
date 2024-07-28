@@ -27,6 +27,7 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         primarySwatch: ColorConfig.primarySwatch,
         scaffoldBackgroundColor: ColorConfig.white,
+        useMaterial3: false,
       ),
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(routerProvider(ref)),

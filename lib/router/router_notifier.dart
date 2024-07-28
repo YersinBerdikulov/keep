@@ -21,7 +21,6 @@ import '../app/group/update_group/update_group_page.dart';
 import '../app/home/home_page.dart';
 import '../app/onboarding/onboarding_page.dart';
 import '../app/splash/splash_page.dart';
-import '../models/box_model.dart';
 import '../models/group_model.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();

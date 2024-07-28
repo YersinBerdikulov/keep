@@ -217,6 +217,7 @@ class BoxNotifier extends StateNotifier<BoxState> {
     state = res.fold(
       (l) => BoxState.error(l.message),
       (r) {
+        //TODO(AliAzim)
         // Deleting expense in every box
         //ref
         //    .read(expenseNotifierProvider.notifier)

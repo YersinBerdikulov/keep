@@ -5,23 +5,20 @@ import '../../../constants/font_config.dart';
 import '../../../constants/size_config.dart';
 import '../../../widgets/list_tile/list_tile_card.dart';
 
-class FriendReviewWidget {
-  /// * ----- total expense
-  friendName(BuildContext context) {
+// Friend name widget
+class FriendNameWidget extends StatelessWidget {
+  const FriendNameWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: SizeConfig.width(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          // Text(
-          //   'total expense',
-          //   style: FontConfig.caption().copyWith(color: ColorConfig.pureWhite),
-          // ),
-          // const SizedBox(height: 5),
           Text(
             'Friend Name',
-            // '\$7,540.00',
             style: FontConfig.h5().copyWith(
               color: ColorConfig.pureWhite,
               fontWeight: FontWeight.bold,
@@ -32,11 +29,15 @@ class FriendReviewWidget {
       ),
     );
   }
+}
 
-  /// * ----- review section
-  review() {
-    /// * review card
-    reviewCard() {
+// Review section widget
+class ReviewSectionWidget extends StatelessWidget {
+  const ReviewSectionWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Widget reviewCard() {
       return Expanded(
         child: Container(
           padding: const EdgeInsets.all(10),
@@ -72,7 +73,6 @@ class FriendReviewWidget {
       );
     }
 
-    /// * ----- review widget
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
       child: Row(
@@ -86,9 +86,14 @@ class FriendReviewWidget {
       ),
     );
   }
+}
 
-  /// * ----- expense list
-  expensesList() {
+// Expenses list widget
+class ExpensesListWidget extends StatelessWidget {
+  const ExpensesListWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(

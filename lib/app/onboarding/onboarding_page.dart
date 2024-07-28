@@ -6,7 +6,7 @@ import '../../constants/content/onboarding_contents.dart';
 import 'onboarding_controller.dart';
 import 'onboarding_widget.dart';
 
-class OnboardingPage extends ConsumerWidget with OnboardingWidget {
+class OnboardingPage extends ConsumerWidget {
   final PageController _controller = PageController();
 
   OnboardingPage({super.key});
@@ -57,9 +57,12 @@ class OnboardingPage extends ConsumerWidget with OnboardingWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      title(index),
-                      animatedDots(index, currentPage),
-                      actionButtons(context, index, _controller)
+                      OnboardingTitle(index),
+                      OnboardingAnimatedDots(currentPage),
+                      OnboardingActionButtons(
+                        index: index,
+                        controller: _controller,
+                      )
                     ],
                   ),
                 ),

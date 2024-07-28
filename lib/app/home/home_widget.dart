@@ -210,20 +210,12 @@ class GroupCardWidget extends ConsumerWidget {
   Positioned positionedCircleBox({Color? color, double? left, String? url}) {
     return Positioned(
       left: left,
-      child: ColorFiltered(
-        colorFilter: ColorFilter.mode(
-          color != null
-              ? color.withOpacity(0.3)
-              : Colors.black54.withOpacity(0.3),
-          BlendMode.colorBurn,
-        ),
-        child: ImageWidget(
-          width: 32,
-          height: 32,
-          //color: color,
-          imageUrl: url,
-          borderEnable: url == null ? false : true,
-        ),
+      child: ImageWidget(
+        color: color ?? Colors.black54.withOpacity(0.3),
+        width: 32,
+        height: 32,
+        imageUrl: url,
+        borderEnable: true,
       ),
     );
   }
@@ -274,18 +266,15 @@ class GroupCardWidget extends ConsumerWidget {
                       child: groupMember.when(
                         loading: () {
                           return Stack(
-                            children: group.groupUsers
-                                .asMap()
-                                .entries
-                                .map(
-                                  (val) => positionedCircleBox(
-                                    color: Colors.grey[(900 - (val.key * 100))],
-                                    left: val.key == group.groupUsers.length - 1
-                                        ? null
-                                        : val.key + 1 * 10,
-                                  ),
-                                )
-                                .toList(),
+                            children:
+                                group.groupUsers.asMap().entries.map((val) {
+                              int index = group.groupUsers.length - val.key - 1;
+
+                              return positionedCircleBox(
+                                color: Colors.grey[(800 - (index * 100))],
+                                left: index == 0 ? null : index * 10.0,
+                              );
+                            }).toList(),
                           );
                           //return Stack(
                           //  children: [
@@ -318,20 +307,44 @@ class GroupCardWidget extends ConsumerWidget {
                         error: (error, stackTrace) => ErrorTextWidget(error),
                         data: (data) {
                           return Stack(
-                            children: data
-                                .asMap()
-                                .entries
-                                .map(
-                                  (val) => positionedCircleBox(
-                                    url: val.value.profileImage,
-                                    color: Colors.grey[(900 - (val.key * 100))],
-                                    left: val.key == group.groupUsers.length - 1
-                                        ? null
-                                        : val.key + 1 * 10,
-                                  ),
-                                )
-                                .toList(),
+                            children: data.asMap().entries.map((val) {
+                              int index = data.length - val.key - 1;
+
+                              return positionedCircleBox(
+                                url: val.value.profileImage,
+                                color: Colors.grey[(800 - (index * 100))],
+                                left: index == 0 ? null : index * 10.0,
+                              );
+                            }).toList(),
                           );
+
+                          // return Stack(
+                          //   children: [
+                          //     positionedCircleBox(
+                          //       color: Colors.grey.shade900,
+                          //       left: 50,
+                          //     ),
+                          //     positionedCircleBox(
+                          //       color: Colors.grey.shade800,
+                          //       left: 40,
+                          //     ),
+                          //     positionedCircleBox(
+                          //       color: Colors.grey.shade700,
+                          //       left: 30,
+                          //     ),
+                          //     positionedCircleBox(
+                          //       color: Colors.grey.shade600,
+                          //       left: 20,
+                          //     ),
+                          //     positionedCircleBox(
+                          //       color: Colors.grey.shade400,
+                          //       left: 10,
+                          //     ),
+                          //     positionedCircleBox(
+                          //       color: Colors.grey.shade300,
+                          //     ),
+                          //   ],
+                          // );
                         },
                       ),
                     ),

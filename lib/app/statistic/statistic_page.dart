@@ -7,8 +7,8 @@ import '../../constants/size_config.dart';
 import '../../widgets/appbar/sliver_appbar.dart';
 import './statistic_widget.dart';
 
-class StatisticPage extends ConsumerWidget with StatisticWidget {
-  StatisticPage({super.key});
+class StatisticPage extends ConsumerWidget {
+  const StatisticPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,21 +23,21 @@ class StatisticPage extends ConsumerWidget with StatisticWidget {
       ),
       body: SliverAppBarWidget(
         height: SizeConfig.height(context) / 3.2,
-        appbarTitle: SingleChildScrollView(
+        appbarTitle: const SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              filters(),
-              charts(),
+              FiltersWidget(),
+              ChartsWidget(),
             ],
           ),
         ),
         child: ListView(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          children: [
-            categories(),
-            expensesList(),
+          children: const [
+            CategoriesWidget(),
+            ExpensesListWidget(),
           ],
         ),
       ),

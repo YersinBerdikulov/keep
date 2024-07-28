@@ -87,7 +87,8 @@ class FriendAPI implements IFriendAPI {
       databaseId: AppwriteConfig.databaseId,
       collectionId: AppwriteConfig.userFriendCollection,
       queries: [
-        Query.equal('creatorId', uid),
+        Query.equal('sendRequestUserId', uid),
+        Query.equal('receiveRequestUserId', uid),
         //Query.select("attributes")
       ],
     );

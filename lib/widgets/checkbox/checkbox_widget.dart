@@ -17,7 +17,7 @@ class CheckboxWidget extends Checkbox {
       );
 
   @override
-  BorderSide? get side => MaterialStateBorderSide.resolveWith(
+  BorderSide? get side => WidgetStateBorderSide.resolveWith(
         (states) => BorderSide(width: 1.0, color: borderColor ?? Colors.white),
       );
 }

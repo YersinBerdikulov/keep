@@ -1,6 +1,8 @@
+import 'package:dongi/router/router_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../app/auth/controller/auth_controller.dart';
+// import '../../app/auth/controller/auth_controller.dart';
 import '../../constants/color_config.dart';
 
 class AppBarWidget extends PreferredSize {
@@ -28,16 +30,18 @@ Widget appBarChild(String? title) {
                 title: Text(title ?? "Dongi"),
                 actions: [
                   IconButton(
-                    icon: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: ColorConfig.darkGrey,
+                      icon: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: ColorConfig.darkGrey,
+                        ),
                       ),
-                    ),
-                    onPressed: () => ref
-                        .read(authControllerProvider.notifier)
-                        .logout(context),
-                  )
+                      onPressed: () {
+                        context.push(RouteName.friendList);
+                        // ref
+                        //     .read(authControllerProvider.notifier)
+                        //     .logout(context),
+                      })
                 ],
               ),
             ),

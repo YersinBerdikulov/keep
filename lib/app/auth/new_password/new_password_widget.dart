@@ -6,37 +6,56 @@ import '../../../constants/font_config.dart';
 import '../../../widgets/button/button.dart';
 import '../../../widgets/text_field/text_field.dart';
 
-class NewPasswordWidget {
-  /// * ----- title
-  title() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            NewPasswordContents.title,
-            style: FontConfig.h5(),
-          ),
-          Text(
-            NewPasswordContents.subTitle,
-            style: FontConfig.body2(),
-          ),
-          const SizedBox(height: 20),
-        ],
-      );
+// Title widget
+class NewPasswordTitle extends StatelessWidget {
+  const NewPasswordTitle({super.key});
 
-  /// * ----- form
-  form() => const Column(
-        children: [
-          TextFieldWidget(hintText: 'new password'),
-          SizedBox(height: 10),
-          TextFieldWidget(hintText: 'repeat new password'),
-          SizedBox(height: 20)
-        ],
-      );
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          NewPasswordContents.title,
+          style: FontConfig.h5(),
+        ),
+        Text(
+          NewPasswordContents.subTitle,
+          style: FontConfig.body2(),
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+}
 
-  /// * ----- action buttons
-  actionButton() => ButtonWidget(
-        onPressed: () {},
-        title: 'Save',
-        textColor: ColorConfig.secondary,
-      );
+// Form widget
+class NewPasswordForm extends StatelessWidget {
+  const NewPasswordForm({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        TextFieldWidget(hintText: 'new password'),
+        SizedBox(height: 10),
+        TextFieldWidget(hintText: 'repeat new password'),
+        SizedBox(height: 20),
+      ],
+    );
+  }
+}
+
+// Action button widget
+class NewPasswordActionButton extends StatelessWidget {
+  const NewPasswordActionButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ButtonWidget(
+      onPressed: () {},
+      title: 'Save',
+      textColor: ColorConfig.secondary,
+    );
+  }
 }

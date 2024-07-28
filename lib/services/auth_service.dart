@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/enums.dart';
 import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -74,7 +75,7 @@ class AuthAPI implements IAuthAPI {
   }) async {
     try {
       // Below API will return session that we don't need in this step
-      await _account.createEmailSession(
+      await _account.createEmailPasswordSession(
         email: email,
         password: password,
       );
@@ -97,7 +98,7 @@ class AuthAPI implements IAuthAPI {
   FutureEither<User> signInWithGoogle() async {
     try {
       await _account.createOAuth2Session(
-        provider: "google",
+        provider: OAuthProvider.google,
       );
       final account = await currentUserAccount();
       if (account == null) throw "account not found";

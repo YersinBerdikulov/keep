@@ -6,31 +6,29 @@ import '../../constants/font_config.dart';
 import '../../widgets/card/category_card.dart';
 import '../../widgets/list_tile/list_tile_card.dart';
 
-class StatisticWidget {
-  //static SplineType? _spline = SplineType.natural;
-  static final TooltipBehavior _tooltipBehavior =
-      TooltipBehavior(enable: true, header: '', canShowMarker: false);
+class FiltersWidget extends StatelessWidget {
+  const FiltersWidget({super.key});
 
-  /// *----- date filters
-  filters() {
-    Expanded filterCardItem({required String title}) {
-      return Expanded(
-        child: Container(
-          height: 35,
-          decoration: BoxDecoration(
-            color: ColorConfig.white,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Center(
-            child: Text(
-              title,
-              style: FontConfig.button(),
-            ),
+  Expanded filterCardItem({required String title}) {
+    return Expanded(
+      child: Container(
+        height: 35,
+        decoration: BoxDecoration(
+          color: ColorConfig.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Center(
+          child: Text(
+            title,
+            style: FontConfig.button(),
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         filterCardItem(title: 'day'),
@@ -43,9 +41,16 @@ class StatisticWidget {
       ],
     );
   }
+}
 
-  /// *----- chart section
-  charts() {
+class ChartsWidget extends StatelessWidget {
+  const ChartsWidget({super.key});
+
+  static final TooltipBehavior _tooltipBehavior =
+      TooltipBehavior(enable: true, header: '', canShowMarker: false);
+
+  @override
+  Widget build(BuildContext context) {
     final List<ChartData> chartData = <ChartData>[
       ChartData(title: "SAT", y: 5, x: 1),
       ChartData(title: "SUN", y: 2, x: 2),
@@ -63,7 +68,6 @@ class StatisticWidget {
     }
 
     return Container(
-      // color: Colors.blue,
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 16),
       height: 125,
       child: SfCartesianChart(
@@ -71,7 +75,6 @@ class StatisticWidget {
         plotAreaBorderWidth: 0,
         primaryYAxis: CategoryAxis(isVisible: false),
         primaryXAxis: NumericAxis(
-          //labelStyle: const TextStyle(color: Colors.white),
           axisLine: const AxisLine(width: 0),
           interval: 1,
           labelPosition: ChartDataLabelPosition.outside,
@@ -80,18 +83,15 @@ class StatisticWidget {
             width: 1,
             color: ColorConfig.white.withOpacity(0.1),
           ),
-          // labelFormat: _labelFormat('{value}'),
           axisLabelFormatter: labelFormat,
         ),
         series: <ChartSeries<ChartData, double>>[
           SplineSeries<ChartData, double>(
             animationDuration: 1000,
             dataSource: chartData,
-            xValueMapper: (ChartData data, _) => data.x,
-            yValueMapper: (ChartData data, _) => data.y,
+            xValueMapper: (ChartData data, _) => data.x!,
+            yValueMapper: (ChartData data, _) => data.y!,
             name: 'Unit Sold',
-            // borderRadius: BorderRadius.circular(50),
-            // spacing: 0.5,
             color: ColorConfig.primarySwatch25,
           ),
         ],
@@ -99,9 +99,13 @@ class StatisticWidget {
       ),
     );
   }
+}
 
-  /// *----- categories
-  categories() {
+class CategoriesWidget extends StatelessWidget {
+  const CategoriesWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 16),
@@ -155,9 +159,13 @@ class StatisticWidget {
       ],
     );
   }
+}
 
-  /// *----- expenses
-  expensesList() {
+class ExpensesListWidget extends StatelessWidget {
+  const ExpensesListWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 25, 16, 25),
       child: Column(
@@ -169,61 +177,34 @@ class StatisticWidget {
           ),
           const SizedBox(height: 10),
           ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 15,
-              itemBuilder: (context, i) {
-                return Column(
-                  children: [
-                    ListTileCard(
-                      leading: Container(
-                        height: 30,
-                        width: 30,
-                        decoration: BoxDecoration(
-                          color: ColorConfig.primarySwatch,
-                          shape: BoxShape.circle,
-                        ),
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 15,
+            itemBuilder: (context, i) {
+              return Column(
+                children: [
+                  ListTileCard(
+                    leading: Container(
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        color: ColorConfig.primarySwatch,
+                        shape: BoxShape.circle,
                       ),
-                      titleString: 'expense title',
-                      trailing: const Text("\$53"),
                     ),
-                    const SizedBox(height: 10),
-                  ],
-                );
-              }),
+                    titleString: 'expense title',
+                    trailing: const Text("\$53"),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );
   }
-
-  /// Returns the list of chart series which need to render on the spline chart.
-  // List<SplineSeries<_ChartData, num>> _getSplineTypesSeries() {
-  //   return <SplineSeries<_ChartData, num>>[
-  //     SplineSeries<_ChartData, num>(
-  //       /// To set the spline type here.
-  //       splineType: _spline,
-  //       dataSource: <_ChartData>[
-  //         _ChartData(1, 0.05),
-  //         _ChartData(2, 1),
-  //         _ChartData(3, 0.03),
-  //         _ChartData(4, 2),
-  //         _ChartData(5, -0.5),
-  //         _ChartData(6, 0.5),
-  //       ],
-  //       xValueMapper: (_ChartData sales, _) => sales.x,
-  //       yValueMapper: (_ChartData sales, _) => sales.y,
-  //       width: 2,
-  //     )
-  //   ];
-  // }
 }
-
-/// Private class for storing the spline series data points.
-// class _ChartData {
-//   _ChartData(this.x, this.y);
-//   final double x;
-//   final double y;
-// }
 
 class ChartData {
   ChartData({this.x, this.y, required this.title});

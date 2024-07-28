@@ -6,8 +6,13 @@ import '../../constants/font_config.dart';
 import '../../router/router_notifier.dart';
 import '../../widgets/button/button.dart';
 
-class OnboardingWidget {
-  title(int index) {
+class OnboardingTitle extends StatelessWidget {
+  final int index;
+
+  const OnboardingTitle(this.index, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -25,9 +30,16 @@ class OnboardingWidget {
       ],
     );
   }
+}
 
-  animatedDots(int index, int currentPage) {
-    AnimatedContainer dot(int index, int currentPage) {
+class OnboardingAnimatedDots extends StatelessWidget {
+  final int currentPage;
+
+  const OnboardingAnimatedDots(this.currentPage, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    AnimatedContainer dot(int index) {
       return AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
@@ -41,21 +53,31 @@ class OnboardingWidget {
         margin: const EdgeInsets.only(right: 5),
         height: 10,
         curve: Curves.easeIn,
-        width:
-            //currentPage == index ? 20 :
-            10,
+        width: 10,
       );
     }
 
     return Row(
       children: List.generate(
         onboardingContents.length,
-        (int index) => dot(index, currentPage),
+        (int index) => dot(index),
       ),
     );
   }
+}
 
-  actionButtons(BuildContext context, int index, PageController controller) {
+class OnboardingActionButtons extends StatelessWidget {
+  final int index;
+  final PageController controller;
+
+  const OnboardingActionButtons({
+    Key? key,
+    required this.index,
+    required this.controller,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: index + 1 == onboardingContents.length
           ? [

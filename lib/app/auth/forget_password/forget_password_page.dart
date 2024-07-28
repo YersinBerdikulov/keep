@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../constants/color_config.dart';
 import './forget_password_widget.dart';
 
-class ForgetPasswordPage extends ConsumerWidget with ForgetPasswordWidget {
+class ForgetPasswordPage extends ConsumerWidget {
   const ForgetPasswordPage({super.key});
 
   @override
@@ -23,12 +23,12 @@ class ForgetPasswordPage extends ConsumerWidget with ForgetPasswordWidget {
                 topRight: Radius.circular(16),
               ),
             ),
-            child: Column(
+            child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                title(),
-                form(),
-                actionButton(),
+                ForgetPasswordTitle(),
+                ForgetPasswordForm(),
+                ForgetPasswordActionButton(),
               ],
             ),
           ),
