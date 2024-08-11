@@ -2,6 +2,7 @@ import 'package:dongi/app/box/box_detail/box_detail_page.dart';
 import 'package:dongi/app/expense/create_expense/create_expense_page.dart';
 import 'package:dongi/app/expense/made_by/made_by_page.dart';
 import 'package:dongi/app/expense/split/split_page.dart';
+import 'package:dongi/app/friends/add_friend/add_friend_page.dart';
 import 'package:dongi/app/friends/friends_list/friends_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -45,6 +46,7 @@ class RouteName {
       '/group/${groupId ?? ":groupId"}';
   static String boxDetail(String? boxId) => '/box/${boxId ?? ":boxId"}';
   static String friendList = '/friend/list';
+  static String addFriend = '/friend/add';
   static String createExpense = '/expense/create';
   static String updateExpense = '/expense/update';
   static String expenseMadeBy = '/expense/madeByd';
@@ -88,6 +90,10 @@ GoRouter _goRouterConfig(StateProviderRef ref) {
       GoRoute(
         path: RouteName.friendList,
         builder: (context, state) => const FriendsListPage(),
+      ),
+      GoRoute(
+        path: RouteName.addFriend,
+        builder: (context, state) => const AddFriendPage(),
       ),
       GoRoute(
         path: RouteName.createBox,

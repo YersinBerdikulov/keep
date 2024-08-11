@@ -87,6 +87,12 @@ class FriendNotifier extends StateNotifier<FriendState> {
         .toList();
   }
 
+  Future<List<UserModel>> searchFriends(String query) async {
+    final user = ref.read(currentUserProvider);
+    final friendList = await friendAPI.searchFriends(user!.$id, query);
+    return friendList.map((friend) => UserModel.fromJson(friend.data)).toList();
+  }
+
   Future<UserFriendModel> getFriendDetail(String friendId) async {
     final user = ref.read(currentUserProvider);
     final friend = await friendAPI.getFriendDetail(user!.$id, friendId);

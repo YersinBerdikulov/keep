@@ -18,6 +18,7 @@ final friendAPIProvider = Provider((ref) {
 abstract class IFriendAPI {
   FutureEither<Document> addFriend(UserFriendModel friendModel);
   Future<List<Document>> getFriends(String uid);
+  Future<List<Document>> searchFriends(String uid, String query);
   Future<Document> getFriendDetail(String uid, String friendId);
   FutureEither<bool> deleteFriend(String id);
   //
@@ -87,9 +88,27 @@ class FriendAPI implements IFriendAPI {
       databaseId: AppwriteConfig.databaseId,
       collectionId: AppwriteConfig.userFriendCollection,
       queries: [
-        Query.equal('sendRequestUserId', uid),
-        Query.equal('receiveRequestUserId', uid),
-        //Query.select("attributes")
+        Query.or([
+          Query.equal('sendRequestUserId', uid),
+          Query.equal('receiveRequestUserId', uid),
+        ]),
+      ],
+    );
+    return document.documents;
+  }
+
+  @override
+  Future<List<Document>> searchFriends(String uid, String query) async {
+    final document = await _db.listDocuments(
+      databaseId: AppwriteConfig.databaseId,
+      collectionId: AppwriteConfig.usersCollection,
+      queries: [
+        Query.notEqual('\$id', uid),
+        Query.limit(25),
+        Query.or([
+          Query.search('email', query),
+          Query.search('userName', query),
+        ])
       ],
     );
     return document.documents;
