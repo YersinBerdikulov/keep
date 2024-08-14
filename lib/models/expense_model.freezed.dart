@@ -12,7 +12,7 @@ part of 'expense_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 ExpenseModel _$ExpenseModelFromJson(Map<String, dynamic> json) {
   return _ExpenseModel.fromJson(json);
@@ -150,11 +150,11 @@ class _$ExpenseModelCopyWithImpl<$Res, $Val extends ExpenseModel>
 }
 
 /// @nodoc
-abstract class _$$_ExpenseModelCopyWith<$Res>
+abstract class _$$ExpenseModelImplCopyWith<$Res>
     implements $ExpenseModelCopyWith<$Res> {
-  factory _$$_ExpenseModelCopyWith(
-          _$_ExpenseModel value, $Res Function(_$_ExpenseModel) then) =
-      __$$_ExpenseModelCopyWithImpl<$Res>;
+  factory _$$ExpenseModelImplCopyWith(
+          _$ExpenseModelImpl value, $Res Function(_$ExpenseModelImpl) then) =
+      __$$ExpenseModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -174,11 +174,11 @@ abstract class _$$_ExpenseModelCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_ExpenseModelCopyWithImpl<$Res>
-    extends _$ExpenseModelCopyWithImpl<$Res, _$_ExpenseModel>
-    implements _$$_ExpenseModelCopyWith<$Res> {
-  __$$_ExpenseModelCopyWithImpl(
-      _$_ExpenseModel _value, $Res Function(_$_ExpenseModel) _then)
+class __$$ExpenseModelImplCopyWithImpl<$Res>
+    extends _$ExpenseModelCopyWithImpl<$Res, _$ExpenseModelImpl>
+    implements _$$ExpenseModelImplCopyWith<$Res> {
+  __$$ExpenseModelImplCopyWithImpl(
+      _$ExpenseModelImpl _value, $Res Function(_$ExpenseModelImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -198,7 +198,7 @@ class __$$_ExpenseModelCopyWithImpl<$Res>
     Object? equal = null,
     Object? expenseUsers = null,
   }) {
-    return _then(_$_ExpenseModel(
+    return _then(_$ExpenseModelImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -257,8 +257,8 @@ class __$$_ExpenseModelCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_ExpenseModel implements _ExpenseModel {
-  const _$_ExpenseModel(
+class _$ExpenseModelImpl implements _ExpenseModel {
+  const _$ExpenseModelImpl(
       {@JsonKey(name: '\$id') this.id,
       @JsonKey(name: '\$createdAt') this.createdAt,
       @JsonKey(name: '\$updatedAt') this.updatedAt,
@@ -274,8 +274,8 @@ class _$_ExpenseModel implements _ExpenseModel {
       final List<String> expenseUsers = const []})
       : _expenseUsers = expenseUsers;
 
-  factory _$_ExpenseModel.fromJson(Map<String, dynamic> json) =>
-      _$$_ExpenseModelFromJson(json);
+  factory _$ExpenseModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ExpenseModelImplFromJson(json);
 
   @override
   @JsonKey(name: '\$id')
@@ -321,10 +321,10 @@ class _$_ExpenseModel implements _ExpenseModel {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ExpenseModel &&
+            other is _$ExpenseModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
@@ -367,12 +367,12 @@ class _$_ExpenseModel implements _ExpenseModel {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_ExpenseModelCopyWith<_$_ExpenseModel> get copyWith =>
-      __$$_ExpenseModelCopyWithImpl<_$_ExpenseModel>(this, _$identity);
+  _$$ExpenseModelImplCopyWith<_$ExpenseModelImpl> get copyWith =>
+      __$$ExpenseModelImplCopyWithImpl<_$ExpenseModelImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_ExpenseModelToJson(
+    return _$$ExpenseModelImplToJson(
       this,
     );
   }
@@ -392,10 +392,10 @@ abstract class _ExpenseModel implements ExpenseModel {
       required final String payerId,
       final num cost,
       final bool equal,
-      final List<String> expenseUsers}) = _$_ExpenseModel;
+      final List<String> expenseUsers}) = _$ExpenseModelImpl;
 
   factory _ExpenseModel.fromJson(Map<String, dynamic> json) =
-      _$_ExpenseModel.fromJson;
+      _$ExpenseModelImpl.fromJson;
 
   @override
   @JsonKey(name: '\$id')
@@ -428,6 +428,6 @@ abstract class _ExpenseModel implements ExpenseModel {
   List<String> get expenseUsers;
   @override
   @JsonKey(ignore: true)
-  _$$_ExpenseModelCopyWith<_$_ExpenseModel> get copyWith =>
+  _$$ExpenseModelImplCopyWith<_$ExpenseModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

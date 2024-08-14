@@ -6,8 +6,8 @@ part of 'box_user_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_BoxUserModel _$$_BoxUserModelFromJson(Map<String, dynamic> json) =>
-    _$_BoxUserModel(
+_$BoxUserModelImpl _$$BoxUserModelImplFromJson(Map<String, dynamic> json) =>
+    _$BoxUserModelImpl(
       id: json[r'$id'] as String?,
       createdAt: json[r'$createdAt'] as String?,
       updatedAt: json[r'$updatedAt'] as String?,
@@ -17,7 +17,7 @@ _$_BoxUserModel _$$_BoxUserModelFromJson(Map<String, dynamic> json) =>
       status: json['status'] as String? ?? "accept",
     );
 
-Map<String, dynamic> _$$_BoxUserModelToJson(_$_BoxUserModel instance) =>
+Map<String, dynamic> _$$BoxUserModelImplToJson(_$BoxUserModelImpl instance) =>
     <String, dynamic>{
       r'$id': instance.id,
       r'$createdAt': instance.createdAt,

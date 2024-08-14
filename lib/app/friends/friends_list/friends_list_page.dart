@@ -23,7 +23,10 @@ class FriendsListPage extends HookConsumerWidget {
       friendNotifierProvider,
       (previous, next) {
         next.whenOrNull(
-          loaded: () => ref.refresh(getFriendProvider),
+          loaded: () {
+            showSnackBar(context, 'Request sent successfully');
+            ref.refresh(getFriendProvider);
+          },
           error: (message) {
             showSnackBar(context, message);
           },

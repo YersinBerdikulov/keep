@@ -12,7 +12,7 @@ part of 'group_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 GroupModel _$GroupModelFromJson(Map<String, dynamic> json) {
   return _GroupModel.fromJson(json);
@@ -129,11 +129,11 @@ class _$GroupModelCopyWithImpl<$Res, $Val extends GroupModel>
 }
 
 /// @nodoc
-abstract class _$$_GroupModelCopyWith<$Res>
+abstract class _$$GroupModelImplCopyWith<$Res>
     implements $GroupModelCopyWith<$Res> {
-  factory _$$_GroupModelCopyWith(
-          _$_GroupModel value, $Res Function(_$_GroupModel) then) =
-      __$$_GroupModelCopyWithImpl<$Res>;
+  factory _$$GroupModelImplCopyWith(
+          _$GroupModelImpl value, $Res Function(_$GroupModelImpl) then) =
+      __$$GroupModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -150,11 +150,11 @@ abstract class _$$_GroupModelCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_GroupModelCopyWithImpl<$Res>
-    extends _$GroupModelCopyWithImpl<$Res, _$_GroupModel>
-    implements _$$_GroupModelCopyWith<$Res> {
-  __$$_GroupModelCopyWithImpl(
-      _$_GroupModel _value, $Res Function(_$_GroupModel) _then)
+class __$$GroupModelImplCopyWithImpl<$Res>
+    extends _$GroupModelCopyWithImpl<$Res, _$GroupModelImpl>
+    implements _$$GroupModelImplCopyWith<$Res> {
+  __$$GroupModelImplCopyWithImpl(
+      _$GroupModelImpl _value, $Res Function(_$GroupModelImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -171,7 +171,7 @@ class __$$_GroupModelCopyWithImpl<$Res>
     Object? groupUsers = null,
     Object? boxIds = null,
   }) {
-    return _then(_$_GroupModel(
+    return _then(_$GroupModelImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -218,8 +218,8 @@ class __$$_GroupModelCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_GroupModel implements _GroupModel {
-  const _$_GroupModel(
+class _$GroupModelImpl implements _GroupModel {
+  const _$GroupModelImpl(
       {@JsonKey(name: '\$id') this.id,
       @JsonKey(name: '\$createdAt') this.createdAt,
       @JsonKey(name: '\$updatedAt') this.updatedAt,
@@ -233,8 +233,8 @@ class _$_GroupModel implements _GroupModel {
       : _groupUsers = groupUsers,
         _boxIds = boxIds;
 
-  factory _$_GroupModel.fromJson(Map<String, dynamic> json) =>
-      _$$_GroupModelFromJson(json);
+  factory _$GroupModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GroupModelImplFromJson(json);
 
   @override
   @JsonKey(name: '\$id')
@@ -280,10 +280,10 @@ class _$_GroupModel implements _GroupModel {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_GroupModel &&
+            other is _$GroupModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
@@ -320,12 +320,12 @@ class _$_GroupModel implements _GroupModel {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_GroupModelCopyWith<_$_GroupModel> get copyWith =>
-      __$$_GroupModelCopyWithImpl<_$_GroupModel>(this, _$identity);
+  _$$GroupModelImplCopyWith<_$GroupModelImpl> get copyWith =>
+      __$$GroupModelImplCopyWithImpl<_$GroupModelImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_GroupModelToJson(
+    return _$$GroupModelImplToJson(
       this,
     );
   }
@@ -342,10 +342,10 @@ abstract class _GroupModel implements GroupModel {
       required final String creatorId,
       final num totalBalance,
       final List<String> groupUsers,
-      final List<String> boxIds}) = _$_GroupModel;
+      final List<String> boxIds}) = _$GroupModelImpl;
 
   factory _GroupModel.fromJson(Map<String, dynamic> json) =
-      _$_GroupModel.fromJson;
+      _$GroupModelImpl.fromJson;
 
   @override
   @JsonKey(name: '\$id')
@@ -372,6 +372,6 @@ abstract class _GroupModel implements GroupModel {
   List<String> get boxIds;
   @override
   @JsonKey(ignore: true)
-  _$$_GroupModelCopyWith<_$_GroupModel> get copyWith =>
+  _$$GroupModelImplCopyWith<_$GroupModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

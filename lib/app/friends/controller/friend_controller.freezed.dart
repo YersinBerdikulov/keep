@@ -12,7 +12,7 @@ part of 'friend_controller.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$FriendState {
@@ -87,25 +87,25 @@ class _$FriendStateCopyWithImpl<$Res, $Val extends FriendState>
 }
 
 /// @nodoc
-abstract class _$$FriendInitStateCopyWith<$Res> {
-  factory _$$FriendInitStateCopyWith(
-          _$FriendInitState value, $Res Function(_$FriendInitState) then) =
-      __$$FriendInitStateCopyWithImpl<$Res>;
+abstract class _$$FriendInitStateImplCopyWith<$Res> {
+  factory _$$FriendInitStateImplCopyWith(_$FriendInitStateImpl value,
+          $Res Function(_$FriendInitStateImpl) then) =
+      __$$FriendInitStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$FriendInitStateCopyWithImpl<$Res>
-    extends _$FriendStateCopyWithImpl<$Res, _$FriendInitState>
-    implements _$$FriendInitStateCopyWith<$Res> {
-  __$$FriendInitStateCopyWithImpl(
-      _$FriendInitState _value, $Res Function(_$FriendInitState) _then)
+class __$$FriendInitStateImplCopyWithImpl<$Res>
+    extends _$FriendStateCopyWithImpl<$Res, _$FriendInitStateImpl>
+    implements _$$FriendInitStateImplCopyWith<$Res> {
+  __$$FriendInitStateImplCopyWithImpl(
+      _$FriendInitStateImpl _value, $Res Function(_$FriendInitStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$FriendInitState implements FriendInitState {
-  const _$FriendInitState();
+class _$FriendInitStateImpl implements FriendInitState {
+  const _$FriendInitStateImpl();
 
   @override
   String toString() {
@@ -113,9 +113,9 @@ class _$FriendInitState implements FriendInitState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$FriendInitState);
+        (other.runtimeType == runtimeType && other is _$FriendInitStateImpl);
   }
 
   @override
@@ -197,29 +197,29 @@ class _$FriendInitState implements FriendInitState {
 }
 
 abstract class FriendInitState implements FriendState {
-  const factory FriendInitState() = _$FriendInitState;
+  const factory FriendInitState() = _$FriendInitStateImpl;
 }
 
 /// @nodoc
-abstract class _$$FriendLoadingStateCopyWith<$Res> {
-  factory _$$FriendLoadingStateCopyWith(_$FriendLoadingState value,
-          $Res Function(_$FriendLoadingState) then) =
-      __$$FriendLoadingStateCopyWithImpl<$Res>;
+abstract class _$$FriendLoadingStateImplCopyWith<$Res> {
+  factory _$$FriendLoadingStateImplCopyWith(_$FriendLoadingStateImpl value,
+          $Res Function(_$FriendLoadingStateImpl) then) =
+      __$$FriendLoadingStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$FriendLoadingStateCopyWithImpl<$Res>
-    extends _$FriendStateCopyWithImpl<$Res, _$FriendLoadingState>
-    implements _$$FriendLoadingStateCopyWith<$Res> {
-  __$$FriendLoadingStateCopyWithImpl(
-      _$FriendLoadingState _value, $Res Function(_$FriendLoadingState) _then)
+class __$$FriendLoadingStateImplCopyWithImpl<$Res>
+    extends _$FriendStateCopyWithImpl<$Res, _$FriendLoadingStateImpl>
+    implements _$$FriendLoadingStateImplCopyWith<$Res> {
+  __$$FriendLoadingStateImplCopyWithImpl(_$FriendLoadingStateImpl _value,
+      $Res Function(_$FriendLoadingStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$FriendLoadingState implements FriendLoadingState {
-  const _$FriendLoadingState();
+class _$FriendLoadingStateImpl implements FriendLoadingState {
+  const _$FriendLoadingStateImpl();
 
   @override
   String toString() {
@@ -227,9 +227,9 @@ class _$FriendLoadingState implements FriendLoadingState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$FriendLoadingState);
+        (other.runtimeType == runtimeType && other is _$FriendLoadingStateImpl);
   }
 
   @override
@@ -311,29 +311,29 @@ class _$FriendLoadingState implements FriendLoadingState {
 }
 
 abstract class FriendLoadingState implements FriendState {
-  const factory FriendLoadingState() = _$FriendLoadingState;
+  const factory FriendLoadingState() = _$FriendLoadingStateImpl;
 }
 
 /// @nodoc
-abstract class _$$FriendLoadedStateCopyWith<$Res> {
-  factory _$$FriendLoadedStateCopyWith(
-          _$FriendLoadedState value, $Res Function(_$FriendLoadedState) then) =
-      __$$FriendLoadedStateCopyWithImpl<$Res>;
+abstract class _$$FriendLoadedStateImplCopyWith<$Res> {
+  factory _$$FriendLoadedStateImplCopyWith(_$FriendLoadedStateImpl value,
+          $Res Function(_$FriendLoadedStateImpl) then) =
+      __$$FriendLoadedStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$FriendLoadedStateCopyWithImpl<$Res>
-    extends _$FriendStateCopyWithImpl<$Res, _$FriendLoadedState>
-    implements _$$FriendLoadedStateCopyWith<$Res> {
-  __$$FriendLoadedStateCopyWithImpl(
-      _$FriendLoadedState _value, $Res Function(_$FriendLoadedState) _then)
+class __$$FriendLoadedStateImplCopyWithImpl<$Res>
+    extends _$FriendStateCopyWithImpl<$Res, _$FriendLoadedStateImpl>
+    implements _$$FriendLoadedStateImplCopyWith<$Res> {
+  __$$FriendLoadedStateImplCopyWithImpl(_$FriendLoadedStateImpl _value,
+      $Res Function(_$FriendLoadedStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$FriendLoadedState implements FriendLoadedState {
-  const _$FriendLoadedState();
+class _$FriendLoadedStateImpl implements FriendLoadedState {
+  const _$FriendLoadedStateImpl();
 
   @override
   String toString() {
@@ -341,9 +341,9 @@ class _$FriendLoadedState implements FriendLoadedState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$FriendLoadedState);
+        (other.runtimeType == runtimeType && other is _$FriendLoadedStateImpl);
   }
 
   @override
@@ -425,24 +425,24 @@ class _$FriendLoadedState implements FriendLoadedState {
 }
 
 abstract class FriendLoadedState implements FriendState {
-  const factory FriendLoadedState() = _$FriendLoadedState;
+  const factory FriendLoadedState() = _$FriendLoadedStateImpl;
 }
 
 /// @nodoc
-abstract class _$$FriendErrorStateCopyWith<$Res> {
-  factory _$$FriendErrorStateCopyWith(
-          _$FriendErrorState value, $Res Function(_$FriendErrorState) then) =
-      __$$FriendErrorStateCopyWithImpl<$Res>;
+abstract class _$$FriendErrorStateImplCopyWith<$Res> {
+  factory _$$FriendErrorStateImplCopyWith(_$FriendErrorStateImpl value,
+          $Res Function(_$FriendErrorStateImpl) then) =
+      __$$FriendErrorStateImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String message});
 }
 
 /// @nodoc
-class __$$FriendErrorStateCopyWithImpl<$Res>
-    extends _$FriendStateCopyWithImpl<$Res, _$FriendErrorState>
-    implements _$$FriendErrorStateCopyWith<$Res> {
-  __$$FriendErrorStateCopyWithImpl(
-      _$FriendErrorState _value, $Res Function(_$FriendErrorState) _then)
+class __$$FriendErrorStateImplCopyWithImpl<$Res>
+    extends _$FriendStateCopyWithImpl<$Res, _$FriendErrorStateImpl>
+    implements _$$FriendErrorStateImplCopyWith<$Res> {
+  __$$FriendErrorStateImplCopyWithImpl(_$FriendErrorStateImpl _value,
+      $Res Function(_$FriendErrorStateImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -450,7 +450,7 @@ class __$$FriendErrorStateCopyWithImpl<$Res>
   $Res call({
     Object? message = null,
   }) {
-    return _then(_$FriendErrorState(
+    return _then(_$FriendErrorStateImpl(
       null == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -461,8 +461,8 @@ class __$$FriendErrorStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$FriendErrorState implements FriendErrorState {
-  const _$FriendErrorState(this.message);
+class _$FriendErrorStateImpl implements FriendErrorState {
+  const _$FriendErrorStateImpl(this.message);
 
   @override
   final String message;
@@ -473,10 +473,10 @@ class _$FriendErrorState implements FriendErrorState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$FriendErrorState &&
+            other is _$FriendErrorStateImpl &&
             (identical(other.message, message) || other.message == message));
   }
 
@@ -486,8 +486,9 @@ class _$FriendErrorState implements FriendErrorState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$FriendErrorStateCopyWith<_$FriendErrorState> get copyWith =>
-      __$$FriendErrorStateCopyWithImpl<_$FriendErrorState>(this, _$identity);
+  _$$FriendErrorStateImplCopyWith<_$FriendErrorStateImpl> get copyWith =>
+      __$$FriendErrorStateImplCopyWithImpl<_$FriendErrorStateImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -565,10 +566,10 @@ class _$FriendErrorState implements FriendErrorState {
 }
 
 abstract class FriendErrorState implements FriendState {
-  const factory FriendErrorState(final String message) = _$FriendErrorState;
+  const factory FriendErrorState(final String message) = _$FriendErrorStateImpl;
 
   String get message;
   @JsonKey(ignore: true)
-  _$$FriendErrorStateCopyWith<_$FriendErrorState> get copyWith =>
+  _$$FriendErrorStateImplCopyWith<_$FriendErrorStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

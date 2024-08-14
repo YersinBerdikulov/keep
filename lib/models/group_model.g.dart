@@ -6,8 +6,8 @@ part of 'group_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_GroupModel _$$_GroupModelFromJson(Map<String, dynamic> json) =>
-    _$_GroupModel(
+_$GroupModelImpl _$$GroupModelImplFromJson(Map<String, dynamic> json) =>
+    _$GroupModelImpl(
       id: json[r'$id'] as String?,
       createdAt: json[r'$createdAt'] as String?,
       updatedAt: json[r'$updatedAt'] as String?,
@@ -26,7 +26,7 @@ _$_GroupModel _$$_GroupModelFromJson(Map<String, dynamic> json) =>
           const [],
     );
 
-Map<String, dynamic> _$$_GroupModelToJson(_$_GroupModel instance) =>
+Map<String, dynamic> _$$GroupModelImplToJson(_$GroupModelImpl instance) =>
     <String, dynamic>{
       r'$id': instance.id,
       r'$createdAt': instance.createdAt,

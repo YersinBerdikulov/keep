@@ -21,6 +21,7 @@ abstract class IFriendAPI {
   Future<List<Document>> searchFriends(String uid, String query);
   Future<Document> getFriendDetail(String uid, String friendId);
   FutureEither<bool> deleteFriend(String id);
+  FutureEither<Document> updateFriend(UserFriendModel friendModel);
   //
   //FutureEitherVoid saveUserData(UserModel userModel);
   //Future<model.Document> getUserData(String uid);
@@ -140,5 +141,28 @@ class FriendAPI implements IFriendAPI {
       documentId: friendId,
     );
     return document;
+  }
+
+  @override
+  FutureEither<Document> updateFriend(UserFriendModel friendModel) async {
+    try {
+      // If no request exists, create the new friend request
+      final document = await _db.updateDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.userFriendCollection,
+        documentId: friendModel.id!,
+        data: friendModel.toJson(),
+      );
+      return right(document);
+    } on AppwriteException catch (e, st) {
+      return left(
+        Failure(
+          e.message ?? 'Some unexpected error occurred',
+          st,
+        ),
+      );
+    } catch (e, st) {
+      return left(Failure(e.toString(), st));
+    }
   }
 }

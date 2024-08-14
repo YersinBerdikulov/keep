@@ -12,7 +12,7 @@ part of 'sign_up_controller.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$SignUpState {
@@ -87,25 +87,25 @@ class _$SignUpStateCopyWithImpl<$Res, $Val extends SignUpState>
 }
 
 /// @nodoc
-abstract class _$$SignUpInitStateCopyWith<$Res> {
-  factory _$$SignUpInitStateCopyWith(
-          _$SignUpInitState value, $Res Function(_$SignUpInitState) then) =
-      __$$SignUpInitStateCopyWithImpl<$Res>;
+abstract class _$$SignUpInitStateImplCopyWith<$Res> {
+  factory _$$SignUpInitStateImplCopyWith(_$SignUpInitStateImpl value,
+          $Res Function(_$SignUpInitStateImpl) then) =
+      __$$SignUpInitStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$SignUpInitStateCopyWithImpl<$Res>
-    extends _$SignUpStateCopyWithImpl<$Res, _$SignUpInitState>
-    implements _$$SignUpInitStateCopyWith<$Res> {
-  __$$SignUpInitStateCopyWithImpl(
-      _$SignUpInitState _value, $Res Function(_$SignUpInitState) _then)
+class __$$SignUpInitStateImplCopyWithImpl<$Res>
+    extends _$SignUpStateCopyWithImpl<$Res, _$SignUpInitStateImpl>
+    implements _$$SignUpInitStateImplCopyWith<$Res> {
+  __$$SignUpInitStateImplCopyWithImpl(
+      _$SignUpInitStateImpl _value, $Res Function(_$SignUpInitStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$SignUpInitState implements SignUpInitState {
-  const _$SignUpInitState();
+class _$SignUpInitStateImpl implements SignUpInitState {
+  const _$SignUpInitStateImpl();
 
   @override
   String toString() {
@@ -113,9 +113,9 @@ class _$SignUpInitState implements SignUpInitState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$SignUpInitState);
+        (other.runtimeType == runtimeType && other is _$SignUpInitStateImpl);
   }
 
   @override
@@ -197,29 +197,29 @@ class _$SignUpInitState implements SignUpInitState {
 }
 
 abstract class SignUpInitState implements SignUpState {
-  const factory SignUpInitState() = _$SignUpInitState;
+  const factory SignUpInitState() = _$SignUpInitStateImpl;
 }
 
 /// @nodoc
-abstract class _$$SignUpLoadingStateCopyWith<$Res> {
-  factory _$$SignUpLoadingStateCopyWith(_$SignUpLoadingState value,
-          $Res Function(_$SignUpLoadingState) then) =
-      __$$SignUpLoadingStateCopyWithImpl<$Res>;
+abstract class _$$SignUpLoadingStateImplCopyWith<$Res> {
+  factory _$$SignUpLoadingStateImplCopyWith(_$SignUpLoadingStateImpl value,
+          $Res Function(_$SignUpLoadingStateImpl) then) =
+      __$$SignUpLoadingStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$SignUpLoadingStateCopyWithImpl<$Res>
-    extends _$SignUpStateCopyWithImpl<$Res, _$SignUpLoadingState>
-    implements _$$SignUpLoadingStateCopyWith<$Res> {
-  __$$SignUpLoadingStateCopyWithImpl(
-      _$SignUpLoadingState _value, $Res Function(_$SignUpLoadingState) _then)
+class __$$SignUpLoadingStateImplCopyWithImpl<$Res>
+    extends _$SignUpStateCopyWithImpl<$Res, _$SignUpLoadingStateImpl>
+    implements _$$SignUpLoadingStateImplCopyWith<$Res> {
+  __$$SignUpLoadingStateImplCopyWithImpl(_$SignUpLoadingStateImpl _value,
+      $Res Function(_$SignUpLoadingStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$SignUpLoadingState implements SignUpLoadingState {
-  const _$SignUpLoadingState();
+class _$SignUpLoadingStateImpl implements SignUpLoadingState {
+  const _$SignUpLoadingStateImpl();
 
   @override
   String toString() {
@@ -227,9 +227,9 @@ class _$SignUpLoadingState implements SignUpLoadingState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$SignUpLoadingState);
+        (other.runtimeType == runtimeType && other is _$SignUpLoadingStateImpl);
   }
 
   @override
@@ -311,29 +311,29 @@ class _$SignUpLoadingState implements SignUpLoadingState {
 }
 
 abstract class SignUpLoadingState implements SignUpState {
-  const factory SignUpLoadingState() = _$SignUpLoadingState;
+  const factory SignUpLoadingState() = _$SignUpLoadingStateImpl;
 }
 
 /// @nodoc
-abstract class _$$SignUpLoadedStateCopyWith<$Res> {
-  factory _$$SignUpLoadedStateCopyWith(
-          _$SignUpLoadedState value, $Res Function(_$SignUpLoadedState) then) =
-      __$$SignUpLoadedStateCopyWithImpl<$Res>;
+abstract class _$$SignUpLoadedStateImplCopyWith<$Res> {
+  factory _$$SignUpLoadedStateImplCopyWith(_$SignUpLoadedStateImpl value,
+          $Res Function(_$SignUpLoadedStateImpl) then) =
+      __$$SignUpLoadedStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$SignUpLoadedStateCopyWithImpl<$Res>
-    extends _$SignUpStateCopyWithImpl<$Res, _$SignUpLoadedState>
-    implements _$$SignUpLoadedStateCopyWith<$Res> {
-  __$$SignUpLoadedStateCopyWithImpl(
-      _$SignUpLoadedState _value, $Res Function(_$SignUpLoadedState) _then)
+class __$$SignUpLoadedStateImplCopyWithImpl<$Res>
+    extends _$SignUpStateCopyWithImpl<$Res, _$SignUpLoadedStateImpl>
+    implements _$$SignUpLoadedStateImplCopyWith<$Res> {
+  __$$SignUpLoadedStateImplCopyWithImpl(_$SignUpLoadedStateImpl _value,
+      $Res Function(_$SignUpLoadedStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$SignUpLoadedState implements SignUpLoadedState {
-  const _$SignUpLoadedState();
+class _$SignUpLoadedStateImpl implements SignUpLoadedState {
+  const _$SignUpLoadedStateImpl();
 
   @override
   String toString() {
@@ -341,9 +341,9 @@ class _$SignUpLoadedState implements SignUpLoadedState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$SignUpLoadedState);
+        (other.runtimeType == runtimeType && other is _$SignUpLoadedStateImpl);
   }
 
   @override
@@ -425,24 +425,24 @@ class _$SignUpLoadedState implements SignUpLoadedState {
 }
 
 abstract class SignUpLoadedState implements SignUpState {
-  const factory SignUpLoadedState() = _$SignUpLoadedState;
+  const factory SignUpLoadedState() = _$SignUpLoadedStateImpl;
 }
 
 /// @nodoc
-abstract class _$$SignUpErrorStateCopyWith<$Res> {
-  factory _$$SignUpErrorStateCopyWith(
-          _$SignUpErrorState value, $Res Function(_$SignUpErrorState) then) =
-      __$$SignUpErrorStateCopyWithImpl<$Res>;
+abstract class _$$SignUpErrorStateImplCopyWith<$Res> {
+  factory _$$SignUpErrorStateImplCopyWith(_$SignUpErrorStateImpl value,
+          $Res Function(_$SignUpErrorStateImpl) then) =
+      __$$SignUpErrorStateImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String message});
 }
 
 /// @nodoc
-class __$$SignUpErrorStateCopyWithImpl<$Res>
-    extends _$SignUpStateCopyWithImpl<$Res, _$SignUpErrorState>
-    implements _$$SignUpErrorStateCopyWith<$Res> {
-  __$$SignUpErrorStateCopyWithImpl(
-      _$SignUpErrorState _value, $Res Function(_$SignUpErrorState) _then)
+class __$$SignUpErrorStateImplCopyWithImpl<$Res>
+    extends _$SignUpStateCopyWithImpl<$Res, _$SignUpErrorStateImpl>
+    implements _$$SignUpErrorStateImplCopyWith<$Res> {
+  __$$SignUpErrorStateImplCopyWithImpl(_$SignUpErrorStateImpl _value,
+      $Res Function(_$SignUpErrorStateImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -450,7 +450,7 @@ class __$$SignUpErrorStateCopyWithImpl<$Res>
   $Res call({
     Object? message = null,
   }) {
-    return _then(_$SignUpErrorState(
+    return _then(_$SignUpErrorStateImpl(
       null == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -461,8 +461,8 @@ class __$$SignUpErrorStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$SignUpErrorState implements SignUpErrorState {
-  const _$SignUpErrorState(this.message);
+class _$SignUpErrorStateImpl implements SignUpErrorState {
+  const _$SignUpErrorStateImpl(this.message);
 
   @override
   final String message;
@@ -473,10 +473,10 @@ class _$SignUpErrorState implements SignUpErrorState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SignUpErrorState &&
+            other is _$SignUpErrorStateImpl &&
             (identical(other.message, message) || other.message == message));
   }
 
@@ -486,8 +486,9 @@ class _$SignUpErrorState implements SignUpErrorState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$SignUpErrorStateCopyWith<_$SignUpErrorState> get copyWith =>
-      __$$SignUpErrorStateCopyWithImpl<_$SignUpErrorState>(this, _$identity);
+  _$$SignUpErrorStateImplCopyWith<_$SignUpErrorStateImpl> get copyWith =>
+      __$$SignUpErrorStateImplCopyWithImpl<_$SignUpErrorStateImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -565,10 +566,10 @@ class _$SignUpErrorState implements SignUpErrorState {
 }
 
 abstract class SignUpErrorState implements SignUpState {
-  const factory SignUpErrorState(final String message) = _$SignUpErrorState;
+  const factory SignUpErrorState(final String message) = _$SignUpErrorStateImpl;
 
   String get message;
   @JsonKey(ignore: true)
-  _$$SignUpErrorStateCopyWith<_$SignUpErrorState> get copyWith =>
+  _$$SignUpErrorStateImplCopyWith<_$SignUpErrorStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

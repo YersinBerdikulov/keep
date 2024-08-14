@@ -6,7 +6,8 @@ part of 'box_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_BoxModel _$$_BoxModelFromJson(Map<String, dynamic> json) => _$_BoxModel(
+_$BoxModelImpl _$$BoxModelImplFromJson(Map<String, dynamic> json) =>
+    _$BoxModelImpl(
       id: json[r'$id'] as String?,
       createdAt: json[r'$createdAt'] as String?,
       updatedAt: json[r'$updatedAt'] as String?,
@@ -26,7 +27,7 @@ _$_BoxModel _$$_BoxModelFromJson(Map<String, dynamic> json) => _$_BoxModel(
       creatorId: json['creatorId'] as String,
     );
 
-Map<String, dynamic> _$$_BoxModelToJson(_$_BoxModel instance) =>
+Map<String, dynamic> _$$BoxModelImplToJson(_$BoxModelImpl instance) =>
     <String, dynamic>{
       r'$id': instance.id,
       r'$createdAt': instance.createdAt,

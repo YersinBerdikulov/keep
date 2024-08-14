@@ -16,9 +16,21 @@ class UserFriendModel with _$UserFriendModel {
     required String receiveRequestUserName,
     String? sendRequestProfilePic,
     String? receiveRequestProfilePic,
-    @Default("pending") String status,
+    @Default(FriendRequestStatus.pending) FriendRequestStatus status,
   }) = _UserFriendModel;
 
   factory UserFriendModel.fromJson(Map<String, dynamic> json) =>
       _$UserFriendModelFromJson(json);
+}
+
+@JsonEnum(alwaysCreate: true)
+enum FriendRequestStatus {
+  @JsonValue('pending')
+  pending,
+
+  @JsonValue('accepted')
+  accepted,
+
+  @JsonValue('rejected')
+  rejected,
 }

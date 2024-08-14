@@ -12,7 +12,7 @@ part of 'user_friend_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 UserFriendModel _$UserFriendModelFromJson(Map<String, dynamic> json) {
   return _UserFriendModel.fromJson(json);
@@ -32,7 +32,7 @@ mixin _$UserFriendModel {
   String get receiveRequestUserName => throw _privateConstructorUsedError;
   String? get sendRequestProfilePic => throw _privateConstructorUsedError;
   String? get receiveRequestProfilePic => throw _privateConstructorUsedError;
-  String get status => throw _privateConstructorUsedError;
+  FriendRequestStatus get status => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -56,7 +56,7 @@ abstract class $UserFriendModelCopyWith<$Res> {
       String receiveRequestUserName,
       String? sendRequestProfilePic,
       String? receiveRequestProfilePic,
-      String status});
+      FriendRequestStatus status});
 }
 
 /// @nodoc
@@ -123,17 +123,17 @@ class _$UserFriendModelCopyWithImpl<$Res, $Val extends UserFriendModel>
       status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
+              as FriendRequestStatus,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$_UserFriendModelCopyWith<$Res>
+abstract class _$$UserFriendModelImplCopyWith<$Res>
     implements $UserFriendModelCopyWith<$Res> {
-  factory _$$_UserFriendModelCopyWith(
-          _$_UserFriendModel value, $Res Function(_$_UserFriendModel) then) =
-      __$$_UserFriendModelCopyWithImpl<$Res>;
+  factory _$$UserFriendModelImplCopyWith(_$UserFriendModelImpl value,
+          $Res Function(_$UserFriendModelImpl) then) =
+      __$$UserFriendModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -146,15 +146,15 @@ abstract class _$$_UserFriendModelCopyWith<$Res>
       String receiveRequestUserName,
       String? sendRequestProfilePic,
       String? receiveRequestProfilePic,
-      String status});
+      FriendRequestStatus status});
 }
 
 /// @nodoc
-class __$$_UserFriendModelCopyWithImpl<$Res>
-    extends _$UserFriendModelCopyWithImpl<$Res, _$_UserFriendModel>
-    implements _$$_UserFriendModelCopyWith<$Res> {
-  __$$_UserFriendModelCopyWithImpl(
-      _$_UserFriendModel _value, $Res Function(_$_UserFriendModel) _then)
+class __$$UserFriendModelImplCopyWithImpl<$Res>
+    extends _$UserFriendModelCopyWithImpl<$Res, _$UserFriendModelImpl>
+    implements _$$UserFriendModelImplCopyWith<$Res> {
+  __$$UserFriendModelImplCopyWithImpl(
+      _$UserFriendModelImpl _value, $Res Function(_$UserFriendModelImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -171,7 +171,7 @@ class __$$_UserFriendModelCopyWithImpl<$Res>
     Object? receiveRequestProfilePic = freezed,
     Object? status = null,
   }) {
-    return _then(_$_UserFriendModel(
+    return _then(_$UserFriendModelImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -211,15 +211,15 @@ class __$$_UserFriendModelCopyWithImpl<$Res>
       status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
+              as FriendRequestStatus,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$_UserFriendModel implements _UserFriendModel {
-  const _$_UserFriendModel(
+class _$UserFriendModelImpl implements _UserFriendModel {
+  const _$UserFriendModelImpl(
       {@JsonKey(name: '\$id') this.id,
       @JsonKey(name: '\$createdAt') this.createdAt,
       @JsonKey(name: '\$updatedAt') this.updatedAt,
@@ -229,10 +229,10 @@ class _$_UserFriendModel implements _UserFriendModel {
       required this.receiveRequestUserName,
       this.sendRequestProfilePic,
       this.receiveRequestProfilePic,
-      this.status = "pending"});
+      this.status = FriendRequestStatus.pending});
 
-  factory _$_UserFriendModel.fromJson(Map<String, dynamic> json) =>
-      _$$_UserFriendModelFromJson(json);
+  factory _$UserFriendModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UserFriendModelImplFromJson(json);
 
   @override
   @JsonKey(name: '\$id')
@@ -257,7 +257,7 @@ class _$_UserFriendModel implements _UserFriendModel {
   final String? receiveRequestProfilePic;
   @override
   @JsonKey()
-  final String status;
+  final FriendRequestStatus status;
 
   @override
   String toString() {
@@ -265,10 +265,10 @@ class _$_UserFriendModel implements _UserFriendModel {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_UserFriendModel &&
+            other is _$UserFriendModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
@@ -308,12 +308,13 @@ class _$_UserFriendModel implements _UserFriendModel {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_UserFriendModelCopyWith<_$_UserFriendModel> get copyWith =>
-      __$$_UserFriendModelCopyWithImpl<_$_UserFriendModel>(this, _$identity);
+  _$$UserFriendModelImplCopyWith<_$UserFriendModelImpl> get copyWith =>
+      __$$UserFriendModelImplCopyWithImpl<_$UserFriendModelImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_UserFriendModelToJson(
+    return _$$UserFriendModelImplToJson(
       this,
     );
   }
@@ -330,10 +331,10 @@ abstract class _UserFriendModel implements UserFriendModel {
       required final String receiveRequestUserName,
       final String? sendRequestProfilePic,
       final String? receiveRequestProfilePic,
-      final String status}) = _$_UserFriendModel;
+      final FriendRequestStatus status}) = _$UserFriendModelImpl;
 
   factory _UserFriendModel.fromJson(Map<String, dynamic> json) =
-      _$_UserFriendModel.fromJson;
+      _$UserFriendModelImpl.fromJson;
 
   @override
   @JsonKey(name: '\$id')
@@ -357,9 +358,9 @@ abstract class _UserFriendModel implements UserFriendModel {
   @override
   String? get receiveRequestProfilePic;
   @override
-  String get status;
+  FriendRequestStatus get status;
   @override
   @JsonKey(ignore: true)
-  _$$_UserFriendModelCopyWith<_$_UserFriendModel> get copyWith =>
+  _$$UserFriendModelImplCopyWith<_$UserFriendModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

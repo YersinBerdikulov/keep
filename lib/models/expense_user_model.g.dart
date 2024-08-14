@@ -6,8 +6,9 @@ part of 'expense_user_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_ExpenseUserModel _$$_ExpenseUserModelFromJson(Map<String, dynamic> json) =>
-    _$_ExpenseUserModel(
+_$ExpenseUserModelImpl _$$ExpenseUserModelImplFromJson(
+        Map<String, dynamic> json) =>
+    _$ExpenseUserModelImpl(
       id: json[r'$id'] as String?,
       createdAt: json[r'$createdAt'] as String?,
       updatedAt: json[r'$updatedAt'] as String?,
@@ -19,7 +20,8 @@ _$_ExpenseUserModel _$$_ExpenseUserModelFromJson(Map<String, dynamic> json) =>
       isPaid: json['isPaid'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$$_ExpenseUserModelToJson(_$_ExpenseUserModel instance) =>
+Map<String, dynamic> _$$ExpenseUserModelImplToJson(
+        _$ExpenseUserModelImpl instance) =>
     <String, dynamic>{
       r'$id': instance.id,
       r'$createdAt': instance.createdAt,

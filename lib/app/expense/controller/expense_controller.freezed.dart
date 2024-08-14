@@ -12,7 +12,7 @@ part of 'expense_controller.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$ExpenseState {
@@ -87,25 +87,25 @@ class _$ExpenseStateCopyWithImpl<$Res, $Val extends ExpenseState>
 }
 
 /// @nodoc
-abstract class _$$ExpenseInitStateCopyWith<$Res> {
-  factory _$$ExpenseInitStateCopyWith(
-          _$ExpenseInitState value, $Res Function(_$ExpenseInitState) then) =
-      __$$ExpenseInitStateCopyWithImpl<$Res>;
+abstract class _$$ExpenseInitStateImplCopyWith<$Res> {
+  factory _$$ExpenseInitStateImplCopyWith(_$ExpenseInitStateImpl value,
+          $Res Function(_$ExpenseInitStateImpl) then) =
+      __$$ExpenseInitStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$ExpenseInitStateCopyWithImpl<$Res>
-    extends _$ExpenseStateCopyWithImpl<$Res, _$ExpenseInitState>
-    implements _$$ExpenseInitStateCopyWith<$Res> {
-  __$$ExpenseInitStateCopyWithImpl(
-      _$ExpenseInitState _value, $Res Function(_$ExpenseInitState) _then)
+class __$$ExpenseInitStateImplCopyWithImpl<$Res>
+    extends _$ExpenseStateCopyWithImpl<$Res, _$ExpenseInitStateImpl>
+    implements _$$ExpenseInitStateImplCopyWith<$Res> {
+  __$$ExpenseInitStateImplCopyWithImpl(_$ExpenseInitStateImpl _value,
+      $Res Function(_$ExpenseInitStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$ExpenseInitState implements ExpenseInitState {
-  const _$ExpenseInitState();
+class _$ExpenseInitStateImpl implements ExpenseInitState {
+  const _$ExpenseInitStateImpl();
 
   @override
   String toString() {
@@ -113,9 +113,9 @@ class _$ExpenseInitState implements ExpenseInitState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$ExpenseInitState);
+        (other.runtimeType == runtimeType && other is _$ExpenseInitStateImpl);
   }
 
   @override
@@ -197,29 +197,29 @@ class _$ExpenseInitState implements ExpenseInitState {
 }
 
 abstract class ExpenseInitState implements ExpenseState {
-  const factory ExpenseInitState() = _$ExpenseInitState;
+  const factory ExpenseInitState() = _$ExpenseInitStateImpl;
 }
 
 /// @nodoc
-abstract class _$$ExpenseLoadingStateCopyWith<$Res> {
-  factory _$$ExpenseLoadingStateCopyWith(_$ExpenseLoadingState value,
-          $Res Function(_$ExpenseLoadingState) then) =
-      __$$ExpenseLoadingStateCopyWithImpl<$Res>;
+abstract class _$$ExpenseLoadingStateImplCopyWith<$Res> {
+  factory _$$ExpenseLoadingStateImplCopyWith(_$ExpenseLoadingStateImpl value,
+          $Res Function(_$ExpenseLoadingStateImpl) then) =
+      __$$ExpenseLoadingStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$ExpenseLoadingStateCopyWithImpl<$Res>
-    extends _$ExpenseStateCopyWithImpl<$Res, _$ExpenseLoadingState>
-    implements _$$ExpenseLoadingStateCopyWith<$Res> {
-  __$$ExpenseLoadingStateCopyWithImpl(
-      _$ExpenseLoadingState _value, $Res Function(_$ExpenseLoadingState) _then)
+class __$$ExpenseLoadingStateImplCopyWithImpl<$Res>
+    extends _$ExpenseStateCopyWithImpl<$Res, _$ExpenseLoadingStateImpl>
+    implements _$$ExpenseLoadingStateImplCopyWith<$Res> {
+  __$$ExpenseLoadingStateImplCopyWithImpl(_$ExpenseLoadingStateImpl _value,
+      $Res Function(_$ExpenseLoadingStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$ExpenseLoadingState implements ExpenseLoadingState {
-  const _$ExpenseLoadingState();
+class _$ExpenseLoadingStateImpl implements ExpenseLoadingState {
+  const _$ExpenseLoadingStateImpl();
 
   @override
   String toString() {
@@ -227,9 +227,10 @@ class _$ExpenseLoadingState implements ExpenseLoadingState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$ExpenseLoadingState);
+        (other.runtimeType == runtimeType &&
+            other is _$ExpenseLoadingStateImpl);
   }
 
   @override
@@ -311,29 +312,29 @@ class _$ExpenseLoadingState implements ExpenseLoadingState {
 }
 
 abstract class ExpenseLoadingState implements ExpenseState {
-  const factory ExpenseLoadingState() = _$ExpenseLoadingState;
+  const factory ExpenseLoadingState() = _$ExpenseLoadingStateImpl;
 }
 
 /// @nodoc
-abstract class _$$ExpenseLoadedStateCopyWith<$Res> {
-  factory _$$ExpenseLoadedStateCopyWith(_$ExpenseLoadedState value,
-          $Res Function(_$ExpenseLoadedState) then) =
-      __$$ExpenseLoadedStateCopyWithImpl<$Res>;
+abstract class _$$ExpenseLoadedStateImplCopyWith<$Res> {
+  factory _$$ExpenseLoadedStateImplCopyWith(_$ExpenseLoadedStateImpl value,
+          $Res Function(_$ExpenseLoadedStateImpl) then) =
+      __$$ExpenseLoadedStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$ExpenseLoadedStateCopyWithImpl<$Res>
-    extends _$ExpenseStateCopyWithImpl<$Res, _$ExpenseLoadedState>
-    implements _$$ExpenseLoadedStateCopyWith<$Res> {
-  __$$ExpenseLoadedStateCopyWithImpl(
-      _$ExpenseLoadedState _value, $Res Function(_$ExpenseLoadedState) _then)
+class __$$ExpenseLoadedStateImplCopyWithImpl<$Res>
+    extends _$ExpenseStateCopyWithImpl<$Res, _$ExpenseLoadedStateImpl>
+    implements _$$ExpenseLoadedStateImplCopyWith<$Res> {
+  __$$ExpenseLoadedStateImplCopyWithImpl(_$ExpenseLoadedStateImpl _value,
+      $Res Function(_$ExpenseLoadedStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$ExpenseLoadedState implements ExpenseLoadedState {
-  const _$ExpenseLoadedState();
+class _$ExpenseLoadedStateImpl implements ExpenseLoadedState {
+  const _$ExpenseLoadedStateImpl();
 
   @override
   String toString() {
@@ -341,9 +342,9 @@ class _$ExpenseLoadedState implements ExpenseLoadedState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$ExpenseLoadedState);
+        (other.runtimeType == runtimeType && other is _$ExpenseLoadedStateImpl);
   }
 
   @override
@@ -425,24 +426,24 @@ class _$ExpenseLoadedState implements ExpenseLoadedState {
 }
 
 abstract class ExpenseLoadedState implements ExpenseState {
-  const factory ExpenseLoadedState() = _$ExpenseLoadedState;
+  const factory ExpenseLoadedState() = _$ExpenseLoadedStateImpl;
 }
 
 /// @nodoc
-abstract class _$$ExpenseErrorStateCopyWith<$Res> {
-  factory _$$ExpenseErrorStateCopyWith(
-          _$ExpenseErrorState value, $Res Function(_$ExpenseErrorState) then) =
-      __$$ExpenseErrorStateCopyWithImpl<$Res>;
+abstract class _$$ExpenseErrorStateImplCopyWith<$Res> {
+  factory _$$ExpenseErrorStateImplCopyWith(_$ExpenseErrorStateImpl value,
+          $Res Function(_$ExpenseErrorStateImpl) then) =
+      __$$ExpenseErrorStateImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String message});
 }
 
 /// @nodoc
-class __$$ExpenseErrorStateCopyWithImpl<$Res>
-    extends _$ExpenseStateCopyWithImpl<$Res, _$ExpenseErrorState>
-    implements _$$ExpenseErrorStateCopyWith<$Res> {
-  __$$ExpenseErrorStateCopyWithImpl(
-      _$ExpenseErrorState _value, $Res Function(_$ExpenseErrorState) _then)
+class __$$ExpenseErrorStateImplCopyWithImpl<$Res>
+    extends _$ExpenseStateCopyWithImpl<$Res, _$ExpenseErrorStateImpl>
+    implements _$$ExpenseErrorStateImplCopyWith<$Res> {
+  __$$ExpenseErrorStateImplCopyWithImpl(_$ExpenseErrorStateImpl _value,
+      $Res Function(_$ExpenseErrorStateImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -450,7 +451,7 @@ class __$$ExpenseErrorStateCopyWithImpl<$Res>
   $Res call({
     Object? message = null,
   }) {
-    return _then(_$ExpenseErrorState(
+    return _then(_$ExpenseErrorStateImpl(
       null == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -461,8 +462,8 @@ class __$$ExpenseErrorStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ExpenseErrorState implements ExpenseErrorState {
-  const _$ExpenseErrorState(this.message);
+class _$ExpenseErrorStateImpl implements ExpenseErrorState {
+  const _$ExpenseErrorStateImpl(this.message);
 
   @override
   final String message;
@@ -473,10 +474,10 @@ class _$ExpenseErrorState implements ExpenseErrorState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ExpenseErrorState &&
+            other is _$ExpenseErrorStateImpl &&
             (identical(other.message, message) || other.message == message));
   }
 
@@ -486,8 +487,9 @@ class _$ExpenseErrorState implements ExpenseErrorState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ExpenseErrorStateCopyWith<_$ExpenseErrorState> get copyWith =>
-      __$$ExpenseErrorStateCopyWithImpl<_$ExpenseErrorState>(this, _$identity);
+  _$$ExpenseErrorStateImplCopyWith<_$ExpenseErrorStateImpl> get copyWith =>
+      __$$ExpenseErrorStateImplCopyWithImpl<_$ExpenseErrorStateImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -565,10 +567,11 @@ class _$ExpenseErrorState implements ExpenseErrorState {
 }
 
 abstract class ExpenseErrorState implements ExpenseState {
-  const factory ExpenseErrorState(final String message) = _$ExpenseErrorState;
+  const factory ExpenseErrorState(final String message) =
+      _$ExpenseErrorStateImpl;
 
   String get message;
   @JsonKey(ignore: true)
-  _$$ExpenseErrorStateCopyWith<_$ExpenseErrorState> get copyWith =>
+  _$$ExpenseErrorStateImplCopyWith<_$ExpenseErrorStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

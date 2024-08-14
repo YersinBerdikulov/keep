@@ -12,7 +12,7 @@ part of 'box_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 BoxModel _$BoxModelFromJson(Map<String, dynamic> json) {
   return _BoxModel.fromJson(json);
@@ -135,10 +135,11 @@ class _$BoxModelCopyWithImpl<$Res, $Val extends BoxModel>
 }
 
 /// @nodoc
-abstract class _$$_BoxModelCopyWith<$Res> implements $BoxModelCopyWith<$Res> {
-  factory _$$_BoxModelCopyWith(
-          _$_BoxModel value, $Res Function(_$_BoxModel) then) =
-      __$$_BoxModelCopyWithImpl<$Res>;
+abstract class _$$BoxModelImplCopyWith<$Res>
+    implements $BoxModelCopyWith<$Res> {
+  factory _$$BoxModelImplCopyWith(
+          _$BoxModelImpl value, $Res Function(_$BoxModelImpl) then) =
+      __$$BoxModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -156,11 +157,11 @@ abstract class _$$_BoxModelCopyWith<$Res> implements $BoxModelCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$_BoxModelCopyWithImpl<$Res>
-    extends _$BoxModelCopyWithImpl<$Res, _$_BoxModel>
-    implements _$$_BoxModelCopyWith<$Res> {
-  __$$_BoxModelCopyWithImpl(
-      _$_BoxModel _value, $Res Function(_$_BoxModel) _then)
+class __$$BoxModelImplCopyWithImpl<$Res>
+    extends _$BoxModelCopyWithImpl<$Res, _$BoxModelImpl>
+    implements _$$BoxModelImplCopyWith<$Res> {
+  __$$BoxModelImplCopyWithImpl(
+      _$BoxModelImpl _value, $Res Function(_$BoxModelImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -178,7 +179,7 @@ class __$$_BoxModelCopyWithImpl<$Res>
     Object? total = null,
     Object? creatorId = null,
   }) {
-    return _then(_$_BoxModel(
+    return _then(_$BoxModelImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -229,8 +230,8 @@ class __$$_BoxModelCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_BoxModel implements _BoxModel {
-  const _$_BoxModel(
+class _$BoxModelImpl implements _BoxModel {
+  const _$BoxModelImpl(
       {@JsonKey(name: '\$id') this.id,
       @JsonKey(name: '\$createdAt') this.createdAt,
       @JsonKey(name: '\$updatedAt') this.updatedAt,
@@ -245,8 +246,8 @@ class _$_BoxModel implements _BoxModel {
       : _boxUsers = boxUsers,
         _expenseIds = expenseIds;
 
-  factory _$_BoxModel.fromJson(Map<String, dynamic> json) =>
-      _$$_BoxModelFromJson(json);
+  factory _$BoxModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BoxModelImplFromJson(json);
 
   @override
   @JsonKey(name: '\$id')
@@ -295,10 +296,10 @@ class _$_BoxModel implements _BoxModel {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_BoxModel &&
+            other is _$BoxModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
@@ -336,12 +337,12 @@ class _$_BoxModel implements _BoxModel {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_BoxModelCopyWith<_$_BoxModel> get copyWith =>
-      __$$_BoxModelCopyWithImpl<_$_BoxModel>(this, _$identity);
+  _$$BoxModelImplCopyWith<_$BoxModelImpl> get copyWith =>
+      __$$BoxModelImplCopyWithImpl<_$BoxModelImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_BoxModelToJson(
+    return _$$BoxModelImplToJson(
       this,
     );
   }
@@ -359,9 +360,10 @@ abstract class _BoxModel implements BoxModel {
       final List<String> boxUsers,
       final List<String> expenseIds,
       final num total,
-      required final String creatorId}) = _$_BoxModel;
+      required final String creatorId}) = _$BoxModelImpl;
 
-  factory _BoxModel.fromJson(Map<String, dynamic> json) = _$_BoxModel.fromJson;
+  factory _BoxModel.fromJson(Map<String, dynamic> json) =
+      _$BoxModelImpl.fromJson;
 
   @override
   @JsonKey(name: '\$id')
@@ -390,6 +392,6 @@ abstract class _BoxModel implements BoxModel {
   String get creatorId;
   @override
   @JsonKey(ignore: true)
-  _$$_BoxModelCopyWith<_$_BoxModel> get copyWith =>
+  _$$BoxModelImplCopyWith<_$BoxModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

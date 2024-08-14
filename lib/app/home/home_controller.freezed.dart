@@ -12,7 +12,7 @@ part of 'home_controller.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$HomeState {
@@ -86,25 +86,25 @@ class _$HomeStateCopyWithImpl<$Res, $Val extends HomeState>
 }
 
 /// @nodoc
-abstract class _$$HomeInitStateCopyWith<$Res> {
-  factory _$$HomeInitStateCopyWith(
-          _$HomeInitState value, $Res Function(_$HomeInitState) then) =
-      __$$HomeInitStateCopyWithImpl<$Res>;
+abstract class _$$HomeInitStateImplCopyWith<$Res> {
+  factory _$$HomeInitStateImplCopyWith(
+          _$HomeInitStateImpl value, $Res Function(_$HomeInitStateImpl) then) =
+      __$$HomeInitStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$HomeInitStateCopyWithImpl<$Res>
-    extends _$HomeStateCopyWithImpl<$Res, _$HomeInitState>
-    implements _$$HomeInitStateCopyWith<$Res> {
-  __$$HomeInitStateCopyWithImpl(
-      _$HomeInitState _value, $Res Function(_$HomeInitState) _then)
+class __$$HomeInitStateImplCopyWithImpl<$Res>
+    extends _$HomeStateCopyWithImpl<$Res, _$HomeInitStateImpl>
+    implements _$$HomeInitStateImplCopyWith<$Res> {
+  __$$HomeInitStateImplCopyWithImpl(
+      _$HomeInitStateImpl _value, $Res Function(_$HomeInitStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$HomeInitState implements HomeInitState {
-  const _$HomeInitState();
+class _$HomeInitStateImpl implements HomeInitState {
+  const _$HomeInitStateImpl();
 
   @override
   String toString() {
@@ -112,9 +112,9 @@ class _$HomeInitState implements HomeInitState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$HomeInitState);
+        (other.runtimeType == runtimeType && other is _$HomeInitStateImpl);
   }
 
   @override
@@ -196,29 +196,29 @@ class _$HomeInitState implements HomeInitState {
 }
 
 abstract class HomeInitState implements HomeState {
-  const factory HomeInitState() = _$HomeInitState;
+  const factory HomeInitState() = _$HomeInitStateImpl;
 }
 
 /// @nodoc
-abstract class _$$HomeLoadingStateCopyWith<$Res> {
-  factory _$$HomeLoadingStateCopyWith(
-          _$HomeLoadingState value, $Res Function(_$HomeLoadingState) then) =
-      __$$HomeLoadingStateCopyWithImpl<$Res>;
+abstract class _$$HomeLoadingStateImplCopyWith<$Res> {
+  factory _$$HomeLoadingStateImplCopyWith(_$HomeLoadingStateImpl value,
+          $Res Function(_$HomeLoadingStateImpl) then) =
+      __$$HomeLoadingStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$HomeLoadingStateCopyWithImpl<$Res>
-    extends _$HomeStateCopyWithImpl<$Res, _$HomeLoadingState>
-    implements _$$HomeLoadingStateCopyWith<$Res> {
-  __$$HomeLoadingStateCopyWithImpl(
-      _$HomeLoadingState _value, $Res Function(_$HomeLoadingState) _then)
+class __$$HomeLoadingStateImplCopyWithImpl<$Res>
+    extends _$HomeStateCopyWithImpl<$Res, _$HomeLoadingStateImpl>
+    implements _$$HomeLoadingStateImplCopyWith<$Res> {
+  __$$HomeLoadingStateImplCopyWithImpl(_$HomeLoadingStateImpl _value,
+      $Res Function(_$HomeLoadingStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$HomeLoadingState implements HomeLoadingState {
-  const _$HomeLoadingState();
+class _$HomeLoadingStateImpl implements HomeLoadingState {
+  const _$HomeLoadingStateImpl();
 
   @override
   String toString() {
@@ -226,9 +226,9 @@ class _$HomeLoadingState implements HomeLoadingState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$HomeLoadingState);
+        (other.runtimeType == runtimeType && other is _$HomeLoadingStateImpl);
   }
 
   @override
@@ -310,29 +310,29 @@ class _$HomeLoadingState implements HomeLoadingState {
 }
 
 abstract class HomeLoadingState implements HomeState {
-  const factory HomeLoadingState() = _$HomeLoadingState;
+  const factory HomeLoadingState() = _$HomeLoadingStateImpl;
 }
 
 /// @nodoc
-abstract class _$$HomeLoadedStateCopyWith<$Res> {
-  factory _$$HomeLoadedStateCopyWith(
-          _$HomeLoadedState value, $Res Function(_$HomeLoadedState) then) =
-      __$$HomeLoadedStateCopyWithImpl<$Res>;
+abstract class _$$HomeLoadedStateImplCopyWith<$Res> {
+  factory _$$HomeLoadedStateImplCopyWith(_$HomeLoadedStateImpl value,
+          $Res Function(_$HomeLoadedStateImpl) then) =
+      __$$HomeLoadedStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$HomeLoadedStateCopyWithImpl<$Res>
-    extends _$HomeStateCopyWithImpl<$Res, _$HomeLoadedState>
-    implements _$$HomeLoadedStateCopyWith<$Res> {
-  __$$HomeLoadedStateCopyWithImpl(
-      _$HomeLoadedState _value, $Res Function(_$HomeLoadedState) _then)
+class __$$HomeLoadedStateImplCopyWithImpl<$Res>
+    extends _$HomeStateCopyWithImpl<$Res, _$HomeLoadedStateImpl>
+    implements _$$HomeLoadedStateImplCopyWith<$Res> {
+  __$$HomeLoadedStateImplCopyWithImpl(
+      _$HomeLoadedStateImpl _value, $Res Function(_$HomeLoadedStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$HomeLoadedState implements HomeLoadedState {
-  const _$HomeLoadedState();
+class _$HomeLoadedStateImpl implements HomeLoadedState {
+  const _$HomeLoadedStateImpl();
 
   @override
   String toString() {
@@ -340,9 +340,9 @@ class _$HomeLoadedState implements HomeLoadedState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$HomeLoadedState);
+        (other.runtimeType == runtimeType && other is _$HomeLoadedStateImpl);
   }
 
   @override
@@ -424,24 +424,24 @@ class _$HomeLoadedState implements HomeLoadedState {
 }
 
 abstract class HomeLoadedState implements HomeState {
-  const factory HomeLoadedState() = _$HomeLoadedState;
+  const factory HomeLoadedState() = _$HomeLoadedStateImpl;
 }
 
 /// @nodoc
-abstract class _$$HomeErrorStateCopyWith<$Res> {
-  factory _$$HomeErrorStateCopyWith(
-          _$HomeErrorState value, $Res Function(_$HomeErrorState) then) =
-      __$$HomeErrorStateCopyWithImpl<$Res>;
+abstract class _$$HomeErrorStateImplCopyWith<$Res> {
+  factory _$$HomeErrorStateImplCopyWith(_$HomeErrorStateImpl value,
+          $Res Function(_$HomeErrorStateImpl) then) =
+      __$$HomeErrorStateImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String message});
 }
 
 /// @nodoc
-class __$$HomeErrorStateCopyWithImpl<$Res>
-    extends _$HomeStateCopyWithImpl<$Res, _$HomeErrorState>
-    implements _$$HomeErrorStateCopyWith<$Res> {
-  __$$HomeErrorStateCopyWithImpl(
-      _$HomeErrorState _value, $Res Function(_$HomeErrorState) _then)
+class __$$HomeErrorStateImplCopyWithImpl<$Res>
+    extends _$HomeStateCopyWithImpl<$Res, _$HomeErrorStateImpl>
+    implements _$$HomeErrorStateImplCopyWith<$Res> {
+  __$$HomeErrorStateImplCopyWithImpl(
+      _$HomeErrorStateImpl _value, $Res Function(_$HomeErrorStateImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -449,7 +449,7 @@ class __$$HomeErrorStateCopyWithImpl<$Res>
   $Res call({
     Object? message = null,
   }) {
-    return _then(_$HomeErrorState(
+    return _then(_$HomeErrorStateImpl(
       null == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -460,8 +460,8 @@ class __$$HomeErrorStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$HomeErrorState implements HomeErrorState {
-  const _$HomeErrorState(this.message);
+class _$HomeErrorStateImpl implements HomeErrorState {
+  const _$HomeErrorStateImpl(this.message);
 
   @override
   final String message;
@@ -472,10 +472,10 @@ class _$HomeErrorState implements HomeErrorState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HomeErrorState &&
+            other is _$HomeErrorStateImpl &&
             (identical(other.message, message) || other.message == message));
   }
 
@@ -485,8 +485,9 @@ class _$HomeErrorState implements HomeErrorState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$HomeErrorStateCopyWith<_$HomeErrorState> get copyWith =>
-      __$$HomeErrorStateCopyWithImpl<_$HomeErrorState>(this, _$identity);
+  _$$HomeErrorStateImplCopyWith<_$HomeErrorStateImpl> get copyWith =>
+      __$$HomeErrorStateImplCopyWithImpl<_$HomeErrorStateImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -564,10 +565,10 @@ class _$HomeErrorState implements HomeErrorState {
 }
 
 abstract class HomeErrorState implements HomeState {
-  const factory HomeErrorState(final String message) = _$HomeErrorState;
+  const factory HomeErrorState(final String message) = _$HomeErrorStateImpl;
 
   String get message;
   @JsonKey(ignore: true)
-  _$$HomeErrorStateCopyWith<_$HomeErrorState> get copyWith =>
+  _$$HomeErrorStateImplCopyWith<_$HomeErrorStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

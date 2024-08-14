@@ -68,6 +68,52 @@ class FriendNotifier extends StateNotifier<FriendState> {
     );
   }
 
+  Future<void> acceptFriendRequest(UserFriendModel userFriendModel) async {
+    state = const FriendState.loading();
+    // final currentUser = ref.read(currentUserProvider);
+
+    try {
+      // Update the friend request status to "accepted"
+      final updatedFriendModel = userFriendModel.copyWith(
+        status: FriendRequestStatus.accepted,
+      );
+
+      final res = await friendAPI.updateFriend(updatedFriendModel);
+
+      state = res.fold(
+        (l) => FriendState.error(l.message),
+        (r) {
+          return const FriendState.loaded();
+        },
+      );
+    } catch (e) {
+      state = FriendState.error(e.toString());
+    }
+  }
+
+  Future<void> rejectFriendRequest(UserFriendModel userFriendModel) async {
+    state = const FriendState.loading();
+    // final currentUser = ref.read(currentUserProvider);
+
+    try {
+      // Update the friend request status to "rejected" or delete the request
+      final updatedFriendModel = userFriendModel.copyWith(
+        status: FriendRequestStatus.rejected,
+      );
+
+      final res = await friendAPI.updateFriend(updatedFriendModel);
+
+      state = res.fold(
+        (l) => FriendState.error(l.message),
+        (r) {
+          return const FriendState.loaded();
+        },
+      );
+    } catch (e) {
+      state = FriendState.error(e.toString());
+    }
+  }
+
   Future<void> deleteFriend(UserFriendModel friendModel) async {
     state = const FriendState.loading();
     //remove friend from server

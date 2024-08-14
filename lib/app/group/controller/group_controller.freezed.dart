@@ -12,7 +12,7 @@ part of 'group_controller.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$GroupState {
@@ -87,25 +87,25 @@ class _$GroupStateCopyWithImpl<$Res, $Val extends GroupState>
 }
 
 /// @nodoc
-abstract class _$$GroupInitStateCopyWith<$Res> {
-  factory _$$GroupInitStateCopyWith(
-          _$GroupInitState value, $Res Function(_$GroupInitState) then) =
-      __$$GroupInitStateCopyWithImpl<$Res>;
+abstract class _$$GroupInitStateImplCopyWith<$Res> {
+  factory _$$GroupInitStateImplCopyWith(_$GroupInitStateImpl value,
+          $Res Function(_$GroupInitStateImpl) then) =
+      __$$GroupInitStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$GroupInitStateCopyWithImpl<$Res>
-    extends _$GroupStateCopyWithImpl<$Res, _$GroupInitState>
-    implements _$$GroupInitStateCopyWith<$Res> {
-  __$$GroupInitStateCopyWithImpl(
-      _$GroupInitState _value, $Res Function(_$GroupInitState) _then)
+class __$$GroupInitStateImplCopyWithImpl<$Res>
+    extends _$GroupStateCopyWithImpl<$Res, _$GroupInitStateImpl>
+    implements _$$GroupInitStateImplCopyWith<$Res> {
+  __$$GroupInitStateImplCopyWithImpl(
+      _$GroupInitStateImpl _value, $Res Function(_$GroupInitStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$GroupInitState implements GroupInitState {
-  const _$GroupInitState();
+class _$GroupInitStateImpl implements GroupInitState {
+  const _$GroupInitStateImpl();
 
   @override
   String toString() {
@@ -113,9 +113,9 @@ class _$GroupInitState implements GroupInitState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$GroupInitState);
+        (other.runtimeType == runtimeType && other is _$GroupInitStateImpl);
   }
 
   @override
@@ -197,29 +197,29 @@ class _$GroupInitState implements GroupInitState {
 }
 
 abstract class GroupInitState implements GroupState {
-  const factory GroupInitState() = _$GroupInitState;
+  const factory GroupInitState() = _$GroupInitStateImpl;
 }
 
 /// @nodoc
-abstract class _$$GroupLoadingStateCopyWith<$Res> {
-  factory _$$GroupLoadingStateCopyWith(
-          _$GroupLoadingState value, $Res Function(_$GroupLoadingState) then) =
-      __$$GroupLoadingStateCopyWithImpl<$Res>;
+abstract class _$$GroupLoadingStateImplCopyWith<$Res> {
+  factory _$$GroupLoadingStateImplCopyWith(_$GroupLoadingStateImpl value,
+          $Res Function(_$GroupLoadingStateImpl) then) =
+      __$$GroupLoadingStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$GroupLoadingStateCopyWithImpl<$Res>
-    extends _$GroupStateCopyWithImpl<$Res, _$GroupLoadingState>
-    implements _$$GroupLoadingStateCopyWith<$Res> {
-  __$$GroupLoadingStateCopyWithImpl(
-      _$GroupLoadingState _value, $Res Function(_$GroupLoadingState) _then)
+class __$$GroupLoadingStateImplCopyWithImpl<$Res>
+    extends _$GroupStateCopyWithImpl<$Res, _$GroupLoadingStateImpl>
+    implements _$$GroupLoadingStateImplCopyWith<$Res> {
+  __$$GroupLoadingStateImplCopyWithImpl(_$GroupLoadingStateImpl _value,
+      $Res Function(_$GroupLoadingStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$GroupLoadingState implements GroupLoadingState {
-  const _$GroupLoadingState();
+class _$GroupLoadingStateImpl implements GroupLoadingState {
+  const _$GroupLoadingStateImpl();
 
   @override
   String toString() {
@@ -227,9 +227,9 @@ class _$GroupLoadingState implements GroupLoadingState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$GroupLoadingState);
+        (other.runtimeType == runtimeType && other is _$GroupLoadingStateImpl);
   }
 
   @override
@@ -311,29 +311,29 @@ class _$GroupLoadingState implements GroupLoadingState {
 }
 
 abstract class GroupLoadingState implements GroupState {
-  const factory GroupLoadingState() = _$GroupLoadingState;
+  const factory GroupLoadingState() = _$GroupLoadingStateImpl;
 }
 
 /// @nodoc
-abstract class _$$GroupLoadedStateCopyWith<$Res> {
-  factory _$$GroupLoadedStateCopyWith(
-          _$GroupLoadedState value, $Res Function(_$GroupLoadedState) then) =
-      __$$GroupLoadedStateCopyWithImpl<$Res>;
+abstract class _$$GroupLoadedStateImplCopyWith<$Res> {
+  factory _$$GroupLoadedStateImplCopyWith(_$GroupLoadedStateImpl value,
+          $Res Function(_$GroupLoadedStateImpl) then) =
+      __$$GroupLoadedStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$GroupLoadedStateCopyWithImpl<$Res>
-    extends _$GroupStateCopyWithImpl<$Res, _$GroupLoadedState>
-    implements _$$GroupLoadedStateCopyWith<$Res> {
-  __$$GroupLoadedStateCopyWithImpl(
-      _$GroupLoadedState _value, $Res Function(_$GroupLoadedState) _then)
+class __$$GroupLoadedStateImplCopyWithImpl<$Res>
+    extends _$GroupStateCopyWithImpl<$Res, _$GroupLoadedStateImpl>
+    implements _$$GroupLoadedStateImplCopyWith<$Res> {
+  __$$GroupLoadedStateImplCopyWithImpl(_$GroupLoadedStateImpl _value,
+      $Res Function(_$GroupLoadedStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$GroupLoadedState implements GroupLoadedState {
-  const _$GroupLoadedState();
+class _$GroupLoadedStateImpl implements GroupLoadedState {
+  const _$GroupLoadedStateImpl();
 
   @override
   String toString() {
@@ -341,9 +341,9 @@ class _$GroupLoadedState implements GroupLoadedState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$GroupLoadedState);
+        (other.runtimeType == runtimeType && other is _$GroupLoadedStateImpl);
   }
 
   @override
@@ -425,24 +425,24 @@ class _$GroupLoadedState implements GroupLoadedState {
 }
 
 abstract class GroupLoadedState implements GroupState {
-  const factory GroupLoadedState() = _$GroupLoadedState;
+  const factory GroupLoadedState() = _$GroupLoadedStateImpl;
 }
 
 /// @nodoc
-abstract class _$$GroupErrorStateCopyWith<$Res> {
-  factory _$$GroupErrorStateCopyWith(
-          _$GroupErrorState value, $Res Function(_$GroupErrorState) then) =
-      __$$GroupErrorStateCopyWithImpl<$Res>;
+abstract class _$$GroupErrorStateImplCopyWith<$Res> {
+  factory _$$GroupErrorStateImplCopyWith(_$GroupErrorStateImpl value,
+          $Res Function(_$GroupErrorStateImpl) then) =
+      __$$GroupErrorStateImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String message});
 }
 
 /// @nodoc
-class __$$GroupErrorStateCopyWithImpl<$Res>
-    extends _$GroupStateCopyWithImpl<$Res, _$GroupErrorState>
-    implements _$$GroupErrorStateCopyWith<$Res> {
-  __$$GroupErrorStateCopyWithImpl(
-      _$GroupErrorState _value, $Res Function(_$GroupErrorState) _then)
+class __$$GroupErrorStateImplCopyWithImpl<$Res>
+    extends _$GroupStateCopyWithImpl<$Res, _$GroupErrorStateImpl>
+    implements _$$GroupErrorStateImplCopyWith<$Res> {
+  __$$GroupErrorStateImplCopyWithImpl(
+      _$GroupErrorStateImpl _value, $Res Function(_$GroupErrorStateImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -450,7 +450,7 @@ class __$$GroupErrorStateCopyWithImpl<$Res>
   $Res call({
     Object? message = null,
   }) {
-    return _then(_$GroupErrorState(
+    return _then(_$GroupErrorStateImpl(
       null == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -461,8 +461,8 @@ class __$$GroupErrorStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$GroupErrorState implements GroupErrorState {
-  const _$GroupErrorState(this.message);
+class _$GroupErrorStateImpl implements GroupErrorState {
+  const _$GroupErrorStateImpl(this.message);
 
   @override
   final String message;
@@ -473,10 +473,10 @@ class _$GroupErrorState implements GroupErrorState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$GroupErrorState &&
+            other is _$GroupErrorStateImpl &&
             (identical(other.message, message) || other.message == message));
   }
 
@@ -486,8 +486,9 @@ class _$GroupErrorState implements GroupErrorState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$GroupErrorStateCopyWith<_$GroupErrorState> get copyWith =>
-      __$$GroupErrorStateCopyWithImpl<_$GroupErrorState>(this, _$identity);
+  _$$GroupErrorStateImplCopyWith<_$GroupErrorStateImpl> get copyWith =>
+      __$$GroupErrorStateImplCopyWithImpl<_$GroupErrorStateImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -565,10 +566,10 @@ class _$GroupErrorState implements GroupErrorState {
 }
 
 abstract class GroupErrorState implements GroupState {
-  const factory GroupErrorState(final String message) = _$GroupErrorState;
+  const factory GroupErrorState(final String message) = _$GroupErrorStateImpl;
 
   String get message;
   @JsonKey(ignore: true)
-  _$$GroupErrorStateCopyWith<_$GroupErrorState> get copyWith =>
+  _$$GroupErrorStateImplCopyWith<_$GroupErrorStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

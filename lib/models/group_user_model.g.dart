@@ -6,8 +6,8 @@ part of 'group_user_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_GroupUserModel _$$_GroupUserModelFromJson(Map<String, dynamic> json) =>
-    _$_GroupUserModel(
+_$GroupUserModelImpl _$$GroupUserModelImplFromJson(Map<String, dynamic> json) =>
+    _$GroupUserModelImpl(
       id: json[r'$id'] as String?,
       createdAt: json[r'$createdAt'] as String?,
       updatedAt: json[r'$updatedAt'] as String?,
@@ -16,7 +16,8 @@ _$_GroupUserModel _$$_GroupUserModelFromJson(Map<String, dynamic> json) =>
       status: json['status'] as String? ?? "pending",
     );
 
-Map<String, dynamic> _$$_GroupUserModelToJson(_$_GroupUserModel instance) =>
+Map<String, dynamic> _$$GroupUserModelImplToJson(
+        _$GroupUserModelImpl instance) =>
     <String, dynamic>{
       r'$id': instance.id,
       r'$createdAt': instance.createdAt,

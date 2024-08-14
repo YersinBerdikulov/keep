@@ -12,7 +12,7 @@ part of 'box_controller.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$BoxState {
@@ -86,25 +86,25 @@ class _$BoxStateCopyWithImpl<$Res, $Val extends BoxState>
 }
 
 /// @nodoc
-abstract class _$$BoxInitStateCopyWith<$Res> {
-  factory _$$BoxInitStateCopyWith(
-          _$BoxInitState value, $Res Function(_$BoxInitState) then) =
-      __$$BoxInitStateCopyWithImpl<$Res>;
+abstract class _$$BoxInitStateImplCopyWith<$Res> {
+  factory _$$BoxInitStateImplCopyWith(
+          _$BoxInitStateImpl value, $Res Function(_$BoxInitStateImpl) then) =
+      __$$BoxInitStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$BoxInitStateCopyWithImpl<$Res>
-    extends _$BoxStateCopyWithImpl<$Res, _$BoxInitState>
-    implements _$$BoxInitStateCopyWith<$Res> {
-  __$$BoxInitStateCopyWithImpl(
-      _$BoxInitState _value, $Res Function(_$BoxInitState) _then)
+class __$$BoxInitStateImplCopyWithImpl<$Res>
+    extends _$BoxStateCopyWithImpl<$Res, _$BoxInitStateImpl>
+    implements _$$BoxInitStateImplCopyWith<$Res> {
+  __$$BoxInitStateImplCopyWithImpl(
+      _$BoxInitStateImpl _value, $Res Function(_$BoxInitStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$BoxInitState implements BoxInitState {
-  const _$BoxInitState();
+class _$BoxInitStateImpl implements BoxInitState {
+  const _$BoxInitStateImpl();
 
   @override
   String toString() {
@@ -112,9 +112,9 @@ class _$BoxInitState implements BoxInitState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$BoxInitState);
+        (other.runtimeType == runtimeType && other is _$BoxInitStateImpl);
   }
 
   @override
@@ -196,29 +196,29 @@ class _$BoxInitState implements BoxInitState {
 }
 
 abstract class BoxInitState implements BoxState {
-  const factory BoxInitState() = _$BoxInitState;
+  const factory BoxInitState() = _$BoxInitStateImpl;
 }
 
 /// @nodoc
-abstract class _$$BoxLoadingStateCopyWith<$Res> {
-  factory _$$BoxLoadingStateCopyWith(
-          _$BoxLoadingState value, $Res Function(_$BoxLoadingState) then) =
-      __$$BoxLoadingStateCopyWithImpl<$Res>;
+abstract class _$$BoxLoadingStateImplCopyWith<$Res> {
+  factory _$$BoxLoadingStateImplCopyWith(_$BoxLoadingStateImpl value,
+          $Res Function(_$BoxLoadingStateImpl) then) =
+      __$$BoxLoadingStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$BoxLoadingStateCopyWithImpl<$Res>
-    extends _$BoxStateCopyWithImpl<$Res, _$BoxLoadingState>
-    implements _$$BoxLoadingStateCopyWith<$Res> {
-  __$$BoxLoadingStateCopyWithImpl(
-      _$BoxLoadingState _value, $Res Function(_$BoxLoadingState) _then)
+class __$$BoxLoadingStateImplCopyWithImpl<$Res>
+    extends _$BoxStateCopyWithImpl<$Res, _$BoxLoadingStateImpl>
+    implements _$$BoxLoadingStateImplCopyWith<$Res> {
+  __$$BoxLoadingStateImplCopyWithImpl(
+      _$BoxLoadingStateImpl _value, $Res Function(_$BoxLoadingStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$BoxLoadingState implements BoxLoadingState {
-  const _$BoxLoadingState();
+class _$BoxLoadingStateImpl implements BoxLoadingState {
+  const _$BoxLoadingStateImpl();
 
   @override
   String toString() {
@@ -226,9 +226,9 @@ class _$BoxLoadingState implements BoxLoadingState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$BoxLoadingState);
+        (other.runtimeType == runtimeType && other is _$BoxLoadingStateImpl);
   }
 
   @override
@@ -310,29 +310,29 @@ class _$BoxLoadingState implements BoxLoadingState {
 }
 
 abstract class BoxLoadingState implements BoxState {
-  const factory BoxLoadingState() = _$BoxLoadingState;
+  const factory BoxLoadingState() = _$BoxLoadingStateImpl;
 }
 
 /// @nodoc
-abstract class _$$BoxLoadedStateCopyWith<$Res> {
-  factory _$$BoxLoadedStateCopyWith(
-          _$BoxLoadedState value, $Res Function(_$BoxLoadedState) then) =
-      __$$BoxLoadedStateCopyWithImpl<$Res>;
+abstract class _$$BoxLoadedStateImplCopyWith<$Res> {
+  factory _$$BoxLoadedStateImplCopyWith(_$BoxLoadedStateImpl value,
+          $Res Function(_$BoxLoadedStateImpl) then) =
+      __$$BoxLoadedStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$BoxLoadedStateCopyWithImpl<$Res>
-    extends _$BoxStateCopyWithImpl<$Res, _$BoxLoadedState>
-    implements _$$BoxLoadedStateCopyWith<$Res> {
-  __$$BoxLoadedStateCopyWithImpl(
-      _$BoxLoadedState _value, $Res Function(_$BoxLoadedState) _then)
+class __$$BoxLoadedStateImplCopyWithImpl<$Res>
+    extends _$BoxStateCopyWithImpl<$Res, _$BoxLoadedStateImpl>
+    implements _$$BoxLoadedStateImplCopyWith<$Res> {
+  __$$BoxLoadedStateImplCopyWithImpl(
+      _$BoxLoadedStateImpl _value, $Res Function(_$BoxLoadedStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$BoxLoadedState implements BoxLoadedState {
-  const _$BoxLoadedState();
+class _$BoxLoadedStateImpl implements BoxLoadedState {
+  const _$BoxLoadedStateImpl();
 
   @override
   String toString() {
@@ -340,9 +340,9 @@ class _$BoxLoadedState implements BoxLoadedState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$BoxLoadedState);
+        (other.runtimeType == runtimeType && other is _$BoxLoadedStateImpl);
   }
 
   @override
@@ -424,24 +424,24 @@ class _$BoxLoadedState implements BoxLoadedState {
 }
 
 abstract class BoxLoadedState implements BoxState {
-  const factory BoxLoadedState() = _$BoxLoadedState;
+  const factory BoxLoadedState() = _$BoxLoadedStateImpl;
 }
 
 /// @nodoc
-abstract class _$$BoxErrorStateCopyWith<$Res> {
-  factory _$$BoxErrorStateCopyWith(
-          _$BoxErrorState value, $Res Function(_$BoxErrorState) then) =
-      __$$BoxErrorStateCopyWithImpl<$Res>;
+abstract class _$$BoxErrorStateImplCopyWith<$Res> {
+  factory _$$BoxErrorStateImplCopyWith(
+          _$BoxErrorStateImpl value, $Res Function(_$BoxErrorStateImpl) then) =
+      __$$BoxErrorStateImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String message});
 }
 
 /// @nodoc
-class __$$BoxErrorStateCopyWithImpl<$Res>
-    extends _$BoxStateCopyWithImpl<$Res, _$BoxErrorState>
-    implements _$$BoxErrorStateCopyWith<$Res> {
-  __$$BoxErrorStateCopyWithImpl(
-      _$BoxErrorState _value, $Res Function(_$BoxErrorState) _then)
+class __$$BoxErrorStateImplCopyWithImpl<$Res>
+    extends _$BoxStateCopyWithImpl<$Res, _$BoxErrorStateImpl>
+    implements _$$BoxErrorStateImplCopyWith<$Res> {
+  __$$BoxErrorStateImplCopyWithImpl(
+      _$BoxErrorStateImpl _value, $Res Function(_$BoxErrorStateImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -449,7 +449,7 @@ class __$$BoxErrorStateCopyWithImpl<$Res>
   $Res call({
     Object? message = null,
   }) {
-    return _then(_$BoxErrorState(
+    return _then(_$BoxErrorStateImpl(
       null == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -460,8 +460,8 @@ class __$$BoxErrorStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$BoxErrorState implements BoxErrorState {
-  const _$BoxErrorState(this.message);
+class _$BoxErrorStateImpl implements BoxErrorState {
+  const _$BoxErrorStateImpl(this.message);
 
   @override
   final String message;
@@ -472,10 +472,10 @@ class _$BoxErrorState implements BoxErrorState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BoxErrorState &&
+            other is _$BoxErrorStateImpl &&
             (identical(other.message, message) || other.message == message));
   }
 
@@ -485,8 +485,8 @@ class _$BoxErrorState implements BoxErrorState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$BoxErrorStateCopyWith<_$BoxErrorState> get copyWith =>
-      __$$BoxErrorStateCopyWithImpl<_$BoxErrorState>(this, _$identity);
+  _$$BoxErrorStateImplCopyWith<_$BoxErrorStateImpl> get copyWith =>
+      __$$BoxErrorStateImplCopyWithImpl<_$BoxErrorStateImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -564,10 +564,10 @@ class _$BoxErrorState implements BoxErrorState {
 }
 
 abstract class BoxErrorState implements BoxState {
-  const factory BoxErrorState(final String message) = _$BoxErrorState;
+  const factory BoxErrorState(final String message) = _$BoxErrorStateImpl;
 
   String get message;
   @JsonKey(ignore: true)
-  _$$BoxErrorStateCopyWith<_$BoxErrorState> get copyWith =>
+  _$$BoxErrorStateImplCopyWith<_$BoxErrorStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
