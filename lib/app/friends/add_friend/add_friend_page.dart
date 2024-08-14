@@ -1,5 +1,6 @@
 import 'package:dongi/app/friends/add_friend/add_friend_widget.dart';
 import 'package:dongi/app/friends/controller/friend_controller.dart';
+import 'package:dongi/core/utils.dart';
 import 'package:dongi/models/user_model.dart';
 import 'package:dongi/widgets/appbar/appbar.dart';
 import 'package:dongi/widgets/text_field/text_field.dart';
@@ -14,14 +15,40 @@ class AddFriendPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final searchController = useTextEditingController(text: '');
     final searchResults = useState<List<UserModel>>([]);
+    final isLoading = useState<bool>(false);
+
+    /// Listen for changes in the friendNotifierProvider state
+    ref.listen<FriendState>(
+      friendNotifierProvider,
+      (previous, next) {
+        next.whenOrNull(
+          loaded: () {
+            // Pop to prev page
+            Navigator.pop(context);
+
+            // Refresh the friend list and handle the result
+            ref.refresh(getFriendProvider);
+
+            // Show success SnackBar
+            showSnackBar(context, "Friend request sent successfully!");
+          },
+          error: (message) {
+            // Show error SnackBar
+            showSnackBar(context, message);
+          },
+        );
+      },
+    );
 
     useEffect(() {
       Future<void> searchFriends() async {
         if (searchController.text.length > 2) {
+          isLoading.value = true; // Start loading
           final results = await ref
               .read(friendNotifierProvider.notifier)
               .searchFriends(searchController.text);
           searchResults.value = results;
+          isLoading.value = false; // Stop loading
         } else {
           searchResults.value = [];
         }
@@ -52,8 +79,12 @@ class AddFriendPage extends HookConsumerWidget {
               controller: searchController,
               hintText: "Search with UserName or Email",
             ),
-            const Divider(),
-            Expanded(child: AddFriendList(searchResults.value)),
+            const Divider(thickness: 1),
+            Expanded(
+              child: isLoading.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : AddFriendList(searchResults.value),
+            ),
           ],
         ),
       ),

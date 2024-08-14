@@ -1,5 +1,7 @@
+import 'package:dongi/app/friends/controller/friend_controller.dart';
 import 'package:dongi/constants/color_config.dart';
 import 'package:dongi/models/user_model.dart';
+import 'package:dongi/widgets/dialog/dialog_widget.dart';
 import 'package:dongi/widgets/image/image_widget.dart';
 import 'package:dongi/widgets/list_tile/list_tile_card.dart';
 import 'package:flutter/material.dart';
@@ -34,30 +36,41 @@ class AddFriendList extends HookConsumerWidget {
             itemCount: searchResults.length,
             itemBuilder: (context, index) {
               final result = searchResults[index];
-              return ListTileCard(
-                leading: ImageWidget(
-                  imageUrl: result.profileImage,
-                  borderRadius: 10,
-                  width: 50,
-                  height: 50,
-                ),
-                titleString: result.userName,
-                subtitleString: result.email,
-                visualDensity: const VisualDensity(vertical: -2),
-                trailing: Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: ColorConfig.secondary,
+              return Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: ListTileCard(
+                  leading: ImageWidget(
+                    imageUrl: result.profileImage,
+                    borderRadius: 10,
+                    width: 50,
+                    height: 50,
                   ),
-                  child: Icon(
-                    Icons.add,
-                    color: ColorConfig.darkGrey,
+                  titleString: result.userName,
+                  subtitleString: result.email,
+                  visualDensity: const VisualDensity(vertical: -2),
+                  trailing: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: ColorConfig.secondary,
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      color: ColorConfig.darkGrey,
+                    ),
                   ),
+                  onTap: () async {
+                    showCustomBottomDialog(
+                      context,
+                      title: "Send Friend Request",
+                      description:
+                          "Are you sure you want to send a friend request to ${result.userName}? This user will be able to accept or decline your request.",
+                      onConfirm: () => ref
+                          .read(friendNotifierProvider.notifier)
+                          .addFriend(result),
+                    );
+                  },
                 ),
-                onTap: () {
-                  // Handle friend addition logic here
-                },
               );
             },
           );

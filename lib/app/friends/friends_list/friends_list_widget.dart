@@ -1,4 +1,5 @@
 import 'package:dongi/app/auth/controller/auth_controller.dart';
+import 'package:dongi/app/friends/controller/friend_controller.dart';
 import 'package:dongi/models/user_friend_model.dart';
 import 'package:dongi/widgets/image/image_widget.dart';
 import 'package:flutter/material.dart';
@@ -15,14 +16,17 @@ class FriendListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: SlidableAutoCloseBehavior(
-        child: ListView(
-          children: userFriendModels
-              .where((element) => element.status == "accept")
-              .map<Widget>((userFriend) => UserFriendListCard(userFriend))
-              .toList(),
+    return RefreshIndicator(
+      onRefresh: () async => ref.refresh(getFriendProvider),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        child: SlidableAutoCloseBehavior(
+          child: ListView(
+            children: userFriendModels
+                .where((element) => element.status == "accept")
+                .map<Widget>((userFriend) => UserFriendListCard(userFriend))
+                .toList(),
+          ),
         ),
       ),
     );
@@ -38,16 +42,20 @@ class PendingListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: SlidableAutoCloseBehavior(
-        child: ListView(
-          children: pendingFriendModels
-              .where((element) =>
-                  element.status == "pending" &&
-                  element.sendRequestUserId == currentUser!.$id)
-              .map<Widget>((pendingFriend) => UserFriendListCard(pendingFriend))
-              .toList(),
+    return RefreshIndicator(
+      onRefresh: () async => ref.refresh(getFriendProvider),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        child: SlidableAutoCloseBehavior(
+          child: ListView(
+            children: pendingFriendModels
+                .where((element) =>
+                    element.status == "pending" &&
+                    element.sendRequestUserId == currentUser!.$id)
+                .map<Widget>(
+                    (pendingFriend) => UserFriendListCard(pendingFriend))
+                .toList(),
+          ),
         ),
       ),
     );
@@ -63,17 +71,20 @@ class IncomingListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: SlidableAutoCloseBehavior(
-        child: ListView(
-          children: incomingFriendModels
-              .where((element) =>
-                  element.status == "pending" &&
-                  element.receiveRequestUserId == currentUser!.$id)
-              .map<Widget>(
-                  (incomingFriend) => UserFriendListCard(incomingFriend))
-              .toList(),
+    return RefreshIndicator(
+      onRefresh: () async => ref.refresh(getFriendProvider),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        child: SlidableAutoCloseBehavior(
+          child: ListView(
+            children: incomingFriendModels
+                .where((element) =>
+                    element.status == "pending" &&
+                    element.receiveRequestUserId == currentUser!.$id)
+                .map<Widget>(
+                    (incomingFriend) => UserFriendListCard(incomingFriend))
+                .toList(),
+          ),
         ),
       ),
     );

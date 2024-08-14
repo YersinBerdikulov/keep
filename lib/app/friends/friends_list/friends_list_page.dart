@@ -54,18 +54,15 @@ class FriendsListPage extends HookConsumerWidget {
         //skipLoadingOnReload: true,
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => Center(child: Text(error.toString())),
-        data: (data) => RefreshIndicator(
-          onRefresh: () async => ref.refresh(getFriendProvider),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: TabBarView(
-              controller: tabController,
-              children: [
-                FriendListView(data),
-                PendingListView(data),
-                IncomingListView(data),
-              ],
-            ),
+        data: (data) => Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: TabBarView(
+            controller: tabController,
+            children: [
+              FriendListView(data),
+              PendingListView(data),
+              IncomingListView(data),
+            ],
           ),
         ),
       ),

@@ -25,7 +25,7 @@ class FriendState with _$FriendState {
   const factory FriendState.error(String message) = FriendErrorState;
 }
 
-final getFriendProvider = FutureProvider((ref) {
+final getFriendProvider = FutureProvider.autoDispose((ref) {
   final friendController = ref.watch(friendNotifierProvider.notifier);
   return friendController.getFriends();
 });

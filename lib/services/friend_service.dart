@@ -42,6 +42,24 @@ class FriendAPI implements IFriendAPI {
   @override
   FutureEither<Document> addFriend(UserFriendModel friendModel) async {
     try {
+      // Query the collection to check if a request already exists
+      final List<Document> existingRequests = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.userFriendCollection,
+        queries: [
+          Query.equal('sendRequestUserId', friendModel.sendRequestUserId),
+          Query.equal('receiveRequestUserId', friendModel.receiveRequestUserId),
+        ],
+      ).then((response) => response.documents);
+
+      // If there's already an existing request, return an error
+      if (existingRequests.isNotEmpty) {
+        return left(
+          Failure('Friend request already exists', StackTrace.current),
+        );
+      }
+
+      // If no request exists, create the new friend request
       final document = await _db.createDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.userFriendCollection,
