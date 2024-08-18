@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:dongi/app/auth/controller/auth_controller.dart';
+import 'package:dongi/app/friends/controller/friend_controller.dart';
 import 'package:dongi/core/utils.dart';
+import 'package:dongi/models/user_friend_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -127,11 +130,13 @@ class CreateGroupButton extends ConsumerWidget {
   final TextEditingController groupTitle;
   final TextEditingController groupDescription;
   final GlobalKey<FormState> formKey;
+  final ValueNotifier<Set<String>> selectedFriends;
   const CreateGroupButton({
     required this.image,
     required this.groupTitle,
     required this.groupDescription,
     required this.formKey,
+    required this.selectedFriends,
     super.key,
   });
 
@@ -150,6 +155,7 @@ class CreateGroupButton extends ConsumerWidget {
                   image: image,
                   groupTitle: groupTitle,
                   groupDescription: groupDescription,
+                  selectedFriends: selectedFriends,
                 );
           }
         },
@@ -160,12 +166,15 @@ class CreateGroupButton extends ConsumerWidget {
   }
 }
 
-class CreateGroupAddFriend extends ConsumerWidget {
-  const CreateGroupAddFriend({super.key});
+class CreateGroupAddFriend extends HookConsumerWidget {
+  final ValueNotifier<Set<String>> selectedFriends;
+
+  const CreateGroupAddFriend({super.key, required this.selectedFriends});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    //final currentUser = ref.read(currentUserProvider);
+    final friendList = ref.watch(getFriendProvider);
+    final currentUserId = ref.read(currentUserProvider)!.$id;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
@@ -184,27 +193,85 @@ class CreateGroupAddFriend extends ConsumerWidget {
               color: ColorConfig.grey,
               borderRadius: BorderRadius.circular(15),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 2,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  itemBuilder: (context, i) {
-                    return i != 0
-                        ? FriendWidget(
-                            backgroundColor: ColorConfig.white,
-                          )
-                        : FriendWidget.add();
-                  },
-                ),
-              ],
+            child: friendList.when(
+              data: (data) {
+                final approvedFriends = data
+                    .where(
+                      (element) =>
+                          element.status == FriendRequestStatus.accepted,
+                    )
+                    .toList();
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: approvedFriends.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 0.9,
+                      ),
+                      itemBuilder: (context, i) {
+                        final friend = approvedFriends[i];
+                        final friendIdToAdd =
+                            friend.receiveRequestUserId == currentUserId
+                                ? friend.sendRequestUserId
+                                : friend.receiveRequestUserId;
+                        final isSelected =
+                            selectedFriends.value.contains(friendIdToAdd);
+
+                        return GestureDetector(
+                          onTap: () {
+                            if (isSelected) {
+                              selectedFriends.value.remove(friendIdToAdd);
+                            } else {
+                              selectedFriends.value.add(friendIdToAdd);
+                            }
+
+                            selectedFriends.value =
+                                Set.from(selectedFriends.value);
+                          },
+                          child: Column(
+                            children: [
+                              FriendWidget(
+                                image: friend.sendRequestUserId == currentUserId
+                                    ? friend.receiveRequestProfilePic
+                                    : friend.sendRequestProfilePic,
+                                isSelected: isSelected, // Pass selection state
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    friend.sendRequestUserId == currentUserId
+                                        ? friend.receiveRequestUserName
+                                        : friend.sendRequestUserName,
+                                    style: FontConfig.body2().copyWith(
+                                      color: isSelected
+                                          ? ColorConfig.secondary
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stackTrace) => Center(
+                child: Text(error.toString()),
+              ),
             ),
           ),
         ],

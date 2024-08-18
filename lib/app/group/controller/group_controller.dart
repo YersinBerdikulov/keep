@@ -61,6 +61,7 @@ class GroupNotifier extends StateNotifier<GroupState> {
     required ValueNotifier<File?> image,
     required TextEditingController groupTitle,
     required TextEditingController groupDescription,
+    required ValueNotifier<Set<String>> selectedFriends,
   }) async {
     state = const GroupState.loading();
     final currentUser = ref.read(currentUserProvider);
@@ -78,7 +79,7 @@ class GroupNotifier extends StateNotifier<GroupState> {
       description: groupDescription.text,
       creatorId: currentUser!.$id,
       image: imageLinks.isNotEmpty ? imageLinks[0] : null,
-      groupUsers: [currentUser.$id],
+      groupUsers: [currentUser.$id, ...selectedFriends.value],
       boxIds: [],
       totalBalance: 0,
     );

@@ -19,6 +19,7 @@ class CreateGroupPage extends HookConsumerWidget {
     final groupTitle = useTextEditingController();
     final groupDescription = useTextEditingController();
     final image = useState<File?>(null);
+    final selectedFriends = useState<Set<String>>({});
 
     /// by using listen we are not gonna rebuild our app
     ref.listen<GroupState>(
@@ -51,7 +52,9 @@ class CreateGroupPage extends HookConsumerWidget {
                   groupDescription: groupDescription,
                   formKey: _formKey,
                 ),
-                const CreateGroupAddFriend(),
+                CreateGroupAddFriend(
+                  selectedFriends: selectedFriends,
+                ),
               ],
             ),
           ),
@@ -60,6 +63,7 @@ class CreateGroupPage extends HookConsumerWidget {
             image: image,
             groupTitle: groupTitle,
             groupDescription: groupDescription,
+            selectedFriends: selectedFriends,
           ),
         ],
       ),
