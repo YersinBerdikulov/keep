@@ -4,7 +4,7 @@ import 'package:dongi/core/constants/appwrite_config.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../core/types/failure.dart';
-import '../providers/appwrite_provider.dart';
+import '../core/di/appwrite_di.dart';
 import '../core/types/type_defs.dart';
 import '../models/box_model.dart';
 

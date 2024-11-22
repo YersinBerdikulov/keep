@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:collection/collection.dart';
+import 'package:dongi/core/di/storage_di.dart';
 import 'package:dongi/models/expense_user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -10,7 +11,7 @@ import '../../../models/box_model.dart';
 import '../../../models/expense_model.dart';
 import '../../../modules/group/domain/models/group_model.dart';
 import '../../../services/expense_service.dart';
-import '../../../services/storage_api.dart';
+import '../../../core/data/storage/storage_service.dart';
 import '../../auth/controller/auth_controller.dart';
 import '../../box/controller/box_controller.dart';
 part 'expense_controller.freezed.dart';

@@ -8,7 +8,7 @@ import 'package:dongi/models/box_model.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../providers/appwrite_provider.dart';
+import '../core/di/appwrite_di.dart';
 
 final functionAPIProvider = Provider((ref) {
   return FunctionAPI(

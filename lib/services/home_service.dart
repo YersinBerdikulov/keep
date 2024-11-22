@@ -3,7 +3,7 @@ import 'package:appwrite/models.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../core/constants/appwrite_config.dart';
-import '../providers/appwrite_provider.dart';
+import '../core/di/appwrite_di.dart';
 
 final homeAPIProvider = Provider((ref) {
   return HomeAPI(
