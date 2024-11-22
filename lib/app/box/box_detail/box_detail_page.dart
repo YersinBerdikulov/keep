@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/utils.dart';
-import '../../../models/group_model.dart';
-import '../../../router/router_notifier.dart';
+import '../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../modules/group/domain/models/group_model.dart';
+import '../../../core/router/router_notifier.dart';
 import '../../../widgets/appbar/sliver_appbar.dart';
 import '../../../widgets/error/error.dart';
 import '../../../widgets/floating_action_button/floating_action_button.dart';

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../constants/color_config.dart';
-import '../../../constants/font_config.dart';
-import '../../../constants/size_config.dart';
-import '../../../core/utils.dart';
-import '../../../core/validation.dart';
-import '../../../models/group_model.dart';
+import '../../../core/constants/color_config.dart';
+import '../../../core/constants/font_config.dart';
+import '../../../core/constants/size_config.dart';
+import '../../../core/utilities/helpers/image_picker_util.dart';
+import '../../../core/utilities/validation/validation.dart';
+import '../../../modules/group/domain/models/group_model.dart';
 import '../../../widgets/button/button.dart';
 import '../../../widgets/friends/friend.dart';
 import '../../../widgets/text_field/text_field.dart';

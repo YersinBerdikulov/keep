@@ -1,8 +1,8 @@
 import 'package:dongi/app/expense/controller/expense_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../../constants/color_config.dart';
-import '../../../core/utils.dart';
+import '../../../core/constants/color_config.dart';
+import '../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../../widgets/appbar/sliver_appbar.dart';
 import '../../../widgets/error/error.dart';
 import '../../../widgets/loading/loading.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../../constants/color_config.dart';
-import '../../constants/font_config.dart';
+import '../../core/constants/color_config.dart';
+import '../../core/constants/font_config.dart';
 import '../../widgets/card/category_card.dart';
 import '../../widgets/list_tile/list_tile_card.dart';
 
@@ -85,16 +85,16 @@ class ChartsWidget extends StatelessWidget {
           ),
           axisLabelFormatter: labelFormat,
         ),
-        series: <ChartSeries<ChartData, double>>[
-          SplineSeries<ChartData, double>(
-            animationDuration: 1000,
-            dataSource: chartData,
-            xValueMapper: (ChartData data, _) => data.x!,
-            yValueMapper: (ChartData data, _) => data.y!,
-            name: 'Unit Sold',
-            color: ColorConfig.primarySwatch25,
-          ),
-        ],
+        // series: <ChartSeries<ChartData, double>>[
+        //   SplineSeries<ChartData, double>(
+        //     animationDuration: 1000,
+        //     dataSource: chartData,
+        //     xValueMapper: (ChartData data, _) => data.x!,
+        //     yValueMapper: (ChartData data, _) => data.y!,
+        //     name: 'Unit Sold',
+        //     color: ColorConfig.primarySwatch25,
+        //   ),
+        // ],
         tooltipBehavior: _tooltipBehavior,
       ),
     );

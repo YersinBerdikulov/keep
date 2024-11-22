@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants/color_config.dart';
+import '../../core/constants/color_config.dart';
 
 class FABWidget extends StatelessWidget {
   final String title;

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../models/user_model.dart';
-import '../../../router/router_notifier.dart';
+import '../../../core/router/router_notifier.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/user_service.dart';
 import '../sign_in/sign_in_page.dart';

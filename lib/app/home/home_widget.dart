@@ -3,11 +3,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants/color_config.dart';
-import '../../constants/font_config.dart';
-import '../../constants/size_config.dart';
-import '../../models/group_model.dart';
-import '../../router/router_notifier.dart';
+import '../../core/constants/color_config.dart';
+import '../../core/constants/font_config.dart';
+import '../../core/constants/size_config.dart';
+import '../../modules/group/domain/models/group_model.dart';
+import '../../core/router/router_notifier.dart';
 import '../../widgets/card/card.dart';
 import '../../widgets/error/error.dart';
 import '../../widgets/image/image_widget.dart';
@@ -413,18 +413,18 @@ class HomeWeeklyAnalytic extends StatelessWidget {
         majorTickLines: const MajorTickLines(width: 0),
         majorGridLines: const MajorGridLines(width: 0),
       ),
-      series: <ChartSeries<ChartData, String>>[
-        ColumnSeries<ChartData, String>(
-          animationDuration: 1000,
-          dataSource: chartData,
-          xValueMapper: (ChartData data, _) => data.x,
-          yValueMapper: (ChartData data, _) => data.y,
-          name: 'Unit Sold',
-          borderRadius: BorderRadius.circular(50),
-          spacing: 0.5,
-          color: ColorConfig.primarySwatch25,
-        ),
-      ],
+      // series: <ChartSeries<ChartData, String>>[
+      //   ColumnSeries<ChartData, String>(
+      //     animationDuration: 1000,
+      //     dataSource: chartData,
+      //     xValueMapper: (ChartData data, _) => data.x,
+      //     yValueMapper: (ChartData data, _) => data.y,
+      //     name: 'Unit Sold',
+      //     borderRadius: BorderRadius.circular(50),
+      //     spacing: 0.5,
+      //     color: ColorConfig.primarySwatch25,
+      //   ),
+      // ],
       tooltipBehavior: TooltipBehavior(
         enable: true,
         canShowMarker: false,

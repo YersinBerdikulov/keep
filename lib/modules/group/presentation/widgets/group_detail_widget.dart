@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../constants/color_config.dart';
-import '../../../constants/font_config.dart';
-import '../../../core/utils.dart';
-import '../../../models/group_model.dart';
-import '../../../models/user_model.dart';
-import '../../../widgets/card/box_card.dart';
-import '../../../widgets/card/card.dart';
-import '../../../widgets/error/error.dart';
-import '../../../widgets/friends/friend.dart';
-import '../../../widgets/loading/loading.dart';
-import '../../box/controller/box_controller.dart';
-import '../controller/group_controller.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/constants/font_config.dart';
+import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../domain/models/group_model.dart';
+import '../../../../models/user_model.dart';
+import '../../../../widgets/card/box_card.dart';
+import '../../../../widgets/card/card.dart';
+import '../../../../widgets/error/error.dart';
+import '../../../../widgets/friends/friend.dart';
+import '../../../../widgets/loading/loading.dart';
+import '../../../../app/box/controller/box_controller.dart';
+import '../../domain/controllers/group_controller.dart';
 
 class GroupDetailTitle extends StatelessWidget {
   final String groupName;

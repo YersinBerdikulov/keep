@@ -1,6 +1,6 @@
 import 'package:dongi/app/friends/add_friend/add_friend_widget.dart';
 import 'package:dongi/app/friends/controller/friend_controller.dart';
-import 'package:dongi/core/utils.dart';
+import 'package:dongi/core/utilities/helpers/snackbar_helper.dart';
 import 'package:dongi/models/user_model.dart';
 import 'package:dongi/widgets/appbar/appbar.dart';
 import 'package:dongi/widgets/text_field/text_field.dart';

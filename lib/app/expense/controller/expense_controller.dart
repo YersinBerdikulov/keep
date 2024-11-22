@@ -8,7 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../models/box_model.dart';
 import '../../../models/expense_model.dart';
-import '../../../models/group_model.dart';
+import '../../../modules/group/domain/models/group_model.dart';
 import '../../../services/expense_service.dart';
 import '../../../services/storage_api.dart';
 import '../../auth/controller/auth_controller.dart';

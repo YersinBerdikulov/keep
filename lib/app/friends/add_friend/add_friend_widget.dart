@@ -1,5 +1,5 @@
 import 'package:dongi/app/friends/controller/friend_controller.dart';
-import 'package:dongi/constants/color_config.dart';
+import 'package:dongi/core/constants/color_config.dart';
 import 'package:dongi/models/user_model.dart';
 import 'package:dongi/widgets/dialog/dialog_widget.dart';
 import 'package:dongi/widgets/image/image_widget.dart';

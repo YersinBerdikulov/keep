@@ -1,14 +1,15 @@
 import 'dart:io';
 
+import 'package:dongi/modules/group/domain/models/group_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/utils.dart';
-import '../../../widgets/appbar/appbar.dart';
-import '../controller/group_controller.dart';
-import 'create_group_widget.dart';
+import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../widgets/appbar/appbar.dart';
+import '../../domain/controllers/group_controller.dart';
+import '../widgets/create_group_widget.dart';
 
 class CreateGroupPage extends HookConsumerWidget {
   CreateGroupPage({super.key});
@@ -22,16 +23,19 @@ class CreateGroupPage extends HookConsumerWidget {
     final selectedFriends = useState<Set<String>>({});
 
     /// by using listen we are not gonna rebuild our app
-    ref.listen<GroupState>(
+    ref.listen<AsyncValue<List<GroupModel>>>(
       groupNotifierProvider,
       (previous, next) {
-        next.whenOrNull(
-          loaded: () {
+        next.when(
+          data: (_) {
             showSnackBar(context, "Successfully Created!!");
             context.pop();
           },
-          error: (message) {
-            showSnackBar(context, message);
+          loading: () {
+            // Optionally handle loading state if needed
+          },
+          error: (error, stackTrace) {
+            showSnackBar(context, error.toString());
           },
         );
       },

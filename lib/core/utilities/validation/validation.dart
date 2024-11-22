@@ -1,4 +1,4 @@
-import 'package:dongi/extensions/validation_string.dart';
+import 'package:dongi/core/utilities/extensions/validation_string.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FormValidatorNotifier extends StateNotifier<String?> {

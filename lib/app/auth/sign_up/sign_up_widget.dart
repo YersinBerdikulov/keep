@@ -3,11 +3,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../constants/color_config.dart';
-import '../../../constants/content/register/sign_up_contents.dart';
-import '../../../constants/font_config.dart';
-import '../../../core/validation.dart';
-import '../../../router/router_notifier.dart';
+import '../../../core/constants/color_config.dart';
+import '../../../core/constants/content/register/sign_up_contents.dart';
+import '../../../core/constants/font_config.dart';
+import '../../../core/utilities/validation/validation.dart';
+import '../../../core/router/router_notifier.dart';
 import '../../../widgets/button/button.dart';
 import '../../../widgets/text_field/text_field.dart';
 import '../controller/sign_up_controller.dart';

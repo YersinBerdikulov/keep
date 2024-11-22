@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants/font_config.dart';
+import '../../core/constants/font_config.dart';
 
 class ListTileWidget extends ListTile {
   final String titleString;

@@ -1,16 +1,16 @@
 import 'dart:math';
 
-import 'package:dongi/extensions/format_with_comma.dart';
+import 'package:dongi/core/utilities/extensions/format_with_comma.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../constants/color_config.dart';
+import '../../../core/constants/color_config.dart';
 import '../../../models/box_model.dart';
 import '../../../models/expense_model.dart';
-import '../../../models/group_model.dart';
-import '../../../router/router_notifier.dart';
+import '../../../modules/group/domain/models/group_model.dart';
+import '../../../core/router/router_notifier.dart';
 import '../../../widgets/button/button.dart';
 import '../../../widgets/card/card.dart';
 import '../../../widgets/card/grey_card.dart';

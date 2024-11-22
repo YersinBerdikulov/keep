@@ -1,4 +1,4 @@
-import 'package:dongi/extensions/date_extension.dart';
+import 'package:dongi/core/utilities/extensions/date_extension.dart';
 import 'package:dongi/models/expense_model.dart';
 import 'package:dongi/widgets/card/grey_card.dart';
 import 'package:dongi/widgets/list_tile/list_tile.dart';
@@ -6,8 +6,8 @@ import 'package:dongi/widgets/list_tile/list_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../constants/color_config.dart';
-import '../../../constants/font_config.dart';
+import '../../../core/constants/color_config.dart';
+import '../../../core/constants/font_config.dart';
 import '../../../widgets/error/error.dart';
 import '../../../widgets/friends/friend.dart';
 import '../../../widgets/loading/loading.dart';

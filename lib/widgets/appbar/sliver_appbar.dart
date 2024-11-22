@@ -5,7 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../constants/color_config.dart';
+import '../../core/constants/color_config.dart';
 
 class SliverAppBarWidget extends HookWidget {
   final Widget appbarTitle;

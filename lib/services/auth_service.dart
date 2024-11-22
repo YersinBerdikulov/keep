@@ -4,9 +4,9 @@ import 'package:appwrite/models.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../core/failure.dart';
+import '../core/types/failure.dart';
 import '../providers/appwrite_provider.dart';
-import '../core/type_defs.dart';
+import '../core/types/type_defs.dart';
 
 final authAPIProvider = Provider((ref) {
   final account = ref.watch(appwriteAccountProvider);

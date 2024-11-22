@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../constants/color_config.dart';
-import '../../constants/font_config.dart';
-import '../../constants/size_config.dart';
+import '../../core/constants/color_config.dart';
+import '../../core/constants/font_config.dart';
+import '../../core/constants/size_config.dart';
 import '../../widgets/appbar/sliver_appbar.dart';
 import './statistic_widget.dart';
 

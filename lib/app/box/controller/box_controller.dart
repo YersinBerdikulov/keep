@@ -4,13 +4,13 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../models/box_model.dart';
-import '../../../models/group_model.dart';
+import '../../../modules/group/domain/models/group_model.dart';
 import '../../../models/user_model.dart';
 import '../../../services/box_service.dart';
 import '../../../services/storage_api.dart';
 import '../../auth/controller/auth_controller.dart';
 import '../../expense/controller/expense_controller.dart';
-import '../../group/controller/group_controller.dart';
+import '../../../modules/group/domain/controllers/group_controller.dart';
 part 'box_controller.freezed.dart';
 
 final boxNotifierProvider = StateNotifierProvider<BoxNotifier, BoxState>(

@@ -8,21 +8,21 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../app/auth/controller/auth_controller.dart';
-import '../app/auth/sign_in/sign_in_page.dart';
-import '../app/auth/sign_up/sign_up_page.dart';
-import '../app/box/create_box/create_box_page.dart';
-import '../app/box/update_box/update_box_page.dart';
-import '../app/expense/expense_detail/expense_detail_page.dart';
-import '../app/expense/update_expense/update_expense_page.dart';
-import '../app/group/create_group/create_group_page.dart';
-import '../app/group/group_detail/group_detail_page.dart';
-import '../app/group/group_list/group_list_page.dart';
-import '../app/group/update_group/update_group_page.dart';
-import '../app/home/home_page.dart';
-import '../app/onboarding/onboarding_page.dart';
-import '../app/splash/splash_page.dart';
-import '../models/group_model.dart';
+import '../../app/auth/controller/auth_controller.dart';
+import '../../app/auth/sign_in/sign_in_page.dart';
+import '../../app/auth/sign_up/sign_up_page.dart';
+import '../../app/box/create_box/create_box_page.dart';
+import '../../app/box/update_box/update_box_page.dart';
+import '../../app/expense/expense_detail/expense_detail_page.dart';
+import '../../app/expense/update_expense/update_expense_page.dart';
+import '../../modules/group/presentation/pages/create_group_page.dart';
+import '../../modules/group/presentation/pages/group_detail_page.dart';
+import '../../modules/group/presentation/pages/group_list_page.dart';
+import '../../modules/group/presentation/pages/update_group_page.dart';
+import '../../app/home/home_page.dart';
+import '../../app/onboarding/onboarding_page.dart';
+import '../../app/splash/splash_page.dart';
+import '../../modules/group/domain/models/group_model.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 final routerProvider = StateProvider.family(
@@ -121,7 +121,7 @@ GoRouter _goRouterConfig(StateProviderRef ref) {
       GoRoute(
         path: RouteName.boxDetail(null),
         builder: (context, state) {
-          String boxId = state.params['boxId']!;
+          String boxId = state.pathParameters['boxId']!;
           Map extra = state.extra as Map<String, dynamic>;
           return BoxDetailPage(
             boxId: boxId,
@@ -132,7 +132,7 @@ GoRouter _goRouterConfig(StateProviderRef ref) {
       GoRoute(
         path: RouteName.groupDetail(null),
         builder: (context, state) {
-          String groupId = state.params['groupId']!;
+          String groupId = state.pathParameters['groupId']!;
           return GroupDetailPage(groupId: groupId);
         },
       ),
@@ -179,10 +179,10 @@ GoRouter _goRouterConfig(StateProviderRef ref) {
           }),
     ],
     redirect: (context, state) async {
-      if (state.location == RouteName.signup ||
-          state.location == RouteName.signin ||
-          state.location == RouteName.splash ||
-          state.location == RouteName.onboarding) {
+      if (state.uri.toString() == RouteName.signup ||
+          state.uri.toString() == RouteName.signin ||
+          state.uri.toString() == RouteName.splash ||
+          state.uri.toString() == RouteName.onboarding) {
         //user try to sign in or sign up
         return null;
       }
@@ -342,7 +342,7 @@ GoRouter _goRouterConfig(StateProviderRef ref) {
 //        GoRoute(
 //          path: RouteName.groupDetail(null),
 //          builder: (context, state) {
-//            String groupId = state.params['groupId']!;
+//            String groupId = state.pathParameters['groupId']!;
 //            return GroupDetailPage(groupId: groupId);
 //          },
 //        ),

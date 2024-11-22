@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../constants/color_config.dart';
+import '../../core/constants/color_config.dart';
 import 'card.dart';
 
 class GreyCardWidget extends StatelessWidget {

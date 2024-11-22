@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../constants/color_config.dart';
-import '../../constants/font_config.dart';
+import '../../core/constants/color_config.dart';
+import '../../core/constants/font_config.dart';
 
 class TextFieldWidget extends HookWidget {
   final String hintText;

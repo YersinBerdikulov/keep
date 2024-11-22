@@ -1,4 +1,4 @@
-import 'package:dongi/constants/color_config.dart';
+import 'package:dongi/core/constants/color_config.dart';
 import 'package:flutter/material.dart';
 
 //class CardWidget extends Card {

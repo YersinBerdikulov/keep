@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/utils.dart';
-import '../../../router/router_notifier.dart';
-import '../../../widgets/appbar/sliver_appbar.dart';
-import '../../../widgets/error/error.dart';
-import '../../../widgets/floating_action_button/floating_action_button.dart';
-import '../../../widgets/loading/loading.dart';
-import '../controller/group_controller.dart';
-import './group_detail_widget.dart';
+import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../core/router/router_notifier.dart';
+import '../../../../widgets/appbar/sliver_appbar.dart';
+import '../../../../widgets/error/error.dart';
+import '../../../../widgets/floating_action_button/floating_action_button.dart';
+import '../../../../widgets/loading/loading.dart';
+import '../../domain/controllers/group_controller.dart';
+import '../widgets/group_detail_widget.dart';
 
 class GroupDetailPage extends ConsumerWidget {
   final String groupId;
@@ -20,15 +20,22 @@ class GroupDetailPage extends ConsumerWidget {
     final groupDetail = ref.watch(getGroupDetailProvider(groupId));
 
     /// by using listen we are not gonna rebuild our app
-    ref.listen<GroupState>(
+    ref.listen<AsyncValue<void>>(
       groupNotifierProvider,
       (previous, next) {
-        next.whenOrNull(
-          loaded: () {
-            ref.read(getGroupsProvider);
-            return ref.refresh(getGroupDetailProvider(groupId));
+        next.when(
+          data: (_) {
+            // Trigger refresh for related providers
+            ref.invalidate(getGroupsProvider);
+            ref.invalidate(getGroupDetailProvider(groupId));
+            showSnackBar(context, "Successfully Updated!");
           },
-          error: (message) => showSnackBar(context, message),
+          error: (error, stackTrace) {
+            showSnackBar(context, error.toString());
+          },
+          loading: () {
+            // Optional: Handle loading state if needed
+          },
         );
       },
     );

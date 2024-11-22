@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../constants/color_config.dart';
-import '../../constants/font_config.dart';
+import '../../core/constants/color_config.dart';
+import '../../core/constants/font_config.dart';
 import 'card.dart';
 
 class CategoryCardWidget extends StatelessWidget {

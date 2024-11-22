@@ -3,11 +3,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../constants/color_config.dart';
-import '../../../core/utils.dart';
+import '../../../core/constants/color_config.dart';
+import '../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../../models/box_model.dart';
 import '../../../models/expense_model.dart';
-import '../../../models/group_model.dart';
+import '../../../modules/group/domain/models/group_model.dart';
 import '../../../widgets/appbar/appbar.dart';
 import '../../../widgets/card/card.dart';
 import '../../../widgets/text_field/text_field.dart';

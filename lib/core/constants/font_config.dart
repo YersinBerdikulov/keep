@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import './color_config.dart';
+import 'color_config.dart';
 
 class FontConfig {
   static TextStyle h4() => TextStyle(

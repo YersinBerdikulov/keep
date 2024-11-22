@@ -3,9 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../constants/color_config.dart';
-import '../../../core/utils.dart';
-import '../../../router/router_notifier.dart';
+import '../../../core/constants/color_config.dart';
+import '../../../core/router/router_notifier.dart';
+import '../../../core/utilities/helpers/snackbar_helper.dart';
 import '../controller/sign_in_controller.dart';
 import 'sign_in_widget.dart';
 

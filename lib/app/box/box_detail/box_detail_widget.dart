@@ -3,21 +3,21 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-import '../../../constants/color_config.dart';
-import '../../../constants/font_config.dart';
-import '../../../core/utils.dart';
+import '../../../core/constants/color_config.dart';
+import '../../../core/constants/font_config.dart';
+import '../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../../models/box_model.dart';
 import '../../../models/expense_model.dart';
-import '../../../models/group_model.dart';
+import '../../../modules/group/domain/models/group_model.dart';
 import '../../../models/user_model.dart';
-import '../../../router/router_notifier.dart';
+import '../../../core/router/router_notifier.dart';
 import '../../../widgets/card/category_card.dart';
 import '../../../widgets/error/error.dart';
 import '../../../widgets/friends/friend.dart';
 import '../../../widgets/list_tile/list_tile_card.dart';
 import '../../../widgets/loading/loading.dart';
 import '../../../widgets/long_press_menu/long_press_menu.dart';
-import '../../../extensions/date_extension.dart';
+import '../../../core/utilities/extensions/date_extension.dart';
 import '../../expense/controller/expense_controller.dart';
 import '../controller/box_controller.dart';
 

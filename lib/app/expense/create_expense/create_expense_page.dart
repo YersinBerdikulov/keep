@@ -3,9 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/utils.dart';
+import '../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../../models/box_model.dart';
-import '../../../models/group_model.dart';
+import '../../../modules/group/domain/models/group_model.dart';
 import '../../../widgets/appbar/appbar.dart';
 import '../../../widgets/card/card.dart';
 import '../controller/expense_controller.dart';

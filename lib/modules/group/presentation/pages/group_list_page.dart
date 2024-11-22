@@ -1,12 +1,13 @@
+import 'package:dongi/modules/group/domain/models/group_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../../core/utils.dart';
-import '../../../router/router_notifier.dart';
-import '../../../widgets/appbar/appbar.dart';
-import '../../../widgets/floating_action_button/floating_action_button.dart';
-import '../controller/group_controller.dart';
-import 'group_list_widget.dart';
+import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../core/router/router_notifier.dart';
+import '../../../../widgets/appbar/appbar.dart';
+import '../../../../widgets/floating_action_button/floating_action_button.dart';
+import '../../domain/controllers/group_controller.dart';
+import '../widgets/group_list_widget.dart';
 
 class GroupListPage extends ConsumerWidget {
   const GroupListPage({super.key});
@@ -16,15 +17,17 @@ class GroupListPage extends ConsumerWidget {
     //final controller = useState<PanelController>(PanelController());
     final groupList = ref.watch(getGroupsProvider);
 
-    /// by using listen we are not gonna rebuild our app
-    ref.listen<GroupState>(
+    /// Listening to changes in the groupNotifierProvider without rebuilding the UI
+    ref.listen<AsyncValue<List<GroupModel>>>(
       groupNotifierProvider,
-      (previous, next) {
-        next.whenOrNull(
-          loaded: () => ref.refresh(getGroupsProvider),
-          error: (message) {
-            showSnackBar(context, message);
+      (_, state) {
+        state.whenOrNull(
+          data: (_) {
+            // if (/* condition to refresh */) {
+            //   ref.invalidate(getGroupsProvider);
+            // }
           },
+          error: (error, _) => showSnackBar(context, error.toString()),
         );
       },
     );

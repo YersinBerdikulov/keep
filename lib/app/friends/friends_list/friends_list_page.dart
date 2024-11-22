@@ -1,13 +1,13 @@
 import 'package:dongi/app/friends/controller/friend_controller.dart';
-import 'package:dongi/core/utils.dart';
-import 'package:dongi/router/router_notifier.dart';
+import 'package:dongi/core/utilities/helpers/snackbar_helper.dart';
+import 'package:dongi/core/router/router_notifier.dart';
 import 'package:dongi/widgets/floating_action_button/floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../constants/color_config.dart';
+import '../../../core/constants/color_config.dart';
 import 'friends_list_widget.dart';
 
 class FriendsListPage extends HookConsumerWidget {

@@ -1,9 +1,9 @@
-import 'package:dongi/constants/color_config.dart';
+import 'package:dongi/core/constants/color_config.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../constants/content/onboarding_contents.dart';
-import '../../constants/font_config.dart';
-import '../../router/router_notifier.dart';
+import '../../core/constants/content/onboarding_contents.dart';
+import '../../core/constants/font_config.dart';
+import '../../core/router/router_notifier.dart';
 import '../../widgets/button/button.dart';
 
 class OnboardingTitle extends StatelessWidget {

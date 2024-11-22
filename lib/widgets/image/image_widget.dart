@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants/color_config.dart';
+import '../../core/constants/color_config.dart';
 
 class ImageWidget extends StatelessWidget {
   final double width;

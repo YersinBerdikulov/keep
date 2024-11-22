@@ -5,12 +5,12 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../constants/color_config.dart';
-import '../../../core/utils.dart';
-import '../../../models/group_model.dart';
-import '../../../widgets/appbar/appbar.dart';
-import '../controller/group_controller.dart';
-import 'update_group_widget.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../domain/models/group_model.dart';
+import '../../../../widgets/appbar/appbar.dart';
+import '../../domain/controllers/group_controller.dart';
+import '../widgets/update_group_widget.dart';
 
 class UpdateGroupPage extends HookConsumerWidget {
   final GroupModel groupModel;
@@ -25,18 +25,20 @@ class UpdateGroupPage extends HookConsumerWidget {
     final oldGroupImage = useState<String?>(groupModel.image);
     final newGroupImage = useState<File?>(null);
 
-    /// by using listen we are not gonna rebuild our app
-    ref.listen<GroupState>(
+    /// Listen to changes in the groupNotifierProvider state
+    ref.listen<AsyncValue<List<GroupModel>>>(
       groupNotifierProvider,
-      (previous, next) {
-        next.whenOrNull(
-          loaded: () {
+      (_, state) {
+        state.when(
+          data: (_) {
             showSnackBar(context, "Successfully updated!!");
             context.pop();
-            //ref.refresh(refreshGroupsProvider).value;
           },
-          error: (message) {
-            showSnackBar(context, message);
+          loading: () {
+            // Handle loading if needed (optional)
+          },
+          error: (error, stackTrace) {
+            showSnackBar(context, error.toString());
           },
         );
       },

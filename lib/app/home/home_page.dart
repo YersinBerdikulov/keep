@@ -1,7 +1,7 @@
 import 'package:dongi/app/home/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../constants/color_config.dart';
+import '../../core/constants/color_config.dart';
 import '../../widgets/appbar/appbar.dart';
 import 'home_widget.dart';
 // import 'package:url_launcher/url_launcher_string.dart';

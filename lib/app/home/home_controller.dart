@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../models/group_model.dart';
+import '../../modules/group/domain/models/group_model.dart';
 import '../../services/home_service.dart';
 import '../auth/controller/auth_controller.dart';
 part 'home_controller.freezed.dart';

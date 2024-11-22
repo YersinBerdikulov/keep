@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../extensions/widget_position.dart';
+import '../../core/utilities/extensions/widget_position.dart';
 
 class LongPressMenuWidget extends HookWidget {
   final Widget child;

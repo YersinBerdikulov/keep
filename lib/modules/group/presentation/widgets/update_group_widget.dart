@@ -1,19 +1,19 @@
 import 'dart:io';
 
-import 'package:dongi/core/utils.dart';
-import 'package:dongi/models/group_model.dart';
+import 'package:dongi/modules/group/domain/models/group_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../constants/color_config.dart';
-import '../../../constants/font_config.dart';
-import '../../../constants/size_config.dart';
-import '../../../core/validation.dart';
-import '../../../widgets/button/button.dart';
-import '../../../widgets/friends/friend.dart';
-import '../../../widgets/text_field/text_field.dart';
-import '../controller/group_controller.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/constants/font_config.dart';
+import '../../../../core/constants/size_config.dart';
+import '../../../../core/utilities/helpers/image_picker_util.dart';
+import '../../../../core/utilities/validation/validation.dart';
+import '../../../../widgets/button/button.dart';
+import '../../../../widgets/friends/friend.dart';
+import '../../../../widgets/text_field/text_field.dart';
+import '../../domain/controllers/group_controller.dart';
 
 class UpdateGroupInfoCard extends ConsumerWidget {
   final TextEditingController groupTitle;

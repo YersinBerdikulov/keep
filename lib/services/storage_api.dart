@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:appwrite/appwrite.dart';
-import 'package:dongi/constants/appwrite_config.dart';
+import 'package:dongi/core/constants/appwrite_config.dart';
 import 'package:dongi/core/core.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
