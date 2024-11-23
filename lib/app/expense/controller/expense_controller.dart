@@ -22,7 +22,7 @@ final expenseNotifierProvider =
     return ExpenseNotifier(
       ref: ref,
       expenseAPI: ref.watch(expenseAPIProvider),
-      storageAPI: ref.watch(storageAPIProvider),
+      storageAPI: ref.watch(storageProvider),
     );
   },
 );
@@ -67,7 +67,7 @@ class ExpenseNotifier extends StateNotifier<ExpenseState> {
 
   final Ref ref;
   final ExpenseAPI expenseAPI;
-  final StorageAPI storageAPI;
+  final StorageService storageAPI;
 
   Future<void> addExpense({
     required TextEditingController expenseTitle,

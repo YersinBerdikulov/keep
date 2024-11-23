@@ -18,7 +18,7 @@ final boxNotifierProvider = StateNotifierProvider<BoxNotifier, BoxState>(
   (ref) {
     return BoxNotifier(
       boxAPI: ref.watch(boxAPIProvider),
-      storageAPI: ref.watch(storageAPIProvider),
+      storageAPI: ref.watch(storageProvider),
       // functionAPI: ref.watch(functionAPIProvider),
       ref: ref,
     );
@@ -72,7 +72,7 @@ class BoxNotifier extends StateNotifier<BoxState> {
 
   final Ref ref;
   final BoxAPI boxAPI;
-  final StorageAPI storageAPI;
+  final StorageService storageAPI;
   // final FunctionAPI functionAPI;
 
   Future<void> addBox({

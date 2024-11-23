@@ -4,9 +4,9 @@ import 'package:dongi/core/constants/appwrite_config.dart';
 import 'package:dongi/core/core.dart';
 import 'package:fpdart/fpdart.dart';
 
-class StorageAPI {
+class StorageService {
   final Storage _storage;
-  StorageAPI({required Storage storage}) : _storage = storage;
+  StorageService({required Storage storage}) : _storage = storage;
 
   FutureEither<List<String>> uploadImage(List<File> files) async {
     List<String> imageLinks = [];

@@ -37,7 +37,7 @@ final getGroupsProvider = FutureProvider((ref) {
 
 class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
   late GroupRepository groupRepository;
-  late StorageAPI storageAPI;
+  late StorageService storageAPI;
 
   bool _isInitialized = false;
 
@@ -46,7 +46,7 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
     if (!_isInitialized) {
       // Initialize dependencies
       groupRepository = ref.watch(groupRepositoryProvider);
-      storageAPI = ref.watch(storageAPIProvider);
+      storageAPI = ref.watch(storageProvider);
 
       _isInitialized = true;
     }

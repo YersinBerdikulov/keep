@@ -6,19 +6,10 @@ import 'package:appwrite/models.dart';
 import 'package:dongi/core/core.dart';
 import 'package:dongi/models/box_model.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../core/di/appwrite_di.dart';
-
-final functionAPIProvider = Provider((ref) {
-  return FunctionAPI(
-    function: ref.watch(appwriteFunctionProvider),
-  );
-});
-
-class FunctionAPI {
+class FunctionService {
   final Functions _functions;
-  FunctionAPI({required Functions function}) : _functions = function;
+  FunctionService({required Functions function}) : _functions = function;
 
   FutureEitherVoid addBox(BoxModel boxModel) async {
     try {
@@ -27,7 +18,7 @@ class FunctionAPI {
       // final body = jsonEncode(boxModel.toJson());
 
       Execution response = await _functions.createExecution(
-        functionId: '66a3ca45001839e3641e',
+        functionId: '',
       );
 
       // final response = await http.post(
