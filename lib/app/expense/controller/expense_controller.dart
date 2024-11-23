@@ -7,13 +7,13 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../models/box_model.dart';
+import '../../../modules/box/domain/models/box_model.dart';
 import '../../../models/expense_model.dart';
 import '../../../modules/group/domain/models/group_model.dart';
 import '../../../services/expense_service.dart';
 import '../../../core/data/storage/storage_service.dart';
 import '../../auth/controller/auth_controller.dart';
-import '../../box/controller/box_controller.dart';
+import '../../../modules/box/domain/controllers/box_controller.dart';
 part 'expense_controller.freezed.dart';
 
 final expenseNotifierProvider =

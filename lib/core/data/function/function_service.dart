@@ -4,7 +4,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 // import 'package:dongi/constants/appwrite_config.dart';
 import 'package:dongi/core/core.dart';
-import 'package:dongi/models/box_model.dart';
+import 'package:dongi/modules/box/domain/models/box_model.dart';
 import 'package:fpdart/fpdart.dart';
 
 class FunctionService {

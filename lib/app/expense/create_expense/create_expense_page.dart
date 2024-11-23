@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../core/utilities/helpers/snackbar_helper.dart';
-import '../../../models/box_model.dart';
+import '../../../modules/box/domain/models/box_model.dart';
 import '../../../modules/group/domain/models/group_model.dart';
 import '../../../widgets/appbar/appbar.dart';
 import '../../../widgets/card/card.dart';

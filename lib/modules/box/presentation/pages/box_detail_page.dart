@@ -1,16 +1,17 @@
+import 'package:dongi/modules/box/domain/models/box_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/utilities/helpers/snackbar_helper.dart';
-import '../../../modules/group/domain/models/group_model.dart';
-import '../../../core/router/router_notifier.dart';
-import '../../../widgets/appbar/sliver_appbar.dart';
-import '../../../widgets/error/error.dart';
-import '../../../widgets/floating_action_button/floating_action_button.dart';
-import '../../../widgets/loading/loading.dart';
-import '../controller/box_controller.dart';
-import './box_detail_widget.dart';
+import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../group/domain/models/group_model.dart';
+import '../../../../core/router/router_notifier.dart';
+import '../../../../widgets/appbar/sliver_appbar.dart';
+import '../../../../widgets/error/error.dart';
+import '../../../../widgets/floating_action_button/floating_action_button.dart';
+import '../../../../widgets/loading/loading.dart';
+import '../../domain/controllers/box_controller.dart';
+import '../widgets/box_detail_widget.dart';
 
 class BoxDetailPage extends ConsumerWidget {
   final String boxId;
@@ -25,16 +26,24 @@ class BoxDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final boxDetail = ref.watch(getBoxDetailProvider(boxId));
 
-    //by using listen we are not gonna rebuild our app
-    ref.listen<BoxState>(
+    ref.listen<AsyncValue<List<BoxModel>>>(
       boxNotifierProvider,
       (previous, next) {
-        next.whenOrNull(
-          loaded: () {
+        next.when(
+          data: (boxes) {
+            // Refresh the group boxes provider
             ref.read(getBoxesInGroupProvider(groupModel.id!));
-            return ref.refresh(getBoxDetailProvider(boxId));
+
+            // Refresh the box details provider for the specific box
+            ref.refresh(getBoxDetailProvider(boxId));
           },
-          error: (message) => showSnackBar(context, message),
+          loading: () {
+            // Optionally handle loading state
+          },
+          error: (error, stackTrace) {
+            // Show error in a snackbar
+            showSnackBar(context, error.toString());
+          },
         );
       },
     );

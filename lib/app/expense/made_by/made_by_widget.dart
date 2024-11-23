@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../core/constants/color_config.dart';
 import '../../../widgets/list_tile/list_tile_card.dart';
-import '../../box/controller/box_controller.dart';
+import '../../../modules/box/domain/controllers/box_controller.dart';
 import '../controller/expense_controller.dart';
 
 class MadeByFriendListWidget extends ConsumerWidget {

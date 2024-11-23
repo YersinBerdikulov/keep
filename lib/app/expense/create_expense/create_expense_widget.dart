@@ -8,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../core/constants/color_config.dart';
 import '../../../core/utilities/validation/validation.dart';
-import '../../../models/box_model.dart';
+import '../../../modules/box/domain/models/box_model.dart';
 import '../../../modules/group/domain/models/group_model.dart';
 import '../../../core/router/router_notifier.dart';
 import '../../../widgets/button/button.dart';

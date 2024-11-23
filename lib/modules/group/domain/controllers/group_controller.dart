@@ -9,7 +9,7 @@ import '../models/group_model.dart';
 import '../../../../models/user_model.dart';
 import '../../../../core/data/storage/storage_service.dart';
 import '../../../../app/auth/controller/auth_controller.dart';
-import '../../../../app/box/controller/box_controller.dart';
+import '../../../box/domain/controllers/box_controller.dart';
 
 final groupNotifierProvider =
     AsyncNotifierProvider<GroupNotifier, List<GroupModel>>(

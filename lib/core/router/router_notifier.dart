@@ -1,4 +1,4 @@
-import 'package:dongi/app/box/box_detail/box_detail_page.dart';
+import 'package:dongi/modules/box/presentation/pages/box_detail_page.dart';
 import 'package:dongi/app/expense/create_expense/create_expense_page.dart';
 import 'package:dongi/app/expense/made_by/made_by_page.dart';
 import 'package:dongi/app/expense/split/split_page.dart';
@@ -11,8 +11,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../app/auth/controller/auth_controller.dart';
 import '../../app/auth/sign_in/sign_in_page.dart';
 import '../../app/auth/sign_up/sign_up_page.dart';
-import '../../app/box/create_box/create_box_page.dart';
-import '../../app/box/update_box/update_box_page.dart';
+import '../../modules/box/presentation/pages/create_box_page.dart';
+import '../../modules/box/presentation/pages/update_box_page.dart';
 import '../../app/expense/expense_detail/expense_detail_page.dart';
 import '../../app/expense/update_expense/update_expense_page.dart';
 import '../../modules/group/presentation/pages/create_group_page.dart';

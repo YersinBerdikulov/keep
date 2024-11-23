@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../app/box/controller/box_controller.dart';
+import '../../modules/box/domain/controllers/box_controller.dart';
 import '../../core/constants/font_config.dart';
 import '../../core/utilities/helpers/snackbar_helper.dart';
-import '../../models/box_model.dart';
+import '../../modules/box/domain/models/box_model.dart';
 import '../../modules/group/domain/models/group_model.dart';
 import '../../core/router/router_notifier.dart';
 import '../image/image_widget.dart';

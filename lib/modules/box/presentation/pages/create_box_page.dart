@@ -1,15 +1,16 @@
 import 'dart:io';
 
-import 'package:dongi/app/box/controller/box_controller.dart';
+import 'package:dongi/modules/box/domain/controllers/box_controller.dart';
+import 'package:dongi/modules/box/domain/models/box_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../../core/constants/color_config.dart';
-import '../../../core/utilities/helpers/snackbar_helper.dart';
-import '../../../modules/group/domain/models/group_model.dart';
-import '../../../widgets/appbar/appbar.dart';
-import 'create_box_widget.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../group/domain/models/group_model.dart';
+import '../../../../widgets/appbar/appbar.dart';
+import '../widgets/create_box_widget.dart';
 
 class CreateBoxPage extends HookConsumerWidget {
   final GroupModel groupModel;
@@ -23,15 +24,23 @@ class CreateBoxPage extends HookConsumerWidget {
     final image = useState<File?>(null);
 
     /// by using listen we are not gonna rebuild our app
-    ref.listen<BoxState>(
+    ref.listen<AsyncValue<List<BoxModel>>>(
       boxNotifierProvider,
       (previous, next) {
-        next.whenOrNull(
-            loaded: () {
-              showSnackBar(context, "Successfully Created!!");
-              context.pop();
-            },
-            error: (message) => showSnackBar(context, message));
+        next.when(
+          data: (boxes) {
+            // Show success message
+            showSnackBar(context, "Successfully Created!!");
+            context.pop(); // Navigate back
+          },
+          loading: () {
+            // Optionally handle loading state if needed
+          },
+          error: (error, stackTrace) {
+            // Show error in a snackbar
+            showSnackBar(context, error.toString());
+          },
+        );
       },
     );
 

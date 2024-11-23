@@ -1,3 +1,4 @@
+import 'package:dongi/modules/box/domain/models/box_model.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -11,7 +12,7 @@ import '../../../../widgets/card/card.dart';
 import '../../../../widgets/error/error.dart';
 import '../../../../widgets/friends/friend.dart';
 import '../../../../widgets/loading/loading.dart';
-import '../../../../app/box/controller/box_controller.dart';
+import '../../../box/domain/controllers/box_controller.dart';
 import '../../domain/controllers/group_controller.dart';
 
 class GroupDetailTitle extends StatelessWidget {
@@ -219,12 +220,21 @@ class GroupDetailBoxGrid extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final boxesInGroup = ref.watch(getBoxesInGroupProvider(groupModel.id!));
 
-    ref.listen<BoxState>(
+    ref.listen<AsyncValue<List<BoxModel>>>(
       boxNotifierProvider,
       (previous, next) {
-        next.whenOrNull(
-          loaded: () => ref.refresh(getBoxesInGroupProvider(groupModel.id!)),
-          error: (message) => showSnackBar(context, message),
+        next.when(
+          data: (boxes) {
+            // Refreshes the provider when the operation succeeds
+            ref.refresh(getBoxesInGroupProvider(groupModel.id!));
+          },
+          loading: () {
+            // Optionally handle loading state if needed
+          },
+          error: (error, stackTrace) {
+            // Displays the error message in a snackbar
+            showSnackBar(context, error.toString());
+          },
         );
       },
     );
