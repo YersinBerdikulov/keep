@@ -18,7 +18,7 @@ import '../../../../widgets/list_tile/list_tile_card.dart';
 import '../../../../widgets/loading/loading.dart';
 import '../../../../widgets/long_press_menu/long_press_menu.dart';
 import '../../../../core/utilities/extensions/date_extension.dart';
-import '../../../../app/expense/controller/expense_controller.dart';
+import '../../../expense/domain/controllers/expense_controller.dart';
 import '../../domain/controllers/box_controller.dart';
 
 class TotalExpenseBoxDetail extends ConsumerWidget {
@@ -232,13 +232,21 @@ class ExpenseListBoxDetail extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final expenses = ref.watch(getExpensesInBoxProvider(boxModel.id!));
 
-    // by using listen we are not gonna rebuild our app
-    ref.listen<ExpenseState>(
+    /// by using listen we are not gonna rebuild our app
+    ref.listen<AsyncValue<void>>(
       expenseNotifierProvider,
       (previous, next) {
-        next.whenOrNull(
-          loaded: () => ref.refresh(getExpensesInBoxProvider(boxModel.id!)),
-          error: (message) => showSnackBar(context, message),
+        next.when(
+          data: (_) {
+            // Refreshing the list of expenses in the box
+            ref.refresh(getExpensesInBoxProvider(boxModel.id!));
+          },
+          loading: () {
+            // Optionally handle loading state here
+          },
+          error: (error, stackTrace) {
+            showSnackBar(context, error.toString());
+          },
         );
       },
     );

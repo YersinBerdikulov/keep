@@ -10,7 +10,7 @@ import '../../../group/domain/models/group_model.dart';
 import '../../../../models/user_model.dart';
 import '../../../../core/data/storage/storage_service.dart';
 import '../../../../app/auth/controller/auth_controller.dart';
-import '../../../../app/expense/controller/expense_controller.dart';
+import '../../../expense/domain/controllers/expense_controller.dart';
 import '../../../group/domain/controllers/group_controller.dart';
 
 final boxNotifierProvider = AsyncNotifierProvider<BoxNotifier, List<BoxModel>>(

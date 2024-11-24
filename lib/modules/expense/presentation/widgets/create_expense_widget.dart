@@ -6,17 +6,17 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/constants/color_config.dart';
-import '../../../core/utilities/validation/validation.dart';
-import '../../../modules/box/domain/models/box_model.dart';
-import '../../../modules/group/domain/models/group_model.dart';
-import '../../../core/router/router_notifier.dart';
-import '../../../widgets/button/button.dart';
-import '../../../widgets/card/card.dart';
-import '../../../widgets/card/grey_card.dart';
-import '../../../widgets/list_tile/list_tile_card.dart';
-import '../../../widgets/text_field/text_field.dart';
-import '../controller/expense_controller.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/utilities/validation/validation.dart';
+import '../../../box/domain/models/box_model.dart';
+import '../../../group/domain/models/group_model.dart';
+import '../../../../core/router/router_notifier.dart';
+import '../../../../widgets/button/button.dart';
+import '../../../../widgets/card/card.dart';
+import '../../../../widgets/card/grey_card.dart';
+import '../../../../widgets/list_tile/list_tile_card.dart';
+import '../../../../widgets/text_field/text_field.dart';
+import '../../domain/controllers/expense_controller.dart';
 
 class CreateExpenseAmount extends ConsumerWidget {
   final TextEditingController expenseCost;

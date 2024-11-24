@@ -1,15 +1,16 @@
+import 'package:dongi/models/expense_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/utilities/helpers/snackbar_helper.dart';
-import '../../../modules/box/domain/models/box_model.dart';
-import '../../../modules/group/domain/models/group_model.dart';
-import '../../../widgets/appbar/appbar.dart';
-import '../../../widgets/card/card.dart';
-import '../controller/expense_controller.dart';
-import 'create_expense_widget.dart';
+import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../box/domain/models/box_model.dart';
+import '../../../group/domain/models/group_model.dart';
+import '../../../../widgets/appbar/appbar.dart';
+import '../../../../widgets/card/card.dart';
+import '../../domain/controllers/expense_controller.dart';
+import '../widgets/create_expense_widget.dart';
 
 class CreateExpensePage extends HookConsumerWidget {
   final BoxModel boxModel;
@@ -28,17 +29,21 @@ class CreateExpensePage extends HookConsumerWidget {
     final expenseDescription = useTextEditingController();
     final expenseCost = useTextEditingController();
 
-    /// by using listen we are not gonna rebuild our app
-    ref.listen<ExpenseState>(
+    ref.listen<AsyncValue<List<ExpenseModel>>>(
       expenseNotifierProvider,
       (previous, next) {
-        next.whenOrNull(
-            loaded: () {
-              showSnackBar(context, "Successfully Created!!");
-
-              context.pop();
-            },
-            error: (message) => showSnackBar(context, message));
+        next.when(
+          data: (_) {
+            showSnackBar(context, "Successfully Created!!");
+            context.pop();
+          },
+          loading: () {
+            // Optionally show a loading spinner
+          },
+          error: (error, stackTrace) {
+            showSnackBar(context, error.toString());
+          },
+        );
       },
     );
 

@@ -3,16 +3,16 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/constants/color_config.dart';
-import '../../../core/utilities/helpers/snackbar_helper.dart';
-import '../../../modules/box/domain/models/box_model.dart';
-import '../../../models/expense_model.dart';
-import '../../../modules/group/domain/models/group_model.dart';
-import '../../../widgets/appbar/appbar.dart';
-import '../../../widgets/card/card.dart';
-import '../../../widgets/text_field/text_field.dart';
-import '../controller/expense_controller.dart';
-import 'update_expense_widget.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../box/domain/models/box_model.dart';
+import '../../../../models/expense_model.dart';
+import '../../../group/domain/models/group_model.dart';
+import '../../../../widgets/appbar/appbar.dart';
+import '../../../../widgets/card/card.dart';
+import '../../../../widgets/text_field/text_field.dart';
+import '../../domain/controllers/expense_controller.dart';
+import '../widgets/update_expense_widget.dart';
 
 class UpdateExpensePage extends StatefulHookConsumerWidget {
   final ExpenseModel expenseModel;
@@ -51,16 +51,22 @@ class _UpdateExpensePageState extends ConsumerState<UpdateExpensePage> {
     final expenseCost =
         useTextEditingController(text: widget.expenseModel.cost.toString());
 
-    /// by using listen we are not gonna rebuild our app
-    ref.listen<ExpenseState>(
+    /// Using listen without rebuilding the app
+    ref.listen<AsyncValue<void>>(
       expenseNotifierProvider,
       (previous, next) {
-        next.whenOrNull(
-            loaded: () {
-              showSnackBar(context, "Successfully Created!!");
-              context.pop();
-            },
-            error: (message) => showSnackBar(context, message));
+        next.when(
+          data: (_) {
+            showSnackBar(context, "Successfully Created!!");
+            context.pop();
+          },
+          loading: () {
+            // Optionally, show a loading indicator or log the state
+          },
+          error: (error, stackTrace) {
+            showSnackBar(context, error.toString());
+          },
+        );
       },
     );
 

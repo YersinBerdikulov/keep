@@ -6,12 +6,12 @@ import 'package:dongi/widgets/list_tile/list_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/constants/color_config.dart';
-import '../../../core/constants/font_config.dart';
-import '../../../widgets/error/error.dart';
-import '../../../widgets/friends/friend.dart';
-import '../../../widgets/loading/loading.dart';
-import '../../auth/controller/auth_controller.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/constants/font_config.dart';
+import '../../../../widgets/error/error.dart';
+import '../../../../widgets/friends/friend.dart';
+import '../../../../widgets/loading/loading.dart';
+import '../../../../app/auth/controller/auth_controller.dart';
 
 class UserInfoExpenseDetail extends ConsumerWidget {
   final String creatorId;

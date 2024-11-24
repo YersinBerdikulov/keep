@@ -1,51 +1,17 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:dongi/core/constants/appwrite_config.dart';
+import 'package:dongi/core/types/failure.dart';
+import 'package:dongi/core/types/type_defs.dart';
+import 'package:dongi/models/expense_model.dart';
 import 'package:dongi/models/expense_user_model.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../core/types/failure.dart';
-import '../models/expense_model.dart';
-import '../core/di/appwrite_di.dart';
-import '../core/types/type_defs.dart';
 
-final expenseAPIProvider = Provider((ref) {
-  return ExpenseAPI(
-    db: ref.watch(appwriteDatabaseProvider),
-    //functions: ref.watch(appwriteFunctionProvider),
-  );
-});
-
-abstract class IExpenseAPI {
-  FutureEither<Document> addExpense(
-    ExpenseModel expenseModel, {
-    required String customId,
-  });
-  FutureEither<Document> updateExpense(Map updateExpenseModel);
-  Future<List<Document>> getExpenses(String uid);
-  Future<List<Document>> getExpensesInBox(String groupId);
-  Future<Document> getExpenseDetail(String expenseId);
-  Future<List<Document>> getUsersInExpense(List<String> userIds);
-  Future<List<Document>> getCurrentUserExpenses(String uid);
-  FutureEither<bool> deleteExpense(String id);
-  FutureEither<bool> deleteAllExpense(List<String> ids);
-  FutureEither<bool> addExpenseUser(
-    ExpenseUserModel expenseUser, {
-    required String customId,
-  });
-  FutureEither<bool> deleteExpenseUser(String id);
-}
-
-class ExpenseAPI implements IExpenseAPI {
+class ExpenseRemoteDataSource {
   final Databases _db;
-  //final Functions _functions;
-  ExpenseAPI({
-    required Databases db,
-    //required Functions functions,
-  }) : _db = db;
-  //_functions = functions
 
-  @override
+  ExpenseRemoteDataSource({required Databases db}) : _db = db;
+
   FutureEither<Document> addExpense(
     ExpenseModel expenseModel, {
     required String customId,
@@ -70,7 +36,6 @@ class ExpenseAPI implements IExpenseAPI {
     }
   }
 
-  @override
   FutureEither<Document> updateExpense(Map updateExpenseModel) async {
     try {
       final document = await _db.updateDocument(
@@ -92,7 +57,6 @@ class ExpenseAPI implements IExpenseAPI {
     }
   }
 
-  @override
   FutureEither<bool> deleteExpense(String id) async {
     try {
       await _db.deleteDocument(
@@ -113,7 +77,6 @@ class ExpenseAPI implements IExpenseAPI {
     }
   }
 
-  @override
   FutureEither<bool> deleteAllExpense(List<String> ids) async {
     try {
       for (var id in ids) {
@@ -140,7 +103,6 @@ class ExpenseAPI implements IExpenseAPI {
     }
   }
 
-  @override
   FutureEither<bool> addExpenseUser(
     ExpenseUserModel expenseUser, {
     required String customId,
@@ -165,7 +127,6 @@ class ExpenseAPI implements IExpenseAPI {
     }
   }
 
-  @override
   FutureEither<bool> deleteExpenseUser(String id) async {
     try {
       await _db.deleteDocument(
@@ -186,7 +147,6 @@ class ExpenseAPI implements IExpenseAPI {
     }
   }
 
-  @override
   Future<List<Document>> getExpenses(String uid) async {
     final document = await _db.listDocuments(
       databaseId: AppwriteConfig.databaseId,
@@ -198,7 +158,6 @@ class ExpenseAPI implements IExpenseAPI {
     return document.documents;
   }
 
-  @override
   Future<List<Document>> getExpensesInBox(String boxId) async {
     final document = await _db.listDocuments(
       databaseId: AppwriteConfig.databaseId,
@@ -212,7 +171,6 @@ class ExpenseAPI implements IExpenseAPI {
     return document.documents;
   }
 
-  @override
   Future<Document> getExpenseDetail(String expenseId) async {
     final document = await _db.getDocument(
       databaseId: AppwriteConfig.databaseId,
@@ -225,7 +183,6 @@ class ExpenseAPI implements IExpenseAPI {
     return document;
   }
 
-  @override
   Future<List<Document>> getUsersInExpense(List<String> userIds) async {
     try {
       if (userIds.isEmpty) return [];
@@ -242,7 +199,6 @@ class ExpenseAPI implements IExpenseAPI {
     }
   }
 
-  @override
   Future<List<Document>> getCurrentUserExpenses(String uid) async {
     final document = await _db.listDocuments(
       databaseId: AppwriteConfig.databaseId,

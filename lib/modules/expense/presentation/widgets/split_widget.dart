@@ -4,10 +4,10 @@ import 'package:dongi/models/user_model.dart';
 import 'package:dongi/widgets/card/card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../../core/constants/color_config.dart';
-import '../../../widgets/checkbox/checkbox_widget.dart';
-import '../../../widgets/list_tile/list_tile_card.dart';
-import '../controller/expense_controller.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../widgets/checkbox/checkbox_widget.dart';
+import '../../../../widgets/list_tile/list_tile_card.dart';
+import '../../domain/controllers/expense_controller.dart';
 
 class SplitFriendListWidget extends ConsumerWidget {
   final List<UserModel> users;
@@ -116,7 +116,7 @@ class SplitActionButtonWidget extends ConsumerWidget {
                           value: selectedUsers.length == users.length,
                           onChanged: (value) => ref
                               .read(splitUserProvider.notifier)
-                              .addAll(users.map((e) => e.id!).toList()),
+                              .toggleAll(users.map((e) => e.id!).toList()),
                         ),
                         Text(
                           "All",
