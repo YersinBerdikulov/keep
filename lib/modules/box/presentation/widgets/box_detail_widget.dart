@@ -7,7 +7,7 @@ import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
 import '../../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/box_model.dart';
-import '../../../../models/expense_model.dart';
+import '../../../expense/domain/models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
 import '../../../../models/user_model.dart';
 import '../../../../core/router/router_notifier.dart';

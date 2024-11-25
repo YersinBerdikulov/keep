@@ -1,4 +1,4 @@
-import 'package:dongi/models/expense_model.dart';
+import 'package:dongi/modules/expense/domain/models/expense_model.dart';
 import 'package:dongi/modules/expense/domain/controllers/expense_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

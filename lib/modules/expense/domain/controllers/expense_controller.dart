@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:appwrite/appwrite.dart';
 import 'package:collection/collection.dart';
 import 'package:dongi/core/di/storage_di.dart';
-import 'package:dongi/models/expense_user_model.dart';
+import 'package:dongi/modules/expense/domain/models/expense_user_model.dart';
 import 'package:dongi/modules/expense/data/di/expense_di.dart';
 import 'package:dongi/modules/expense/domain/repository/expense_repository.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../box/domain/models/box_model.dart';
-import '../../../../models/expense_model.dart';
+import '../models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
 import '../../../../core/data/storage/storage_service.dart';
 import '../../../../app/auth/controller/auth_controller.dart';

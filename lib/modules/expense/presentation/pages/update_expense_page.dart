@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../../box/domain/models/box_model.dart';
-import '../../../../models/expense_model.dart';
+import '../../domain/models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
 import '../../../../widgets/appbar/appbar.dart';
 import '../../../../widgets/card/card.dart';
