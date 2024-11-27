@@ -1,4 +1,5 @@
 // ignore_for_file: invalid_annotation_target
+import 'package:appwrite/models.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'user_model.freezed.dart';
@@ -26,4 +27,20 @@ class UserModel with _$UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
+}
+
+extension UserConversion on User {
+  UserModel toUserModel() {
+    return UserModel(
+      id: $id,
+      createdAt: $createdAt,
+      updatedAt: $updatedAt,
+      email: email,
+      userName: name,
+      phoneNumber: phone,
+      profileImage: null,
+      firstName: null,
+      lastName: null,
+    );
+  }
 }
