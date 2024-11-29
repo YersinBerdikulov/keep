@@ -56,7 +56,7 @@ class BoxCardWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     deleteBox() async {
       await ref
-          .read(boxNotifierProvider.notifier)
+          .read(boxNotifierProvider(groupModel.id!).notifier)
           .deleteBox(boxModel: boxModel, groupModel: groupModel);
       if (context.mounted) {
         showSnackBar(context, "box deleted successfully");

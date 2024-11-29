@@ -25,7 +25,7 @@ class UpdateBoxPage extends HookConsumerWidget {
 
     /// by using listen we are not gonna rebuild our app
     ref.listen<AsyncValue<List<BoxModel>>>(
-      boxNotifierProvider,
+      boxNotifierProvider(boxModel.groupId),
       (previous, next) {
         next.when(
           data: (boxes) {

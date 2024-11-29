@@ -1,4 +1,5 @@
 import 'package:dongi/core/utilities/extensions/date_extension.dart';
+import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
 import 'package:dongi/modules/expense/domain/models/expense_model.dart';
 import 'package:dongi/widgets/card/grey_card.dart';
 import 'package:dongi/widgets/list_tile/list_tile.dart';
@@ -11,7 +12,6 @@ import '../../../../core/constants/font_config.dart';
 import '../../../../widgets/error/error.dart';
 import '../../../../widgets/friends/friend.dart';
 import '../../../../widgets/loading/loading.dart';
-import '../../../../app/auth/controller/auth_controller.dart';
 
 class UserInfoExpenseDetail extends ConsumerWidget {
   final String creatorId;

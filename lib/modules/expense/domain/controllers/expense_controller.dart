@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:appwrite/appwrite.dart';
 import 'package:collection/collection.dart';
 import 'package:dongi/core/di/storage_di.dart';
+import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
 import 'package:dongi/modules/expense/domain/models/expense_user_model.dart';
 import 'package:dongi/modules/expense/data/di/expense_di.dart';
 import 'package:dongi/modules/expense/domain/repository/expense_repository.dart';
@@ -14,7 +15,6 @@ import '../../../box/domain/models/box_model.dart';
 import '../models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
 import '../../../../core/data/storage/storage_service.dart';
-import '../../../../app/auth/controller/auth_controller.dart';
 import '../../../box/domain/controllers/box_controller.dart';
 
 final expenseNotifierProvider =
@@ -36,7 +36,7 @@ final getExpensesDetailProvider =
 
 final expensePayerIdProvider = StateProvider<String?>((ref) {
   final user = ref.read(currentUserProvider);
-  return user?.$id;
+  return user?.id;
 });
 
 final splitUserProvider =
@@ -100,8 +100,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         description: expenseDescription.text,
         boxId: boxModel.id!,
         groupId: groupModel.id!,
-        creatorId: currentUser!.$id,
-        payerId: payerUserId ?? currentUser.$id,
+        creatorId: currentUser!.id!,
+        payerId: payerUserId ?? currentUser.id!,
         cost: convertedCost,
         expenseUsers: expenseUserIds,
       );
@@ -112,7 +112,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         (l) => throw Exception(l.message),
         (r) {
           // Update the associated box
-          ref.read(boxNotifierProvider.notifier).updateBox(
+          ref.read(boxNotifierProvider(groupModel.id!).notifier).updateBox(
             boxId: boxModel.id!,
             total: boxModel.total + convertedCost,
             expenseIds: [...boxModel.expenseIds, r.$id],
@@ -143,7 +143,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       final splitUsers = ref.read(splitUserProvider);
       final payerUserId = ref.read(expensePayerIdProvider);
 
-      updateData['payerId'] = payerUserId ?? currentUser!.$id;
+      updateData['payerId'] = payerUserId ?? currentUser!.id;
 
       if (expenseTitle != null && expenseTitle.text.isNotEmpty) {
         updateData['title'] = expenseTitle.text;
@@ -195,7 +195,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       res.fold(
         (l) => throw Exception(l.message),
         (_) {
-          ref.read(boxNotifierProvider.notifier).updateBox(
+          ref.read(boxNotifierProvider(groupModel.id!).notifier).updateBox(
                 boxId: boxModel.id!,
                 total: boxModel.total - expenseModel.cost + newCost,
               );
@@ -224,7 +224,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       res.fold(
         (l) => throw Exception(l.message),
         (_) {
-          ref.read(boxNotifierProvider.notifier).updateBox(
+          ref.read(boxNotifierProvider(boxModel.groupId).notifier).updateBox(
                 boxId: boxModel.id!,
                 total: boxModel.total - expenseModel.cost,
                 expenseIds: boxModel.expenseIds

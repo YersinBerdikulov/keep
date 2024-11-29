@@ -1,3 +1,4 @@
+import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
 import 'package:dongi/modules/box/presentation/pages/box_detail_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/create_expense_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/made_by_page.dart';
@@ -8,9 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../app/auth/controller/auth_controller.dart';
-import '../../app/auth/sign_in/sign_in_page.dart';
-import '../../app/auth/sign_up/sign_up_page.dart';
+import '../../modules/auth/presentation/pages/sign_in_page.dart';
+import '../../modules/auth/presentation/pages/sign_up_page.dart';
 import '../../modules/box/presentation/pages/create_box_page.dart';
 import '../../modules/box/presentation/pages/update_box_page.dart';
 import '../../modules/expense/presentation/pages/expense_detail_page.dart';

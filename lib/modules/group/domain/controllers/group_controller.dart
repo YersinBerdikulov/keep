@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:dongi/core/di/storage_di.dart';
+import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
 import 'package:dongi/modules/group/data/di/group_di.dart';
 import 'package:dongi/modules/group/domain/repository/group_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../models/group_model.dart';
-import '../../../../models/user_model.dart';
+import '../../../auth/domain/models/user_model.dart';
 import '../../../../core/data/storage/storage_service.dart';
-import '../../../../app/auth/controller/auth_controller.dart';
 import '../../../box/domain/controllers/box_controller.dart';
 
 final groupNotifierProvider =
@@ -56,7 +56,7 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
 
   Future<List<GroupModel>> _fetchGroups() async {
     final user = ref.read(currentUserProvider);
-    final groupList = await groupRepository.getGroups(user!.$id);
+    final groupList = await groupRepository.getGroups(user!.id!);
     return groupList.map((group) => GroupModel.fromJson(group.data)).toList();
   }
 
@@ -82,9 +82,9 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
       final groupModel = GroupModel(
         title: groupTitle.text,
         description: groupDescription.text,
-        creatorId: currentUser!.$id,
+        creatorId: currentUser!.id!,
         image: imageLinks.isNotEmpty ? imageLinks[0] : null,
-        groupUsers: [currentUser.$id, ...selectedFriends.value],
+        groupUsers: [currentUser.id!, ...selectedFriends.value],
         boxIds: [],
         totalBalance: 0,
       );
@@ -141,7 +141,9 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
         await storageAPI.deleteImage(groupModel.image!);
       }
 
-      ref.read(boxNotifierProvider.notifier).deleteAllBox(groupModel.boxIds);
+      ref
+          .read(boxNotifierProvider(groupModel.id!).notifier)
+          .deleteAllBox(groupModel.boxIds);
       state = AsyncValue.data(
         (state.value ?? [])
             .where((group) => group.id != groupModel.id)
@@ -164,7 +166,7 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
   Future<GroupModel> getGroupDetail(String groupId) async {
     try {
       final user = ref.read(currentUserProvider);
-      final group = await groupRepository.getGroupDetail(user!.$id, groupId);
+      final group = await groupRepository.getGroupDetail(user!.id!, groupId);
       return GroupModel.fromJson(group.data);
     } catch (e) {
       rethrow;

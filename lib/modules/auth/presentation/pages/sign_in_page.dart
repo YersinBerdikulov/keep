@@ -1,13 +1,13 @@
+import 'package:dongi/modules/auth/domain/controllers/sign_up_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/constants/color_config.dart';
-import '../../../core/router/router_notifier.dart';
-import '../../../core/utilities/helpers/snackbar_helper.dart';
-import '../controller/sign_in_controller.dart';
-import 'sign_in_widget.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/router/router_notifier.dart';
+import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../widgets/sign_in_widget.dart';
 
 class SignInPage extends HookConsumerWidget {
   SignInPage({super.key});
@@ -19,15 +19,21 @@ class SignInPage extends HookConsumerWidget {
     TextEditingController passwordController = useTextEditingController();
 
     /// by using listen we are not gonna rebuild our app
-    ref.listen<SignInState>(
-      signInNotifierProvider,
+    ref.listen<AsyncValue<void>>(
+      signUpControllerProvider,
       (previous, next) {
-        next.whenOrNull(
-          loaded: () {
+        next.when(
+          data: (_) {
+            // Navigate to the home page on success
             context.go(RouteName.home);
           },
-          error: (message) {
-            showSnackBar(context, message);
+          loading: () {
+            // Optionally show a loading indicator or spinner
+            debugPrint('SignUp in progress...');
+          },
+          error: (error, stack) {
+            // Show an error message
+            showSnackBar(context, error.toString());
           },
         );
       },

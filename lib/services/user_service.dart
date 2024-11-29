@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../core/types/failure.dart';
 import '../core/di/appwrite_di.dart';
 import '../core/types/type_defs.dart';
-import '../models/user_model.dart';
+import '../modules/auth/domain/models/user_model.dart';
 
 final userAPIProvider = Provider((ref) {
   return UserAPI(

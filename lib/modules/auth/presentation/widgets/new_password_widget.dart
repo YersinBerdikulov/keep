@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/color_config.dart';
-import '../../../core/constants/content/register/new_password_contents.dart';
-import '../../../core/constants/font_config.dart';
-import '../../../widgets/button/button.dart';
-import '../../../widgets/text_field/text_field.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/constants/content/register/new_password_contents.dart';
+import '../../../../core/constants/font_config.dart';
+import '../../../../widgets/button/button.dart';
+import '../../../../widgets/text_field/text_field.dart';
 
 // Title widget
 class NewPasswordTitle extends StatelessWidget {

@@ -24,18 +24,22 @@ class BoxDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final boxDetail = ref.watch(getBoxDetailProvider(boxId));
+    final boxDetail = ref.watch(getBoxDetailProvider(
+      BoxDetailArgs(boxId: boxId, groupId: groupModel.id!),
+    ));
 
     ref.listen<AsyncValue<List<BoxModel>>>(
-      boxNotifierProvider,
+      boxNotifierProvider(groupModel.id!),
       (previous, next) {
         next.when(
           data: (boxes) {
             // Refresh the group boxes provider
-            ref.read(getBoxesInGroupProvider(groupModel.id!));
+            // ref.read(getBoxesInGroupProvider(groupModel.id!));
 
             // Refresh the box details provider for the specific box
-            ref.refresh(getBoxDetailProvider(boxId));
+            // ref.refresh(getBoxDetailProvider(
+            //   BoxDetailArgs(boxId: boxId, groupId: groupModel.id!),
+            // ));
           },
           loading: () {
             // Optionally handle loading state
@@ -75,7 +79,7 @@ class BoxDetailPage extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                FriendListBoxDetail(userIds: data.boxUsers),
+                FriendListBoxDetail(data),
                 //TODO: Think about the structure
                 const CategoryListBoxDetail(),
                 ExpenseListBoxDetail(

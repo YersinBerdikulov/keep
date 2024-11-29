@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:dongi/app/auth/sign_in/sign_in_page.dart';
+import 'package:dongi/modules/auth/presentation/pages/sign_in_page.dart';
 import 'package:dongi/core/router/router_notifier.dart';
-import 'package:dongi/models/user_model.dart';
+import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/services/auth_service.dart';
 import 'package:dongi/services/user_service.dart';
 

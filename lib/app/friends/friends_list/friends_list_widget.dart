@@ -1,8 +1,8 @@
-import 'package:dongi/app/auth/controller/auth_controller.dart';
 import 'package:dongi/app/friends/controller/friend_controller.dart';
 import 'package:dongi/core/constants/color_config.dart';
 import 'package:dongi/core/utilities/extensions/date_extension.dart';
 import 'package:dongi/models/user_friend_model.dart';
+import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
 import 'package:dongi/widgets/dialog/dialog_widget.dart';
 import 'package:dongi/widgets/image/image_widget.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +55,7 @@ class PendingListView extends ConsumerWidget {
             children: pendingFriendModels
                 .where((element) =>
                     element.status == FriendRequestStatus.pending &&
-                    element.sendRequestUserId == currentUser!.$id)
+                    element.sendRequestUserId == currentUser!.id)
                 .map<Widget>(
                     (pendingFriend) => PendingFriendListCard(pendingFriend))
                 .toList(),
@@ -84,7 +84,7 @@ class IncomingListView extends ConsumerWidget {
             children: incomingFriendModels
                 .where((element) =>
                     element.status == FriendRequestStatus.pending &&
-                    element.receiveRequestUserId == currentUser!.$id)
+                    element.receiveRequestUserId == currentUser!.id)
                 .map<Widget>(
                     (incomingFriend) => IncomingFriendListCard(incomingFriend))
                 .toList(),

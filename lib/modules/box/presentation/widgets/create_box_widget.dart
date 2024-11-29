@@ -215,13 +215,13 @@ class CreateBoxButton extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
       child: ButtonWidget(
-        isLoading: ref.watch(boxNotifierProvider).maybeWhen(
+        isLoading: ref.watch(boxNotifierProvider(groupModel.id!)).maybeWhen(
               loading: () => true,
               orElse: () => false,
             ),
         onPressed: () {
           if (formKey.currentState!.validate()) {
-            ref.read(boxNotifierProvider.notifier).addBox(
+            ref.read(boxNotifierProvider(groupModel.id!).notifier).addBox(
                   image: image,
                   boxTitle: boxTitle,
                   boxDescription: boxDescription,

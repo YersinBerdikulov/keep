@@ -1,6 +1,6 @@
 import 'package:dongi/core/constants/font_config.dart';
 import 'package:dongi/core/utilities/extensions/round_double.dart';
-import 'package:dongi/models/user_model.dart';
+import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/widgets/card/card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

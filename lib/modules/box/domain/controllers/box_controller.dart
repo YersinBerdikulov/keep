@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dongi/core/di/storage_di.dart';
+import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
 import 'package:dongi/modules/box/data/di/box_di.dart';
 import 'package:dongi/modules/box/domain/repository/box_repository.dart';
 import 'package:flutter/material.dart';
@@ -7,37 +8,35 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../models/box_model.dart';
 import '../../../group/domain/models/group_model.dart';
-import '../../../../models/user_model.dart';
+import '../../../auth/domain/models/user_model.dart';
 import '../../../../core/data/storage/storage_service.dart';
-import '../../../../app/auth/controller/auth_controller.dart';
 import '../../../expense/domain/controllers/expense_controller.dart';
 import '../../../group/domain/controllers/group_controller.dart';
 
-final boxNotifierProvider = AsyncNotifierProvider<BoxNotifier, List<BoxModel>>(
-  BoxNotifier.new,
+final boxNotifierProvider =
+    AsyncNotifierProviderFamily<BoxNotifier, List<BoxModel>, String>(
+  BoxNotifier.new, // Leverage the default constructor
 );
 
-final getBoxesProvider = FutureProvider((ref) {
-  final boxesController = ref.watch(boxNotifierProvider.notifier);
-  return boxesController.getBoxes();
-});
-
-final getBoxesInGroupProvider =
-    FutureProvider.family.autoDispose((ref, String groupId) {
-  final boxesController = ref.watch(boxNotifierProvider.notifier);
-  return boxesController.getBoxesInGroup(groupId);
-});
+// final getBoxesProvider = FutureProvider((ref,) {
+//   final boxesController = ref.watch(boxNotifierProvider.notifier);
+//   return boxesController.getBoxes();
+// });
 
 final getBoxDetailProvider =
-    FutureProvider.family.autoDispose((ref, String boxId) {
-  final boxesController = ref.watch(boxNotifierProvider.notifier);
-  return boxesController.getBoxDetail(boxId);
+    FutureProvider.family.autoDispose((ref, BoxDetailArgs boxDetailArgs) {
+  final boxesController =
+      ref.read(boxNotifierProvider(boxDetailArgs.groupId).notifier);
+  return boxesController.getBoxDetail(boxDetailArgs.boxId);
 });
 
-final getUsersInBoxProvider =
-    FutureProvider.family.autoDispose((ref, List<String> userIds) async {
-  final boxesController = ref.watch(boxNotifierProvider.notifier);
-  List<UserModel> usersInBox = await boxesController.getUsersInBox(userIds);
+final getUsersInBoxProvider = FutureProvider.family
+    .autoDispose((ref, UsersInBoxArgs usersInBoxArgs) async {
+  //TODO: Think about it, not the best way
+  final boxesController =
+      ref.read(boxNotifierProvider(usersInBoxArgs.groupId).notifier);
+  List<UserModel> usersInBox =
+      await boxesController.getUsersInBox(usersInBoxArgs.userIds);
   ref.read(userInBoxStoreProvider.notifier).state = usersInBox;
   return usersInBox;
 });
@@ -46,14 +45,14 @@ final userInBoxStoreProvider = StateProvider<List<UserModel>>((ref) {
   return [];
 });
 
-class BoxNotifier extends AsyncNotifier<List<BoxModel>> {
+class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
   late BoxRepository boxRepository;
   late StorageService storageAPI;
 
   bool _isInitialized = false;
 
   @override
-  Future<List<BoxModel>> build() async {
+  Future<List<BoxModel>> build(String arg) async {
     if (!_isInitialized) {
       // Initialize dependencies
       boxRepository = ref.watch(boxRepositoryProvider);
@@ -62,7 +61,7 @@ class BoxNotifier extends AsyncNotifier<List<BoxModel>> {
       _isInitialized = true;
     }
 
-    return getBoxes();
+    return getBoxesInGroup(arg);
   }
 
   Future<void> addBox({
@@ -87,10 +86,10 @@ class BoxNotifier extends AsyncNotifier<List<BoxModel>> {
       BoxModel boxModel = BoxModel(
         title: boxTitle.text,
         description: boxDescription.text,
-        creatorId: currentUser!.$id,
+        creatorId: currentUser!.id!,
         groupId: groupModel.id!,
         image: imageLinks.isNotEmpty ? imageLinks[0] : null,
-        boxUsers: [currentUser.$id],
+        boxUsers: [currentUser.id!],
         total: 0,
       );
 
@@ -104,7 +103,7 @@ class BoxNotifier extends AsyncNotifier<List<BoxModel>> {
             boxIds: [...groupModel.boxIds, r.$id],
           );
 
-          final updatedBoxes = await getBoxes();
+          final updatedBoxes = await getBoxesInGroup(arg);
           state = AsyncValue.data(updatedBoxes);
         },
       );
@@ -151,7 +150,7 @@ class BoxNotifier extends AsyncNotifier<List<BoxModel>> {
       res.fold(
         (l) => state = AsyncValue.error(l.message, l.stackTrace),
         (r) async {
-          final updatedBoxes = await getBoxes();
+          final updatedBoxes = await getBoxesInGroup(arg);
           state = AsyncValue.data(updatedBoxes);
         },
       );
@@ -189,7 +188,7 @@ class BoxNotifier extends AsyncNotifier<List<BoxModel>> {
               .read(expenseNotifierProvider.notifier)
               .deleteAllExpense(boxModel.expenseIds);
 
-          final updatedBoxes = await getBoxes();
+          final updatedBoxes = await getBoxesInGroup(arg);
           state = AsyncValue.data(updatedBoxes);
         },
       );
@@ -226,7 +225,7 @@ class BoxNotifier extends AsyncNotifier<List<BoxModel>> {
           }
 
           // Fetch the updated list of boxes
-          final updatedBoxes = await getBoxes();
+          final updatedBoxes = await getBoxesInGroup(arg);
           state = AsyncValue.data(updatedBoxes);
         },
       );
@@ -235,11 +234,11 @@ class BoxNotifier extends AsyncNotifier<List<BoxModel>> {
     }
   }
 
-  Future<List<BoxModel>> getBoxes() async {
-    final user = ref.watch(currentUserProvider);
-    final boxList = await boxRepository.getBoxes(user!.$id);
-    return boxList.map((box) => BoxModel.fromJson(box.data)).toList();
-  }
+  // Future<List<BoxModel>> getBoxes() async {
+  //   final user = ref.watch(currentUserProvider);
+  //   final boxList = await boxRepository.getBoxes(user!.id!);
+  //   return boxList.map((box) => BoxModel.fromJson(box.data)).toList();
+  // }
 
   Future<List<BoxModel>> getBoxesInGroup(String groupId) async {
     final boxList = await boxRepository.getBoxesInGroup(groupId);
@@ -258,7 +257,21 @@ class BoxNotifier extends AsyncNotifier<List<BoxModel>> {
 
   Future<List<BoxModel>> getCurrentUserBoxes() async {
     final user = ref.watch(currentUserProvider);
-    final boxList = await boxRepository.getBoxesInGroup(user!.$id);
+    final boxList = await boxRepository.getBoxesInGroup(user!.id!);
     return boxList.map((box) => BoxModel.fromJson(box.data)).toList();
   }
+}
+
+class BoxDetailArgs {
+  final String boxId;
+  final String groupId;
+
+  BoxDetailArgs({required this.boxId, required this.groupId});
+}
+
+class UsersInBoxArgs {
+  final List<String> userIds;
+  final String groupId;
+
+  UsersInBoxArgs({required this.userIds, required this.groupId});
 }

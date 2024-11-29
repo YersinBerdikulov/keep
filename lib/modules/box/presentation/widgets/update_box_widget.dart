@@ -230,13 +230,15 @@ class UpdateBoxButton extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
       child: ButtonWidget(
-        isLoading: ref.watch(boxNotifierProvider).maybeWhen(
+        isLoading: ref.watch(boxNotifierProvider(boxModel.groupId)).maybeWhen(
               loading: () => true,
               orElse: () => false,
             ),
         onPressed: () {
           if (formKey.currentState!.validate()) {
-            ref.read(boxNotifierProvider.notifier).updateBox(
+            ref
+                .read(boxNotifierProvider((boxModel.groupId)).notifier)
+                .updateBox(
                   image: newBoxImage,
                   boxTitle: boxTitle,
                   boxDescription: boxDescription,

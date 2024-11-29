@@ -1,10 +1,10 @@
 import 'package:dongi/models/user_friend_model.dart';
-import 'package:dongi/models/user_model.dart';
+import 'package:dongi/modules/auth/domain/models/user_model.dart';
+import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../services/friend_service.dart';
-import '../../auth/controller/auth_controller.dart';
 part 'friend_controller.freezed.dart';
 
 final friendNotifierProvider =
@@ -50,7 +50,7 @@ class FriendNotifier extends StateNotifier<FriendState> {
     final currentUser = ref.read(currentUserProvider);
     final currentUserModel = await ref
         .read(authControllerProvider.notifier)
-        .getUserData(currentUser!.$id);
+        .getUserData(currentUser!.id!);
 
     UserFriendModel friendModel = UserFriendModel(
       sendRequestUserId: currentUserModel.id!,
@@ -127,7 +127,7 @@ class FriendNotifier extends StateNotifier<FriendState> {
 
   Future<List<UserFriendModel>> getFriends() async {
     final user = ref.read(currentUserProvider);
-    final friendList = await friendAPI.getFriends(user!.$id);
+    final friendList = await friendAPI.getFriends(user!.id!);
     return friendList
         .map((friend) => UserFriendModel.fromJson(friend.data))
         .toList();
@@ -135,13 +135,13 @@ class FriendNotifier extends StateNotifier<FriendState> {
 
   Future<List<UserModel>> searchFriends(String query) async {
     final user = ref.read(currentUserProvider);
-    final friendList = await friendAPI.searchFriends(user!.$id, query);
+    final friendList = await friendAPI.searchFriends(user!.id!, query);
     return friendList.map((friend) => UserModel.fromJson(friend.data)).toList();
   }
 
   Future<UserFriendModel> getFriendDetail(String friendId) async {
     final user = ref.read(currentUserProvider);
-    final friend = await friendAPI.getFriendDetail(user!.$id, friendId);
+    final friend = await friendAPI.getFriendDetail(user!.id!, friendId);
     return UserFriendModel.fromJson(friend.data);
   }
 }

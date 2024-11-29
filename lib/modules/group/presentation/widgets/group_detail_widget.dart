@@ -6,7 +6,7 @@ import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
 import '../../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/group_model.dart';
-import '../../../../models/user_model.dart';
+import '../../../auth/domain/models/user_model.dart';
 import '../../../../widgets/card/box_card.dart';
 import '../../../../widgets/card/card.dart';
 import '../../../../widgets/error/error.dart';
@@ -218,15 +218,15 @@ class GroupDetailBoxGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final boxesInGroup = ref.watch(getBoxesInGroupProvider(groupModel.id!));
+    final boxesInGroup = ref.watch(boxNotifierProvider(groupModel.id!));
 
     ref.listen<AsyncValue<List<BoxModel>>>(
-      boxNotifierProvider,
+      boxNotifierProvider(groupModel.id!),
       (previous, next) {
         next.when(
           data: (boxes) {
             // Refreshes the provider when the operation succeeds
-            ref.refresh(getBoxesInGroupProvider(groupModel.id!));
+            // ref.refresh(getBoxesInGroupProvider(groupModel.id!));
           },
           loading: () {
             // Optionally handle loading state if needed

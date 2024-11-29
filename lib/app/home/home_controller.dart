@@ -1,9 +1,9 @@
+import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../modules/group/domain/models/group_model.dart';
 import '../../services/home_service.dart';
-import '../auth/controller/auth_controller.dart';
 part 'home_controller.freezed.dart';
 
 final homeNotifierProvider = StateNotifierProvider<HomeNotifier, HomeState>(
@@ -39,7 +39,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
 
   Future<List<GroupModel>> getLatestGroupsInHome() async {
     final user = ref.read(currentUserProvider);
-    final groupList = await homeAPI.getGroupsInHome(user!.$id);
+    final groupList = await homeAPI.getGroupsInHome(user!.id!);
     return groupList.map((group) => GroupModel.fromJson(group.data)).toList();
   }
 }

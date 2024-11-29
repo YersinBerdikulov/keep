@@ -1,3 +1,4 @@
+import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -11,7 +12,6 @@ import '../../core/router/router_notifier.dart';
 import '../../widgets/card/card.dart';
 import '../../widgets/error/error.dart';
 import '../../widgets/image/image_widget.dart';
-import '../auth/controller/auth_controller.dart';
 
 class HomeExpenseSummery extends ConsumerWidget {
   const HomeExpenseSummery({super.key});

@@ -9,7 +9,7 @@ import '../../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/box_model.dart';
 import '../../../expense/domain/models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
-import '../../../../models/user_model.dart';
+import '../../../auth/domain/models/user_model.dart';
 import '../../../../core/router/router_notifier.dart';
 import '../../../../widgets/card/category_card.dart';
 import '../../../../widgets/error/error.dart';
@@ -96,8 +96,8 @@ class ReviewBodyBoxDetail extends ConsumerWidget {
 }
 
 class FriendListBoxDetail extends ConsumerWidget {
-  final List<String> userIds;
-  const FriendListBoxDetail({required this.userIds, super.key});
+  final BoxModel boxModel;
+  const FriendListBoxDetail(this.boxModel, {super.key});
 
   friendItem(UserModel user) {
     return Padding(
@@ -134,7 +134,11 @@ class FriendListBoxDetail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final users = ref.watch(getUsersInBoxProvider(userIds));
+    final users = ref.watch(
+      getUsersInBoxProvider(
+        UsersInBoxArgs(userIds: boxModel.boxUsers, groupId: boxModel.groupId),
+      ),
+    );
 
     return users.when(
       loading: () => const LoadingWidget(),
@@ -312,7 +316,9 @@ class ExpenseCardItem extends ConsumerWidget {
       if (context.mounted) {
         showSnackBar(context, "Expense deleted successfully!!");
       }
-      return ref.refresh(getBoxDetailProvider(boxModel.id!));
+      return ref.refresh(getBoxDetailProvider(
+        BoxDetailArgs(boxId: boxModel.id!, groupId: groupModel.id!),
+      ));
     }
 
     //    List<CupertinoContextMenuAction> menuItems = [
