@@ -1,7 +1,7 @@
-import 'package:dongi/core/router/router_notifier.dart';
+// import 'package:dongi/core/router/router_notifier.dart';
 import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import '../../app/auth/controller/auth_controller.dart';
 import '../../core/constants/color_config.dart';
