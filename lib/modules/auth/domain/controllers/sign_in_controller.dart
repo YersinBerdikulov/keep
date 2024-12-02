@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:dongi/modules/auth/data/di/auth_di.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
-import 'package:dongi/services/auth_service.dart';
+import 'package:dongi/modules/auth/domain/repository/auth_repository.dart';
 import 'package:dongi/services/user_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -13,13 +14,13 @@ final signInControllerProvider = AsyncNotifierProvider<SignInController, void>(
 
 /// SignInController Implementation
 class SignInController extends AsyncNotifier<void> {
-  late final AuthAPI authAPI;
+  late final AuthRepository authAPI;
   late final UserAPI userAPI;
 
   @override
   FutureOr<AsyncValue<void>> build() async {
     // Initialize dependencies
-    authAPI = ref.read(authAPIProvider);
+    authAPI = ref.read(authRepositoryProvider);
     userAPI = ref.read(userAPIProvider);
 
     // Initial state is just AsyncData(null)

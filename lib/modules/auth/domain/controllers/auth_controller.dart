@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:dongi/modules/auth/data/di/auth_di.dart';
+import 'package:dongi/modules/auth/domain/repository/auth_repository.dart';
 import 'package:dongi/modules/auth/presentation/pages/sign_in_page.dart';
 import 'package:dongi/core/router/router_notifier.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
@@ -31,13 +33,13 @@ final currentUserProvider = StateProvider<UserModel?>((ref) {
 });
 
 class AuthController extends AsyncNotifier<UserModel?> {
-  late final AuthAPI authAPI;
+  late final AuthRepository authAPI;
   late final UserAPI userAPI;
 
   @override
   FutureOr<UserModel?> build() async {
     // Initialize dependencies
-    authAPI = ref.read(authAPIProvider);
+    authAPI = ref.read(authRepositoryProvider);
     userAPI = ref.read(userAPIProvider);
 
     // Return the current user if logged in
