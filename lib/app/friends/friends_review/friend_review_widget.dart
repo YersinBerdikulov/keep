@@ -7,7 +7,7 @@ import '../../../widgets/list_tile/list_tile_card.dart';
 
 // Friend name widget
 class FriendNameWidget extends StatelessWidget {
-  const FriendNameWidget({Key? key}) : super(key: key);
+  const FriendNameWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class FriendNameWidget extends StatelessWidget {
 
 // Review section widget
 class ReviewSectionWidget extends StatelessWidget {
-  const ReviewSectionWidget({Key? key}) : super(key: key);
+  const ReviewSectionWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +90,7 @@ class ReviewSectionWidget extends StatelessWidget {
 
 // Expenses list widget
 class ExpensesListWidget extends StatelessWidget {
-  const ExpensesListWidget({Key? key}) : super(key: key);
+  const ExpensesListWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../core/router/router_notifier.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
-  const SplashPage({Key? key}) : super(key: key);
+  const SplashPage({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _SplashPageState();

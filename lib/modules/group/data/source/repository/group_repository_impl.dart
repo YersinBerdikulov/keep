@@ -17,8 +17,8 @@ class GroupRepositoryImpl implements GroupRepository {
   }
 
   @override
-  Future<Either<Failure, Document>> updateGroup(Map updateGroupModel) {
-    return _remoteDataSource.updateGroup(updateGroupModel);
+  Future<Either<Failure, Document>> updateGroup(GroupModel groupModel) {
+    return _remoteDataSource.updateGroup(groupModel);
   }
 
   @override

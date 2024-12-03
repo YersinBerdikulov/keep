@@ -40,11 +40,11 @@ class SignInForm extends ConsumerWidget {
   final TextEditingController password;
   final GlobalKey<FormState> formKey;
   const SignInForm({
-    Key? key,
+    super.key,
     required this.formKey,
     required this.email,
     required this.password,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -157,9 +157,7 @@ class SignInGoogleButton extends ConsumerWidget {
 }
 
 class SignInChangeActionButton extends StatelessWidget {
-  const SignInChangeActionButton({
-    Key? key,
-  }) : super(key: key);
+  const SignInChangeActionButton({super.key});
 
   @override
   Widget build(BuildContext context) {

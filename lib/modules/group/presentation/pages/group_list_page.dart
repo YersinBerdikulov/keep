@@ -15,7 +15,7 @@ class GroupListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     //final controller = useState<PanelController>(PanelController());
-    final groupList = ref.watch(getGroupsProvider);
+    final groupList = ref.watch(groupNotifierProvider);
 
     /// Listening to changes in the groupNotifierProvider without rebuilding the UI
     ref.listen<AsyncValue<List<GroupModel>>>(
@@ -46,7 +46,7 @@ class GroupListPage extends ConsumerWidget {
         error: (error, stackTrace) => Center(child: Text(error.toString())),
         data: (data) => RefreshIndicator(
           child: GroupListView(data),
-          onRefresh: () async => ref.refresh(getGroupsProvider),
+          onRefresh: () async => ref.refresh(groupNotifierProvider),
         ),
       ),
     );

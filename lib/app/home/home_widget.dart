@@ -406,12 +406,12 @@ class HomeWeeklyAnalytic extends StatelessWidget {
         ),
         //isVisible: false,
       ),
-      primaryXAxis: CategoryAxis(
+      primaryXAxis: const CategoryAxis(
         //labelStyle: const TextStyle(color: Colors.white),
-        axisLine: const AxisLine(width: 0),
+        axisLine: AxisLine(width: 0),
         //labelPosition: ChartDataLabelPosition.inside,
-        majorTickLines: const MajorTickLines(width: 0),
-        majorGridLines: const MajorGridLines(width: 0),
+        majorTickLines: MajorTickLines(width: 0),
+        majorGridLines: MajorGridLines(width: 0),
       ),
       // series: <ChartSeries<ChartData, String>>[
       //   ColumnSeries<ChartData, String>(

@@ -73,7 +73,7 @@ class ChartsWidget extends StatelessWidget {
       child: SfCartesianChart(
         margin: EdgeInsets.zero,
         plotAreaBorderWidth: 0,
-        primaryYAxis: CategoryAxis(isVisible: false),
+        primaryYAxis: const CategoryAxis(isVisible: false),
         primaryXAxis: NumericAxis(
           axisLine: const AxisLine(width: 0),
           interval: 1,

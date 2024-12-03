@@ -17,7 +17,7 @@ class GroupDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final groupDetail = ref.watch(getGroupDetailProvider(groupId));
+    final groupDetail = ref.watch(groupDetailProvider(groupId));
 
     /// by using listen we are not gonna rebuild our app
     ref.listen<AsyncValue<void>>(
@@ -26,8 +26,8 @@ class GroupDetailPage extends ConsumerWidget {
         next.when(
           data: (_) {
             // Trigger refresh for related providers
-            ref.invalidate(getGroupsProvider);
-            ref.invalidate(getGroupDetailProvider(groupId));
+            // ref.invalidate(getGroupsProvider);
+            // ref.invalidate(getGroupDetailProvider(groupId));
             showSnackBar(context, "Successfully Updated!");
           },
           error: (error, stackTrace) {

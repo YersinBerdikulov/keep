@@ -24,13 +24,13 @@ class GroupRemoteDataSource {
     }
   }
 
-  Future<Either<Failure, Document>> updateGroup(Map updateGroupModel) async {
+  Future<Either<Failure, Document>> updateGroup(GroupModel groupModel) async {
     try {
       final document = await _db.updateDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.groupCollection,
-        documentId: updateGroupModel['\$id'],
-        data: updateGroupModel,
+        documentId: groupModel.id!,
+        data: groupModel.toJson(),
       );
       return right(document);
     } on AppwriteException catch (e, st) {

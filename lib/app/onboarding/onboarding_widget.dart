@@ -71,10 +71,10 @@ class OnboardingActionButtons extends StatelessWidget {
   final PageController controller;
 
   const OnboardingActionButtons({
-    Key? key,
+    super.key,
     required this.index,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

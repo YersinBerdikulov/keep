@@ -173,7 +173,7 @@ class GroupDetailFriendList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final groupDetail = ref.watch(getUsersInGroupProvider(userIds));
+    final groupDetail = ref.watch(usersInGroupProvider(userIds));
 
     return groupDetail.when(
       loading: () => const LoadingWidget(),
