@@ -10,40 +10,8 @@ import '../models/box_model.dart';
 import '../../../group/domain/models/group_model.dart';
 import '../../../auth/domain/models/user_model.dart';
 import '../../../../core/data/storage/storage_service.dart';
-import '../../../expense/domain/controllers/expense_controller.dart';
-import '../../../group/domain/controllers/group_controller.dart';
-
-final boxNotifierProvider =
-    AsyncNotifierProviderFamily<BoxNotifier, List<BoxModel>, String>(
-  BoxNotifier.new, // Leverage the default constructor
-);
-
-// final getBoxesProvider = FutureProvider((ref,) {
-//   final boxesController = ref.watch(boxNotifierProvider.notifier);
-//   return boxesController.getBoxes();
-// });
-
-final getBoxDetailProvider =
-    FutureProvider.family.autoDispose((ref, BoxDetailArgs boxDetailArgs) {
-  final boxesController =
-      ref.read(boxNotifierProvider(boxDetailArgs.groupId).notifier);
-  return boxesController.getBoxDetail(boxDetailArgs.boxId);
-});
-
-final getUsersInBoxProvider = FutureProvider.family
-    .autoDispose((ref, UsersInBoxArgs usersInBoxArgs) async {
-  //TODO: Think about it, not the best way
-  final boxesController =
-      ref.read(boxNotifierProvider(usersInBoxArgs.groupId).notifier);
-  List<UserModel> usersInBox =
-      await boxesController.getUsersInBox(usersInBoxArgs.userIds);
-  ref.read(userInBoxStoreProvider.notifier).state = usersInBox;
-  return usersInBox;
-});
-
-final userInBoxStoreProvider = StateProvider<List<UserModel>>((ref) {
-  return [];
-});
+import '../../../expense/domain/di/expense_controller_di.dart';
+import '../../../group/domain/di/group_controller_di.dart';
 
 class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
   late BoxRepository boxRepository;
@@ -145,7 +113,9 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
         updateData['total'] = total;
       }
 
-      final res = await boxRepository.updateBox(updateData);
+      final updateBoxModel = BoxModel.fromJson(updateData);
+
+      final res = await boxRepository.updateBox(updateBoxModel);
 
       res.fold(
         (l) => state = AsyncValue.error(l.message, l.stackTrace),

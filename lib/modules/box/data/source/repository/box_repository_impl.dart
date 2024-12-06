@@ -51,7 +51,7 @@ class BoxRepositoryImpl implements BoxRepository {
   }
 
   @override
-  FutureEither<Document> updateBox(Map<String, dynamic> updateBoxModel) {
+  FutureEither<Document> updateBox(BoxModel updateBoxModel) {
     return _remoteDataSource.updateBox(updateBoxModel);
   }
 }

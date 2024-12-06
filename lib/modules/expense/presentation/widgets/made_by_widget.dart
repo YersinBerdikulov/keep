@@ -1,10 +1,10 @@
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../widgets/list_tile/list_tile_card.dart';
-import '../../../box/domain/controllers/box_controller.dart';
-import '../../domain/controllers/expense_controller.dart';
+import '../../domain/di/expense_controller_di.dart';
 
 class MadeByFriendListWidget extends ConsumerWidget {
   const MadeByFriendListWidget({super.key});

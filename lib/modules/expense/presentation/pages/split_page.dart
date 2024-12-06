@@ -1,7 +1,7 @@
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../widgets/appbar/appbar.dart';
-import '../../../box/domain/controllers/box_controller.dart';
 import '../widgets/split_widget.dart';
 
 class SplitPage extends ConsumerWidget {

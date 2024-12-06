@@ -4,7 +4,7 @@ import 'package:dongi/modules/box/domain/models/box_model.dart';
 
 abstract class BoxRepository {
   FutureEither<Document> addBox(BoxModel boxModel);
-  FutureEither<Document> updateBox(Map<String, dynamic> updateBoxModel);
+  FutureEither<Document> updateBox(BoxModel updateBoxModel);
   Future<List<Document>> getBoxes(String uid);
   Future<List<Document>> getBoxesInGroup(String groupId);
   Future<Document> getBoxDetail(String boxId);

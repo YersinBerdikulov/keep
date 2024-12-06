@@ -1,8 +1,8 @@
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../modules/box/domain/controllers/box_controller.dart';
 import '../../core/constants/font_config.dart';
 import '../../core/utilities/helpers/snackbar_helper.dart';
 import '../../modules/box/domain/models/box_model.dart';

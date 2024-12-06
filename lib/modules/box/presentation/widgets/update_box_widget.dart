@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dongi/core/utilities/helpers/image_picker_util.dart';
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -12,7 +13,6 @@ import '../../domain/models/box_model.dart';
 import '../../../../widgets/button/button.dart';
 import '../../../../widgets/friends/friend.dart';
 import '../../../../widgets/text_field/text_field.dart';
-import '../../domain/controllers/box_controller.dart';
 
 class UpdateBoxInfoCard extends ConsumerWidget {
   final TextEditingController boxTitle;

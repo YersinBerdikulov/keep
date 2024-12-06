@@ -9,7 +9,7 @@ import '../../../box/domain/models/box_model.dart';
 import '../../../group/domain/models/group_model.dart';
 import '../../../../widgets/appbar/appbar.dart';
 import '../../../../widgets/card/card.dart';
-import '../../domain/controllers/expense_controller.dart';
+import '../../domain/di/expense_controller_di.dart';
 import '../widgets/create_expense_widget.dart';
 
 class CreateExpensePage extends HookConsumerWidget {

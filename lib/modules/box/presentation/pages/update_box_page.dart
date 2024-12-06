@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:dongi/modules/box/domain/models/box_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -8,7 +9,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../../../widgets/appbar/appbar.dart';
-import '../../domain/controllers/box_controller.dart';
 import '../widgets/update_box_widget.dart';
 
 class UpdateBoxPage extends HookConsumerWidget {

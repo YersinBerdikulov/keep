@@ -6,7 +6,7 @@ import '../../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../../../core/router/router_notifier.dart';
 import '../../../../widgets/appbar/appbar.dart';
 import '../../../../widgets/floating_action_button/floating_action_button.dart';
-import '../../domain/controllers/group_controller.dart';
+import '../../domain/di/group_controller_di.dart';
 import '../widgets/group_list_widget.dart';
 
 class GroupListPage extends ConsumerWidget {

@@ -9,7 +9,7 @@ import '../../../../core/router/router_notifier.dart';
 import '../../../../widgets/image/image_widget.dart';
 import '../../../../widgets/list_tile/list_tile_card.dart';
 import '../../../../widgets/long_press_menu/long_press_menu.dart';
-import '../../domain/controllers/group_controller.dart';
+import '../../domain/di/group_controller_di.dart';
 
 class GroupListView extends StatelessWidget {
   final List<GroupModel> groupModels;

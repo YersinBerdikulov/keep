@@ -32,13 +32,13 @@ class BoxRemoteDataSource {
     }
   }
 
-  FutureEither<Document> updateBox(Map updateBoxModel) async {
+  FutureEither<Document> updateBox(BoxModel updateBoxModel) async {
     try {
       final document = await _db.updateDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.boxCollection,
-        documentId: updateBoxModel["\$id"],
-        data: updateBoxModel,
+        documentId: updateBoxModel.id!,
+        data: updateBoxModel.toJson(),
       );
       return right(document);
     } on AppwriteException catch (e, st) {

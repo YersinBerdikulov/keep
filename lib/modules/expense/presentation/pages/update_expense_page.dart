@@ -11,7 +11,7 @@ import '../../../group/domain/models/group_model.dart';
 import '../../../../widgets/appbar/appbar.dart';
 import '../../../../widgets/card/card.dart';
 import '../../../../widgets/text_field/text_field.dart';
-import '../../domain/controllers/expense_controller.dart';
+import '../../domain/di/expense_controller_di.dart';
 import '../widgets/update_expense_widget.dart';
 
 class UpdateExpensePage extends StatefulHookConsumerWidget {

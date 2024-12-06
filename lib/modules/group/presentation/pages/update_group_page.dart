@@ -9,7 +9,7 @@ import '../../../../core/constants/color_config.dart';
 import '../../../../core/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/group_model.dart';
 import '../../../../widgets/appbar/appbar.dart';
-import '../../domain/controllers/group_controller.dart';
+import '../../domain/di/group_controller_di.dart';
 import '../widgets/update_group_widget.dart';
 
 class UpdateGroupPage extends HookConsumerWidget {

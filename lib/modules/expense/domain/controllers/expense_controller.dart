@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:collection/collection.dart';
-import 'package:dongi/core/di/storage_di.dart';
 import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
+import 'package:dongi/modules/box/domain/di/box_usecase_di.dart';
+import 'package:dongi/modules/box/domain/usecases/update_box_usecase.dart';
+import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
 import 'package:dongi/modules/expense/domain/models/expense_user_model.dart';
 import 'package:dongi/modules/expense/data/di/expense_di.dart';
 import 'package:dongi/modules/expense/domain/repository/expense_repository.dart';
@@ -14,53 +16,15 @@ import 'package:uuid/uuid.dart';
 import '../../../box/domain/models/box_model.dart';
 import '../models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
-import '../../../../core/data/storage/storage_service.dart';
-import '../../../box/domain/controllers/box_controller.dart';
-
-final expenseNotifierProvider =
-    AsyncNotifierProvider<ExpenseNotifier, List<ExpenseModel>>(
-  ExpenseNotifier.new,
-);
-
-final getExpensesInBoxProvider =
-    FutureProvider.family.autoDispose((ref, String boxId) {
-  final expenseController = ref.watch(expenseNotifierProvider.notifier);
-  return expenseController.getExpensesInBox(boxId);
-});
-
-final getExpensesDetailProvider =
-    FutureProvider.family.autoDispose((ref, String expenseId) {
-  final expenseController = ref.watch(expenseNotifierProvider.notifier);
-  return expenseController.getExpenseDetail(expenseId);
-});
-
-final expensePayerIdProvider = StateProvider<String?>((ref) {
-  final user = ref.read(currentUserProvider);
-  return user?.id;
-});
-
-final splitUserProvider =
-    StateNotifierProvider<SplitUserNotifier, List<String>>((ref) {
-  // Retrieve all users in the box from the provider.
-  final allUsers = ref.watch(userInBoxStoreProvider);
-  // Initialize SplitUserNotifier with a list of user IDs.
-  return SplitUserNotifier(allUsers.map((e) => e.id!).toList());
-});
 
 class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
-  late ExpenseRepository expenseRepository;
-  late StorageService storageAPI;
-  bool _isInitialized = false;
+  late final ExpenseRepository _expenseRepository;
+  late final UpdateBoxUseCase _updateBoxUseCase;
 
   @override
   Future<List<ExpenseModel>> build() async {
-    if (!_isInitialized) {
-      // Initialize dependencies
-      expenseRepository = ref.watch(expenseRepositoryProvider);
-      storageAPI = ref.watch(storageProvider);
-
-      _isInitialized = true;
-    }
+    _expenseRepository = ref.watch(expenseRepositoryProvider);
+    _updateBoxUseCase = ref.watch(updateBoxUseCaseProvider);
 
     return [];
   }
@@ -106,17 +70,18 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         expenseUsers: expenseUserIds,
       );
 
-      final res =
-          await expenseRepository.addExpense(expenseModel, customId: expenseId);
+      final res = await _expenseRepository.addExpense(expenseModel,
+          customId: expenseId);
       res.fold(
         (l) => throw Exception(l.message),
         (r) {
           // Update the associated box
-          ref.read(boxNotifierProvider(groupModel.id!).notifier).updateBox(
-            boxId: boxModel.id!,
+          final updateBoxModel = boxModel.copyWith(
             total: boxModel.total + convertedCost,
             expenseIds: [...boxModel.expenseIds, r.$id],
           );
+
+          _updateBoxUseCase.execute(updateBoxModel);
         },
       );
 
@@ -159,7 +124,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         updateData['cost'] = newCost;
       }
 
-// Check if the split users or cost have changed
+      // Check if the split users or cost have changed
       if (!splitUsers.equals(expenseModel.expenseUsers) ||
           newCost != expenseModel.cost) {
         // Delete the existing expense users
@@ -190,15 +155,17 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         updateData['expenseUsers'] = updatedExpenseUserIds;
       }
 
-      final res = await expenseRepository.updateExpense(updateData);
+      final res = await _expenseRepository.updateExpense(updateData);
 
       res.fold(
         (l) => throw Exception(l.message),
         (_) {
-          ref.read(boxNotifierProvider(groupModel.id!).notifier).updateBox(
-                boxId: boxModel.id!,
-                total: boxModel.total - expenseModel.cost + newCost,
-              );
+          // Update the associated box
+          final updateBoxModel = boxModel.copyWith(
+            total: boxModel.total - expenseModel.cost + newCost,
+          );
+
+          _updateBoxUseCase.execute(updateBoxModel);
         },
       );
 
@@ -216,7 +183,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final res = await expenseRepository.deleteExpense(expenseModel.id!);
+      final res = await _expenseRepository.deleteExpense(expenseModel.id!);
       for (var eUid in expenseModel.expenseUsers) {
         await deleteExpenseUser(eUid);
       }
@@ -224,13 +191,15 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       res.fold(
         (l) => throw Exception(l.message),
         (_) {
-          ref.read(boxNotifierProvider(boxModel.groupId).notifier).updateBox(
-                boxId: boxModel.id!,
-                total: boxModel.total - expenseModel.cost,
-                expenseIds: boxModel.expenseIds
-                    .where((id) => id != expenseModel.id)
-                    .toList(),
-              );
+          // Update the associated box
+          final updateBoxModel = boxModel.copyWith(
+            total: boxModel.total - expenseModel.cost,
+            expenseIds: boxModel.expenseIds
+                .where((id) => id != expenseModel.id)
+                .toList(),
+          );
+
+          _updateBoxUseCase.execute(updateBoxModel);
         },
       );
 
@@ -245,7 +214,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   Future<void> deleteAllExpense(List<String> ids) async {
     state = const AsyncValue.loading();
     try {
-      final res = await expenseRepository.deleteAllExpense(ids);
+      final res = await _expenseRepository.deleteAllExpense(ids);
 
       res.fold(
         (l) => throw Exception(l.message),
@@ -261,7 +230,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     required String customId,
   }) async {
     try {
-      final res = await expenseRepository.addExpenseUser(
+      final res = await _expenseRepository.addExpenseUser(
         expenseUser,
         customId: customId,
       );
@@ -277,7 +246,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
 
   Future<void> deleteExpenseUser(String id) async {
     try {
-      final res = await expenseRepository.deleteExpenseUser(id);
+      final res = await _expenseRepository.deleteExpenseUser(id);
 
       res.fold(
         (l) => throw Exception(l.message),
@@ -290,7 +259,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
 
   Future<List<ExpenseModel>> getExpensesInBox(String boxId) async {
     try {
-      final expenseList = await expenseRepository.getExpensesInBox(boxId);
+      final expenseList = await _expenseRepository.getExpensesInBox(boxId);
       return expenseList.map((box) => ExpenseModel.fromJson(box.data)).toList();
     } catch (e, st) {
       throw AsyncValue.error(e, st);
@@ -299,7 +268,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
 
   Future<ExpenseModel> getExpenseDetail(String expenseId) async {
     try {
-      final expense = await expenseRepository.getExpenseDetail(expenseId);
+      final expense = await _expenseRepository.getExpenseDetail(expenseId);
       return ExpenseModel.fromJson(expense.data);
     } catch (e, st) {
       throw AsyncValue.error(e, st);

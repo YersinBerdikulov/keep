@@ -15,7 +15,7 @@ import '../../../../core/utilities/validation/validation.dart';
 import '../../../../widgets/button/button.dart';
 import '../../../../widgets/friends/friend.dart';
 import '../../../../widgets/text_field/text_field.dart';
-import '../../domain/controllers/group_controller.dart';
+import '../../domain/di/group_controller_di.dart';
 
 class CreateGroupInfoCard extends ConsumerWidget {
   final TextEditingController groupTitle;

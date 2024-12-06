@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dongi/core/di/storage_di.dart';
 import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
+import 'package:dongi/modules/box/domain/di/box_usecase_di.dart';
 import 'package:dongi/modules/box/domain/usecases/delete_all_boxes_usecase.dart';
 import 'package:dongi/modules/group/data/di/group_di.dart';
 import 'package:dongi/modules/group/domain/repository/group_repository.dart';
@@ -11,33 +12,16 @@ import '../models/group_model.dart';
 import '../../../auth/domain/models/user_model.dart';
 import '../../../../core/data/storage/storage_service.dart';
 
-final groupNotifierProvider =
-    AsyncNotifierProvider<GroupNotifier, List<GroupModel>>(
-  GroupNotifier.new,
-);
-
-// Provider for getting group details
-final groupDetailProvider =
-    FutureProvider.family<GroupModel, String>((ref, groupId) async {
-  return ref.watch(groupNotifierProvider.notifier).getGroupDetail(groupId);
-});
-
-// Provider for getting users in a group
-final usersInGroupProvider =
-    FutureProvider.family<List<UserModel>, List<String>>((ref, userIds) async {
-  return ref.watch(groupNotifierProvider.notifier).getUsersInGroup(userIds);
-});
-
 class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
   late final GroupRepository _groupRepository;
   late final StorageService _storageService;
-  late final DeleteAllBoxesUseCase deleteAllBoxesUseCase;
+  late final DeleteAllBoxesUseCase _deleteAllBoxesUseCase;
 
   @override
   Future<List<GroupModel>> build() async {
     _groupRepository = ref.watch(groupRepositoryProvider);
     _storageService = ref.watch(storageProvider);
-    deleteAllBoxesUseCase = ref.watch(deleteAllBoxesUseCaseProvider);
+    _deleteAllBoxesUseCase = ref.watch(deleteAllBoxesUseCaseProvider);
     return _fetchGroups();
   }
 
@@ -131,7 +115,7 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
         await _storageService.deleteImage(groupModel.image!);
       }
 
-      await deleteAllBoxesUseCase.execute(groupModel.boxIds);
+      await _deleteAllBoxesUseCase.execute(groupModel.boxIds);
       state = AsyncValue.data(
         (state.value ?? [])
             .where((group) => group.id != groupModel.id)

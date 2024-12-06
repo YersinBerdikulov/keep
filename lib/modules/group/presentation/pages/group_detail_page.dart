@@ -8,7 +8,7 @@ import '../../../../widgets/appbar/sliver_appbar.dart';
 import '../../../../widgets/error/error.dart';
 import '../../../../widgets/floating_action_button/floating_action_button.dart';
 import '../../../../widgets/loading/loading.dart';
-import '../../domain/controllers/group_controller.dart';
+import '../../domain/di/group_controller_di.dart';
 import '../widgets/group_detail_widget.dart';
 
 class GroupDetailPage extends ConsumerWidget {

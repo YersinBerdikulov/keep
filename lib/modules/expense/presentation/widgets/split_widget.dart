@@ -7,7 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
 import '../../../../widgets/checkbox/checkbox_widget.dart';
 import '../../../../widgets/list_tile/list_tile_card.dart';
-import '../../domain/controllers/expense_controller.dart';
+import '../../domain/di/expense_controller_di.dart';
 
 class SplitFriendListWidget extends ConsumerWidget {
   final List<UserModel> users;

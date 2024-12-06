@@ -1,3 +1,4 @@
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,7 +19,7 @@ import '../../../../widgets/list_tile/list_tile_card.dart';
 import '../../../../widgets/loading/loading.dart';
 import '../../../../widgets/long_press_menu/long_press_menu.dart';
 import '../../../../core/utilities/extensions/date_extension.dart';
-import '../../../expense/domain/controllers/expense_controller.dart';
+import '../../../expense/domain/di/expense_controller_di.dart';
 import '../../domain/controllers/box_controller.dart';
 
 class TotalExpenseBoxDetail extends ConsumerWidget {

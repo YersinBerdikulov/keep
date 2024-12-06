@@ -16,7 +16,7 @@ import '../../../../widgets/card/card.dart';
 import '../../../../widgets/card/grey_card.dart';
 import '../../../../widgets/list_tile/list_tile_card.dart';
 import '../../../../widgets/text_field/text_field.dart';
-import '../../domain/controllers/expense_controller.dart';
+import '../../domain/di/expense_controller_di.dart';
 
 class UpdateExpenseAmount extends ConsumerWidget {
   final TextEditingController expenseCost;
