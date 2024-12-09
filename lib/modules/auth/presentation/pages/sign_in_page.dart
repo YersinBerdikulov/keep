@@ -1,4 +1,4 @@
-import 'package:dongi/modules/auth/domain/controllers/sign_up_controller.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +20,7 @@ class SignInPage extends HookConsumerWidget {
 
     /// by using listen we are not gonna rebuild our app
     ref.listen<AsyncValue<void>>(
-      signUpControllerProvider,
+      authControllerProvider,
       (previous, next) {
         next.when(
           data: (_) {

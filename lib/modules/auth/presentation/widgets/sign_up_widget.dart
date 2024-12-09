@@ -1,3 +1,4 @@
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +11,6 @@ import '../../../../core/utilities/validation/validation.dart';
 import '../../../../core/router/router_notifier.dart';
 import '../../../../widgets/button/button.dart';
 import '../../../../widgets/text_field/text_field.dart';
-import '../../domain/controllers/sign_up_controller.dart';
 
 class SignUpBody extends StatelessWidget {
   final List<Widget> children;
@@ -128,13 +128,13 @@ class SignUpAction extends ConsumerWidget {
           Expanded(
             child: ButtonWidget(
                 title: 'Sign Up',
-                isLoading: ref.watch(signUpControllerProvider).maybeWhen(
+                isLoading: ref.watch(authControllerProvider).maybeWhen(
                       loading: () => true,
                       orElse: () => false,
                     ),
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
-                    await ref.read(signUpControllerProvider.notifier).signUp(
+                    await ref.read(authControllerProvider.notifier).signUp(
                           userName: username.text,
                           email: email.text,
                           password: password.text,

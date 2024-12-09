@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dongi/app/friends/controller/friend_controller.dart';
 import 'package:dongi/models/user_friend_model.dart';
-import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

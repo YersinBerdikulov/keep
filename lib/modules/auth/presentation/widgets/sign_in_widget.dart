@@ -1,4 +1,4 @@
-import 'package:dongi/modules/auth/domain/controllers/sign_in_controller.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -101,13 +101,13 @@ class SignInActionButton extends ConsumerWidget {
           Expanded(
             child: ButtonWidget(
               title: "Sign in",
-              isLoading: ref.watch(signInControllerProvider).maybeWhen(
+              isLoading: ref.watch(authControllerProvider).maybeWhen(
                     loading: () => true,
                     orElse: () => false,
                   ),
               onPressed: () {
                 if (formKey.currentState!.validate()) {
-                  ref.read(signInControllerProvider.notifier).signIn(
+                  ref.read(authControllerProvider.notifier).signIn(
                         email: email.text,
                         password: password.text,
                       );
@@ -128,7 +128,7 @@ class SignInGoogleButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLoading = ref.watch(signInControllerProvider).maybeWhen(
+    final isLoading = ref.watch(authControllerProvider).maybeWhen(
           loading: () => true,
           orElse: () => false,
         );
@@ -136,8 +136,7 @@ class SignInGoogleButton extends ConsumerWidget {
     return InkWell(
       onTap: isLoading
           ? null
-          : () =>
-              ref.read(signInControllerProvider.notifier).signInWithGoogle(),
+          : () => ref.read(authControllerProvider.notifier).signInWithGoogle(),
       child: Container(
         height: 50,
         width: 50,

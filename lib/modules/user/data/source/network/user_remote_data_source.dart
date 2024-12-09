@@ -1,37 +1,21 @@
+import 'dart:async';
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart' as model;
 import 'package:dongi/core/constants/appwrite_config.dart';
+import 'package:dongi/core/types/failure.dart';
+import 'package:dongi/core/types/type_defs.dart';
+import 'package:dongi/modules/user/data/source/repository/user_repository_impl.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../core/types/failure.dart';
-import '../core/di/appwrite_di.dart';
-import '../core/types/type_defs.dart';
-import '../modules/auth/domain/models/user_model.dart';
 
-final userAPIProvider = Provider((ref) {
-  return UserAPI(
-    db: ref.watch(appwriteDatabaseProvider),
-    realtime: ref.watch(appwriteRealtimeProvider),
-  );
-});
+import '../../../../auth/domain/models/user_model.dart';
 
-abstract class IUserAPI {
-  FutureEitherVoid saveUserData(UserModel userModel, String uid);
-  Future<model.Document> getUserData(String uid);
-  Future<List<model.Document>> getUsersListData(List<String> userIds);
-  Future<List<model.Document>> searchUserByName(String name);
-  FutureEitherVoid updateUserData(UserModel userModel);
-  Stream<RealtimeMessage> getLatestUserProfileData();
-  FutureEitherVoid followUser(UserModel user);
-}
-
-class UserAPI implements IUserAPI {
+class UserRemoteDataSource implements UserRepositoryImpl {
   final Databases _db;
-  final Realtime _realtime;
-  UserAPI({
+  // final Realtime _realtime;
+  UserRemoteDataSource({
     required Databases db,
-    required Realtime realtime,
-  })  : _realtime = realtime,
+    // required Realtime realtime,
+  }) :
+        //  _realtime = realtime,
         _db = db;
 
   @override
@@ -57,29 +41,35 @@ class UserAPI implements IUserAPI {
   }
 
   @override
-  Future<model.Document> getUserData(String uid) {
-    return _db.getDocument(
+  Future<UserModel> getUserData(String uid) async {
+    final document = await _db.getDocument(
       databaseId: AppwriteConfig.databaseId,
       collectionId: AppwriteConfig.usersCollection,
       documentId: uid,
     );
+
+    final updatedUser = UserModel.fromJson(document.data);
+    return updatedUser;
   }
 
   @override
-  Future<List<model.Document>> getUsersListData(List<String> userIds) async {
-    final documents = await _db.listDocuments(
+  Future<List<UserModel>> getUsersListData(List<String> userIds) async {
+    final document = await _db.listDocuments(
       databaseId: AppwriteConfig.databaseId,
       collectionId: AppwriteConfig.usersCollection,
       queries: [
         Query.equal('\$id', userIds),
       ],
     );
-    return documents.documents;
+
+    return document.documents
+        .map((user) => UserModel.fromJson(user.data))
+        .toList();
   }
 
   @override
-  Future<List<model.Document>> searchUserByName(String name) async {
-    final documents = await _db.listDocuments(
+  Future<List<UserModel>> searchUserByName(String name) async {
+    final document = await _db.listDocuments(
       databaseId: AppwriteConfig.databaseId,
       collectionId: AppwriteConfig.usersCollection,
       queries: [
@@ -87,7 +77,9 @@ class UserAPI implements IUserAPI {
       ],
     );
 
-    return documents.documents;
+    return document.documents
+        .map((user) => UserModel.fromJson(user.data))
+        .toList();
   }
 
   @override
@@ -112,12 +104,12 @@ class UserAPI implements IUserAPI {
     }
   }
 
-  @override
-  Stream<RealtimeMessage> getLatestUserProfileData() {
-    return _realtime.subscribe([
-      'databases.${AppwriteConfig.databaseId}.collections.${AppwriteConfig.usersCollection}.documents'
-    ]).stream;
-  }
+  // @override
+  // Stream<RealtimeMessage> getLatestUserProfileData() {
+  //   return _realtime.subscribe([
+  //     'databases.${AppwriteConfig.databaseId}.collections.${AppwriteConfig.usersCollection}.documents'
+  //   ]).stream;
+  // }
 
   @override
   FutureEitherVoid followUser(UserModel user) {

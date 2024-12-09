@@ -1,5 +1,5 @@
 import 'package:dongi/core/utilities/extensions/date_extension.dart';
-import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/expense/domain/models/expense_model.dart';
 import 'package:dongi/widgets/card/grey_card.dart';
 import 'package:dongi/widgets/list_tile/list_tile.dart';

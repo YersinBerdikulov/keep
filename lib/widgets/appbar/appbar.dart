@@ -1,5 +1,5 @@
 // import 'package:dongi/core/router/router_notifier.dart';
-import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:flutter/material.dart';
 // import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

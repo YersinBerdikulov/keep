@@ -1,4 +1,4 @@
-import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/box/presentation/pages/box_detail_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/create_expense_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/made_by_page.dart';

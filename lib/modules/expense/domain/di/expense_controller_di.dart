@@ -1,4 +1,4 @@
-import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:dongi/modules/expense/domain/controllers/expense_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

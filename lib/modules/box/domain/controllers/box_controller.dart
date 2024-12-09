@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:dongi/core/di/storage_di.dart';
-import 'package:dongi/modules/auth/domain/controllers/auth_controller.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/box/data/di/box_di.dart';
 import 'package:dongi/modules/box/domain/repository/box_repository.dart';
 import 'package:flutter/material.dart';
