@@ -1,4 +1,4 @@
-import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/app/home/home_controller.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -222,7 +222,8 @@ class GroupCardWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final groupMember = ref.watch(getUsersListData(group.groupUsers));
+    final groupMember = ref.watch(groupMembersProvider(group.groupUsers));
+
     return CardWidget(
       onTap: () => context.push(RouteName.groupDetail(group.id)),
       margin: const EdgeInsets.only(right: 10),

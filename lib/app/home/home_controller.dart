@@ -1,4 +1,6 @@
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/modules/auth/domain/models/user_model.dart';
+import 'package:dongi/modules/user/domain/di/user_usecase_di.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -14,6 +16,12 @@ final homeNotifierProvider = StateNotifierProvider<HomeNotifier, HomeState>(
     );
   },
 );
+
+final groupMembersProvider = FutureProvider.autoDispose
+    .family<List<UserModel>, List<String>>((ref, userIds) async {
+  final getGroupMembersUseCase = ref.read(getGroupMembersUseCaseProvider);
+  return await getGroupMembersUseCase.execute(userIds);
+});
 
 @freezed
 class HomeState with _$HomeState {

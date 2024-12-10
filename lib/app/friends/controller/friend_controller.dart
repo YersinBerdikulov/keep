@@ -1,6 +1,7 @@
 import 'package:dongi/models/user_friend_model.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/modules/user/domain/di/user_usecase_di.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -48,9 +49,8 @@ class FriendNotifier extends StateNotifier<FriendState> {
   Future<void> addFriend(UserModel userModel) async {
     state = const FriendState.loading();
     final currentUser = ref.read(currentUserProvider);
-    final currentUserModel = await ref
-        .read(authControllerProvider.notifier)
-        .getUserData(currentUser!.id!);
+    final currentUserModel =
+        await ref.read(getUserDataUseCaseProvider).execute(currentUser!.id!);
 
     UserFriendModel friendModel = UserFriendModel(
       sendRequestUserId: currentUserModel.id!,
