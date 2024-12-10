@@ -3,20 +3,34 @@ import 'package:appwrite/appwrite.dart';
 import 'package:dongi/core/constants/appwrite_config.dart';
 import 'package:dongi/core/types/failure.dart';
 import 'package:dongi/core/types/type_defs.dart';
+import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/modules/user/data/source/repository/user_repository_impl.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '../../../../auth/domain/models/user_model.dart';
-
 class UserRemoteDataSource implements UserRepositoryImpl {
   final Databases _db;
-  // final Realtime _realtime;
+  final Account _account;
+
   UserRemoteDataSource({
     required Databases db,
-    // required Realtime realtime,
-  }) :
-        //  _realtime = realtime,
-        _db = db;
+    required Account account,
+  })  : _db = db,
+        _account = account;
+
+  @override
+  Future<UserModel> getCurrentUserData() async {
+    try {
+      final user = await _account.get();
+      return UserModel.fromJson(user.toMap());
+    } on AppwriteException catch (e, st) {
+      throw Failure(
+        e.message ?? 'Failed to fetch current user data.',
+        st,
+      );
+    } catch (e, st) {
+      throw Failure(e.toString(), st);
+    }
+  }
 
   @override
   FutureEitherVoid saveUserData(UserModel userModel, String authUid) async {
@@ -102,17 +116,5 @@ class UserRemoteDataSource implements UserRepositoryImpl {
     } catch (e, st) {
       return left(Failure(e.toString(), st));
     }
-  }
-
-  // @override
-  // Stream<RealtimeMessage> getLatestUserProfileData() {
-  //   return _realtime.subscribe([
-  //     'databases.${AppwriteConfig.databaseId}.collections.${AppwriteConfig.usersCollection}.documents'
-  //   ]).stream;
-  // }
-
-  @override
-  FutureEitherVoid followUser(UserModel user) {
-    throw UnimplementedError();
   }
 }

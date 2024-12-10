@@ -6,7 +6,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {
   final db = ref.watch(appwriteDatabaseProvider);
-  final remoteDataSource = UserRemoteDataSource(db: db);
+  final account = ref.watch(appwriteAccountProvider);
+
+  final remoteDataSource = UserRemoteDataSource(db: db, account: account);
 
   return UserRepositoryImpl(remoteDataSource: remoteDataSource);
 });

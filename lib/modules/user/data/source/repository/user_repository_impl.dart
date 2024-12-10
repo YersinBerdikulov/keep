@@ -10,8 +10,8 @@ class UserRepositoryImpl implements UserRepository {
       : _remoteDataSource = remoteDataSource;
 
   @override
-  FutureEitherVoid followUser(UserModel user) {
-    return _remoteDataSource.followUser(user);
+  Future<UserModel> getCurrentUserData() {
+    return _remoteDataSource.getCurrentUserData();
   }
 
   @override

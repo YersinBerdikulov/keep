@@ -6,9 +6,8 @@ import 'package:dongi/modules/auth/domain/repository/auth_repository.dart';
 import 'package:dongi/modules/auth/presentation/pages/sign_in_page.dart';
 import 'package:dongi/core/router/router_notifier.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
-import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
+import 'package:dongi/modules/user/data/di/user_di.dart';
 import 'package:dongi/modules/user/domain/repository/user_repository.dart';
-import 'package:dongi/services/user_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -22,7 +21,7 @@ class AuthController extends AsyncNotifier<UserModel?> {
   FutureOr<UserModel?> build() async {
     // Initialize dependencies
     authRepository = ref.read(authRepositoryProvider);
-    userRepository = ref.read(userNotifierProvider);
+    userRepository = ref.read(userRepositoryProvider);
 
     // Return the current user if logged in
     return await currentUser();

@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/modules/user/data/di/user_di.dart';
-// ignore: unused_import
-import 'package:dongi/modules/user/data/source/repository/user_repository_impl.dart';
 import 'package:dongi/modules/user/domain/repository/user_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -11,15 +9,32 @@ class UserController extends AsyncNotifier<UserModel?> {
 
   @override
   FutureOr<UserModel?> build() async {
-    // Initialize the repository
     _userRepository = ref.read(userRepositoryProvider);
+    return await _initializeCurrentUser();
+  }
 
-    // No user is initially loaded
-    return null;
+  UserModel? get currentUser => state.value;
+
+  Future<UserModel?> _initializeCurrentUser() async {
+    try {
+      return await _userRepository.getCurrentUserData();
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return null;
+    }
+  }
+
+  Future<UserModel> getUserData(String uid) async {
+    try {
+      final user = await _userRepository.getUserData(uid);
+      return user;
+    } catch (e) {
+      // state = AsyncValue.error(e, st);
+      rethrow;
+    }
   }
 
   Future<void> saveUser(UserModel userModel, String authUid) async {
-    state = const AsyncValue.loading();
     final result = await _userRepository.saveUserData(userModel, authUid);
 
     result.fold(
@@ -27,36 +42,25 @@ class UserController extends AsyncNotifier<UserModel?> {
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (_) {
-        // Optionally update the state
-        state = AsyncValue.data(userModel);
+        // Update only if the saved user is current user
+        if (currentUser?.id == userModel.id) {
+          state = AsyncValue.data(userModel);
+        }
       },
     );
   }
 
-  Future<void> fetchUser(String uid) async {
-    state = const AsyncValue.loading();
-    try {
-      final user = await _userRepository.getUserData(uid);
-      state = AsyncValue.data(user);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
-
-  Future<void> fetchUsersList(List<String> userIds) async {
-    state = const AsyncValue.loading();
+  Future<List<UserModel>> getUsersListData(List<String> userIds) async {
     try {
       final users = await _userRepository.getUsersListData(userIds);
-      // You can manage how this state reflects if needed
-      // For example, keep only the current state user, or handle as a list
-      state = AsyncValue.data(state.value);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      return users;
+    } catch (e) {
+      // state = AsyncValue.error(e, st);
+      rethrow;
     }
   }
 
   Future<void> updateUser(UserModel userModel) async {
-    state = const AsyncValue.loading();
     final result = await _userRepository.updateUserData(userModel);
 
     result.fold(
@@ -64,8 +68,10 @@ class UserController extends AsyncNotifier<UserModel?> {
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (_) {
-        // Update the state with the updated user model
-        state = AsyncValue.data(userModel);
+        // Update only if the update user is current user
+        if (currentUser?.id == userModel.id) {
+          state = AsyncValue.data(userModel); // Update only if same user
+        }
       },
     );
   }
