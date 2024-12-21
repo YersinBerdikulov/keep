@@ -78,4 +78,18 @@ class GroupRemoteDataSource {
     );
     return document;
   }
+
+  Future<List<Document>> getCurrentUserLatestGroup(
+      String uid, int limit) async {
+    final document = await _db.listDocuments(
+      databaseId: AppwriteConfig.databaseId,
+      collectionId: AppwriteConfig.groupCollection,
+      queries: [
+        Query.equal('creatorId', uid),
+        Query.orderDesc('\$createdAt'),
+        Query.limit(limit),
+      ],
+    );
+    return document.documents;
+  }
 }

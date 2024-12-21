@@ -1,17 +1,18 @@
-import 'package:dongi/app/home/home_controller.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:flutter/material.dart';
 
-import '../../core/constants/color_config.dart';
-import '../../core/constants/font_config.dart';
-import '../../core/constants/size_config.dart';
-import '../../modules/group/domain/models/group_model.dart';
-import '../../core/router/router_notifier.dart';
-import '../../widgets/card/card.dart';
-import '../../widgets/error/error.dart';
-import '../../widgets/image/image_widget.dart';
+import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
+
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/constants/font_config.dart';
+import '../../../../core/constants/size_config.dart';
+import '../../../../core/router/router_notifier.dart';
+import '../../../../widgets/card/card.dart';
+import '../../../../widgets/error/error.dart';
+import '../../../../widgets/image/image_widget.dart';
+import '../../../group/domain/models/group_model.dart';
 
 class HomeExpenseSummery extends ConsumerWidget {
   const HomeExpenseSummery({super.key});

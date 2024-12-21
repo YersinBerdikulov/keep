@@ -40,4 +40,12 @@ class GroupRepositoryImpl implements GroupRepository {
   Future<Document> getGroupDetail(String uid, String groupId) {
     return _remoteDataSource.getGroupDetail(groupId);
   }
+
+  @override
+  Future<List<Document>> getCurrentUserLatestGroup(
+    String uid, {
+    int limit = 3,
+  }) {
+    return _remoteDataSource.getCurrentUserLatestGroup(uid, limit);
+  }
 }

@@ -10,4 +10,5 @@ abstract class GroupRepository {
   Future<List<Document>> getGroups(String uid);
   Future<List<Document>> getUsersInGroup(List<String> userIds);
   Future<Document> getGroupDetail(String uid, String groupId);
+  Future<List<Document>> getCurrentUserLatestGroup(String uid, {int limit = 3});
 }
