@@ -6,19 +6,19 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/box_model.dart';
 import '../../../expense/domain/models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
 import '../../../auth/domain/models/user_model.dart';
 import '../../../../core/router/router_notifier.dart';
-import '../../../../widgets/card/category_card.dart';
-import '../../../../widgets/error/error.dart';
-import '../../../../widgets/friends/friend.dart';
-import '../../../../widgets/list_tile/list_tile_card.dart';
-import '../../../../widgets/loading/loading.dart';
-import '../../../../widgets/long_press_menu/long_press_menu.dart';
-import '../../../../core/utilities/extensions/date_extension.dart';
+import '../../../../shared/widgets/card/category_card.dart';
+import '../../../../shared/widgets/error/error.dart';
+import '../../../../shared/widgets/friends/friend.dart';
+import '../../../../shared/widgets/list_tile/list_tile_card.dart';
+import '../../../../shared/widgets/loading/loading.dart';
+import '../../../../shared/widgets/long_press_menu/long_press_menu.dart';
+import '../../../../shared/utilities/extensions/date_extension.dart';
 import '../../../expense/domain/di/expense_controller_di.dart';
 import '../../domain/controllers/box_controller.dart';
 

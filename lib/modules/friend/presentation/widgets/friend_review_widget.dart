@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
 import '../../../../core/constants/size_config.dart';
-import '../../../../widgets/list_tile/list_tile_card.dart';
+import '../../../../shared/widgets/list_tile/list_tile_card.dart';
 
 // Friend name widget
 class FriendNameWidget extends StatelessWidget {

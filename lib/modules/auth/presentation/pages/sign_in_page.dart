@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/router/router_notifier.dart';
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../widgets/sign_in_widget.dart';
 
 class SignInPage extends HookConsumerWidget {

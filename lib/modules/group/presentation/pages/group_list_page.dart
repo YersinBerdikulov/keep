@@ -2,10 +2,10 @@ import 'package:dongi/modules/group/domain/models/group_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../../../core/router/router_notifier.dart';
-import '../../../../widgets/appbar/appbar.dart';
-import '../../../../widgets/floating_action_button/floating_action_button.dart';
+import '../../../../shared/widgets/appbar/appbar.dart';
+import '../../../../shared/widgets/floating_action_button/floating_action_button.dart';
 import '../../domain/di/group_controller_di.dart';
 import '../widgets/group_list_widget.dart';
 

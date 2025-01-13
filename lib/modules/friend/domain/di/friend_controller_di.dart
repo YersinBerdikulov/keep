@@ -1,4 +1,4 @@
-import 'package:dongi/models/user_friend_model.dart';
+import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
 import 'package:dongi/modules/friend/domain/controllers/friend_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

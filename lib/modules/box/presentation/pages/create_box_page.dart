@@ -7,9 +7,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../../group/domain/models/group_model.dart';
-import '../../../../widgets/appbar/appbar.dart';
+import '../../../../shared/widgets/appbar/appbar.dart';
 import '../widgets/create_box_widget.dart';
 
 class CreateBoxPage extends HookConsumerWidget {

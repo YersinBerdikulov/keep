@@ -9,9 +9,9 @@ import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
 import '../../../../core/constants/size_config.dart';
 import '../../../../core/router/router_notifier.dart';
-import '../../../../widgets/card/card.dart';
-import '../../../../widgets/error/error.dart';
-import '../../../../widgets/image/image_widget.dart';
+import '../../../../shared/widgets/card/card.dart';
+import '../../../../shared/widgets/error/error.dart';
+import '../../../../shared/widgets/image/image_widget.dart';
 import '../../../group/domain/models/group_model.dart';
 
 class HomeExpenseSummery extends ConsumerWidget {

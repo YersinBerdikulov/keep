@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'core/constants/color_config.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'core/utilities/logger/state_logger.dart';
+import 'shared/utilities/logger/state_logger.dart';
 import 'firebase_options.dart';
 
 void main() async {

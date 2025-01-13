@@ -1,7 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:dongi/core/constants/appwrite_config.dart';
-import 'package:dongi/core/types/failure.dart';
+import 'package:dongi/shared/types/failure.dart';
 import 'package:dongi/modules/group/domain/models/group_model.dart';
 import 'package:fpdart/fpdart.dart';
 

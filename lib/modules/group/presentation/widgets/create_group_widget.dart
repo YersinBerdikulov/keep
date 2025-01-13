@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dongi/models/user_friend_model.dart';
+import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
 import 'package:flutter/material.dart';
@@ -10,11 +10,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
 import '../../../../core/constants/size_config.dart';
-import '../../../../core/utilities/helpers/image_picker_util.dart';
-import '../../../../core/utilities/validation/validation.dart';
-import '../../../../widgets/button/button.dart';
-import '../../../../widgets/friends/friend.dart';
-import '../../../../widgets/text_field/text_field.dart';
+import '../../../../shared/utilities/helpers/image_picker_util.dart';
+import '../../../../shared/utilities/validation/validation.dart';
+import '../../../../shared/widgets/button/button.dart';
+import '../../../../shared/widgets/friends/friend.dart';
+import '../../../../shared/widgets/text_field/text_field.dart';
 import '../../domain/di/group_controller_di.dart';
 
 class CreateGroupInfoCard extends ConsumerWidget {

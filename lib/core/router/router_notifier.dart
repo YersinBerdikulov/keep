@@ -20,8 +20,8 @@ import '../../modules/group/presentation/pages/group_detail_page.dart';
 import '../../modules/group/presentation/pages/group_list_page.dart';
 import '../../modules/group/presentation/pages/update_group_page.dart';
 import '../../modules/home/presentation/pages/home_page.dart';
-import '../../app/onboarding/onboarding_page.dart';
-import '../../app/splash/splash_page.dart';
+import '../../modules/onboarding/presentation/pages/onboarding_page.dart';
+import '../../modules/splash/presentation/pages/splash_page.dart';
 import '../../modules/group/domain/models/group_model.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();

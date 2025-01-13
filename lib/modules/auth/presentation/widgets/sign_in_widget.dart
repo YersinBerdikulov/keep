@@ -7,9 +7,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:dongi/core/constants/color_config.dart';
 import 'package:dongi/core/constants/content/register/sign_in_contents.dart';
 import 'package:dongi/core/constants/font_config.dart';
-import 'package:dongi/core/utilities/validation/validation.dart';
-import 'package:dongi/widgets/button/button.dart';
-import 'package:dongi/widgets/text_field/text_field.dart';
+import 'package:dongi/shared/utilities/validation/validation.dart';
+import 'package:dongi/shared/widgets/button/button.dart';
+import 'package:dongi/shared/widgets/text_field/text_field.dart';
 
 import '../../../../core/router/router_notifier.dart';
 

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:dongi/core/utilities/extensions/format_with_comma.dart';
+import 'package:dongi/shared/utilities/extensions/format_with_comma.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -11,11 +11,11 @@ import '../../../box/domain/models/box_model.dart';
 import '../../domain/models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
 import '../../../../core/router/router_notifier.dart';
-import '../../../../widgets/button/button.dart';
-import '../../../../widgets/card/card.dart';
-import '../../../../widgets/card/grey_card.dart';
-import '../../../../widgets/list_tile/list_tile_card.dart';
-import '../../../../widgets/text_field/text_field.dart';
+import '../../../../shared/widgets/button/button.dart';
+import '../../../../shared/widgets/card/card.dart';
+import '../../../../shared/widgets/card/grey_card.dart';
+import '../../../../shared/widgets/list_tile/list_tile_card.dart';
+import '../../../../shared/widgets/text_field/text_field.dart';
 import '../../domain/di/expense_controller_di.dart';
 
 class UpdateExpenseAmount extends ConsumerWidget {

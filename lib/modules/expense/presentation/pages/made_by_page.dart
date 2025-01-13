@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../../../widgets/appbar/appbar.dart';
+import '../../../../shared/widgets/appbar/appbar.dart';
 import '../widgets/made_by_widget.dart';
 
 class MadeByPage extends ConsumerWidget {

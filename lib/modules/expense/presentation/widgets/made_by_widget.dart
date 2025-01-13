@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
-import '../../../../widgets/list_tile/list_tile_card.dart';
+import '../../../../shared/widgets/list_tile/list_tile_card.dart';
 import '../../domain/di/expense_controller_di.dart';
 
 class MadeByFriendListWidget extends ConsumerWidget {

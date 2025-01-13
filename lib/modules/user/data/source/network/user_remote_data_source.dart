@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:appwrite/appwrite.dart';
 import 'package:dongi/core/constants/appwrite_config.dart';
-import 'package:dongi/core/types/failure.dart';
-import 'package:dongi/core/types/type_defs.dart';
+import 'package:dongi/shared/types/failure.dart';
+import 'package:dongi/shared/types/type_defs.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/modules/user/data/source/repository/user_repository_impl.dart';
 import 'package:fpdart/fpdart.dart';

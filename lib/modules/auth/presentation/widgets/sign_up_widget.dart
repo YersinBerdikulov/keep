@@ -7,10 +7,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/content/register/sign_up_contents.dart';
 import '../../../../core/constants/font_config.dart';
-import '../../../../core/utilities/validation/validation.dart';
+import '../../../../shared/utilities/validation/validation.dart';
 import '../../../../core/router/router_notifier.dart';
-import '../../../../widgets/button/button.dart';
-import '../../../../widgets/text_field/text_field.dart';
+import '../../../../shared/widgets/button/button.dart';
+import '../../../../shared/widgets/text_field/text_field.dart';
 
 class SignUpBody extends StatelessWidget {
   final List<Widget> children;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
-import '../../../../widgets/appbar/sliver_appbar.dart';
+import '../../../../shared/widgets/appbar/sliver_appbar.dart';
 import '../widgets/friend_review_widget.dart';
 
 class FriendReviewPage extends HookConsumerWidget {

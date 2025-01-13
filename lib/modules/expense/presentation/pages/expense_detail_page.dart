@@ -3,10 +3,10 @@ import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
-import '../../../../widgets/appbar/sliver_appbar.dart';
-import '../../../../widgets/error/error.dart';
-import '../../../../widgets/loading/loading.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/widgets/appbar/sliver_appbar.dart';
+import '../../../../shared/widgets/error/error.dart';
+import '../../../../shared/widgets/loading/loading.dart';
 import '../widgets/expense_detail_widget.dart';
 
 class ExpenseDetailPage extends ConsumerWidget {

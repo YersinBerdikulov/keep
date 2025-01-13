@@ -1,5 +1,5 @@
 import 'package:appwrite/models.dart';
-import 'package:dongi/core/types/type_defs.dart';
+import 'package:dongi/shared/types/type_defs.dart';
 import 'package:dongi/modules/auth/data/source/network/auth_remote_data_source.dart';
 import 'package:dongi/modules/auth/domain/repository/auth_repository.dart';
 

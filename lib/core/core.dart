@@ -1,2 +1,2 @@
-export 'types/failure.dart';
-export 'types/type_defs.dart';
+export '../shared/types/failure.dart';
+export '../shared/types/type_defs.dart';
