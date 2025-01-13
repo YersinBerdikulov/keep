@@ -1,6 +1,6 @@
-import 'package:dongi/app/friends/controller/friend_controller.dart';
 import 'package:dongi/core/constants/color_config.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
+import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
 import 'package:dongi/widgets/dialog/dialog_widget.dart';
 import 'package:dongi/widgets/image/image_widget.dart';
 import 'package:dongi/widgets/list_tile/list_tile_card.dart';

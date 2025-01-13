@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:dongi/app/friends/controller/friend_controller.dart';
 import 'package:dongi/models/user_friend_model.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -173,7 +173,7 @@ class CreateGroupAddFriend extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final friendList = ref.watch(getFriendProvider);
+    final friendList = ref.watch(friendNotifierProvider);
     final currentUserId = ref.read(currentUserProvider)!.id;
 
     return Padding(

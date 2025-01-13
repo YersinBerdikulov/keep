@@ -1,5 +1,6 @@
-import 'package:dongi/app/friends/add_friend/add_friend_widget.dart';
-import 'package:dongi/app/friends/controller/friend_controller.dart';
+import 'package:dongi/models/user_friend_model.dart';
+import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
+import 'package:dongi/modules/friend/presentation/widgets/add_friend_widget.dart';
 import 'package:dongi/core/utilities/helpers/snackbar_helper.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/widgets/appbar/appbar.dart';
@@ -17,25 +18,17 @@ class AddFriendPage extends HookConsumerWidget {
     final searchResults = useState<List<UserModel>>([]);
     final isLoading = useState<bool>(false);
 
-    /// Listen for changes in the friendNotifierProvider state
-    ref.listen<FriendState>(
+    /// Listening to changes in the groupNotifierProvider without rebuilding the UI
+    ref.listen<AsyncValue<List<UserFriendModel>>>(
       friendNotifierProvider,
-      (previous, next) {
-        next.whenOrNull(
-          loaded: () {
-            // Pop to prev page
-            Navigator.pop(context);
-
-            // Refresh the friend list and handle the result
-            ref.refresh(getFriendProvider);
-
-            // Show success SnackBar
-            showSnackBar(context, "Friend request sent successfully!");
+      (_, state) {
+        state.whenOrNull(
+          data: (_) {
+            // if (/* condition to refresh */) {
+            //   ref.invalidate(getGroupsProvider);
+            // }
           },
-          error: (message) {
-            // Show error SnackBar
-            showSnackBar(context, message);
-          },
+          error: (error, _) => showSnackBar(context, error.toString()),
         );
       },
     );

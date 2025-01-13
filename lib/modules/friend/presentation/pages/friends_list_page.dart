@@ -1,14 +1,15 @@
-import 'package:dongi/app/friends/controller/friend_controller.dart';
+import 'package:dongi/models/user_friend_model.dart';
 import 'package:dongi/core/utilities/helpers/snackbar_helper.dart';
 import 'package:dongi/core/router/router_notifier.dart';
+import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
 import 'package:dongi/widgets/floating_action_button/floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/constants/color_config.dart';
-import 'friends_list_widget.dart';
+import '../../../../core/constants/color_config.dart';
+import '../widgets/friends_list_widget.dart';
 
 class FriendsListPage extends HookConsumerWidget {
   const FriendsListPage({super.key});
@@ -18,18 +19,17 @@ class FriendsListPage extends HookConsumerWidget {
     final friendList = ref.watch(getFriendProvider);
     final tabController = useTabController(initialLength: 3);
 
-    /// by using listen we are not gonna rebuild our app
-    ref.listen<FriendState>(
+    /// Listening to changes in the groupNotifierProvider without rebuilding the UI
+    ref.listen<AsyncValue<List<UserFriendModel>>>(
       friendNotifierProvider,
-      (previous, next) {
-        next.whenOrNull(
-          loaded: () {
-            showSnackBar(context, 'Request sent successfully');
-            ref.refresh(getFriendProvider);
+      (_, state) {
+        state.whenOrNull(
+          data: (_) {
+            // if (/* condition to refresh */) {
+            //   ref.invalidate(getGroupsProvider);
+            // }
           },
-          error: (message) {
-            showSnackBar(context, message);
-          },
+          error: (error, _) => showSnackBar(context, error.toString()),
         );
       },
     );
