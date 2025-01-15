@@ -6,7 +6,7 @@
 
 //final _key = GlobalKey<NavigatorState>(debugLabel: 'routerKey');
 
-///// This simple provider caches our GoRouter.
+// This simple provider caches our GoRouter.
 //final routerProvider = Provider.autoDispose<GoRouter>((ref) {
 //  final notifier = ref.watch(routerNotifierProvider.notifier);
 

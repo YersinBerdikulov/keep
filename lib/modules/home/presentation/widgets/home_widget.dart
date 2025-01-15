@@ -196,7 +196,7 @@ class GroupCardWidget extends ConsumerWidget {
         Text(
           "Boxes",
           style: FontConfig.overline().copyWith(
-            color: ColorConfig.midnight.withOpacity(0.5),
+            color: ColorConfig.midnight.withAlpha((0.5 * 255).toInt()),
           ),
         ),
         const SizedBox(height: 5),
@@ -212,7 +212,7 @@ class GroupCardWidget extends ConsumerWidget {
     return Positioned(
       left: left,
       child: ImageWidget(
-        color: color ?? Colors.black54.withOpacity(0.3),
+        color: color ?? Colors.black54.withAlpha((0.3 * 255).toInt()),
         width: 32,
         height: 32,
         imageUrl: url,
@@ -258,7 +258,7 @@ class GroupCardWidget extends ConsumerWidget {
                 Text(
                   "Members",
                   style: FontConfig.overline().copyWith(
-                    color: ColorConfig.midnight.withOpacity(0.5),
+                    color: ColorConfig.midnight.withAlpha((0.5 * 255).toInt()),
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -480,7 +480,7 @@ class HomeRecentTransaction extends ConsumerWidget {
           Text(
             "Show more",
             style: FontConfig.overline().copyWith(
-              color: ColorConfig.midnight.withOpacity(0.5),
+              color: ColorConfig.midnight..withAlpha((0.5 * 255).toInt()),
             ),
           ),
         ],
@@ -515,7 +515,7 @@ class HomeRecentTransaction extends ConsumerWidget {
           Text(
             "You owe",
             style: FontConfig.overline().copyWith(
-              color: ColorConfig.midnight.withOpacity(0.5),
+              color: ColorConfig.midnight..withAlpha((0.5 * 255).toInt()),
             ),
           ),
           const SizedBox(height: 5),

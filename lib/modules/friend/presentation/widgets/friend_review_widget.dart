@@ -60,7 +60,7 @@ class ReviewSectionWidget extends StatelessWidget {
               Text(
                 'data',
                 style: FontConfig.overline().copyWith(
-                  color: ColorConfig.midnight.withOpacity(0.5),
+                  color: ColorConfig.midnight..withAlpha((0.5 * 255).toInt()),
                 ),
               ),
               Text(

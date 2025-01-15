@@ -54,7 +54,7 @@ class RouteName {
   static String expenseDetail = '/expense/detail';
 }
 
-GoRouter _goRouterConfig(StateProviderRef ref) {
+GoRouter _goRouterConfig(Ref ref) {
   return GoRouter(
     initialLocation: RouteName.splash,
     navigatorKey: navigatorKey,

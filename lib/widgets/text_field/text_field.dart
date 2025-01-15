@@ -45,7 +45,7 @@ class TextFieldWidget extends HookWidget {
         ),
         hintText: hintText,
         hintStyle: FontConfig.body2().copyWith(
-          color: ColorConfig.midnight.withOpacity(0.5),
+          color: ColorConfig.midnight.withAlpha((0.5 * 255).toInt()),
         ),
         suffixIcon: obscureText
             ? InkWell(

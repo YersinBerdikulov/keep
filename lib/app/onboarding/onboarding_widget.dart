@@ -24,7 +24,7 @@ class OnboardingTitle extends StatelessWidget {
         Text(
           onboardingContents[index].desc,
           style: FontConfig.body1().copyWith(
-            color: ColorConfig.primarySwatch.withOpacity(0.6),
+            color: ColorConfig.primarySwatch.withAlpha((0.6 * 255).toInt()),
           ),
         ),
       ],
@@ -96,7 +96,8 @@ class OnboardingActionButtons extends StatelessWidget {
                 width: 50,
                 child: ButtonWidget.outline(
                   title: "Skip",
-                  textColor: ColorConfig.midnight.withOpacity(0.6),
+                  textColor:
+                      ColorConfig.midnight.withAlpha((0.6 * 255).toInt()),
                   onPressed: () {
                     controller.animateToPage(
                       2,

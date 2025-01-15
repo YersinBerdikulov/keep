@@ -147,7 +147,8 @@ class SignInGoogleButton extends ConsumerWidget {
         child: Center(
           child: SvgPicture.asset(
             'assets/svg/google_icon.svg',
-            color: ColorConfig.secondary,
+            colorFilter:
+                ColorFilter.mode(ColorConfig.secondary, BlendMode.srcIn),
           ),
         ),
       ),

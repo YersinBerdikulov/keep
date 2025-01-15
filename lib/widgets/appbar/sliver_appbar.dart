@@ -67,7 +67,7 @@ class SliverAppBarWidget extends HookWidget {
                   ? Positioned.fill(
                       child: ColorFiltered(
                         colorFilter: ColorFilter.mode(
-                          Colors.black54.withOpacity(opacity),
+                          Colors.black54.withAlpha((opacity * 255).toInt()),
                           BlendMode.colorBurn,
                         ),
                         child: CachedNetworkImage(

@@ -81,7 +81,7 @@ class ChartsWidget extends StatelessWidget {
           majorTickLines: const MajorTickLines(width: 0),
           majorGridLines: MajorGridLines(
             width: 1,
-            color: ColorConfig.white.withOpacity(0.1),
+            color: ColorConfig.white.withAlpha((0.1 * 255).toInt()),
           ),
           axisLabelFormatter: labelFormat,
         ),
@@ -121,7 +121,8 @@ class CategoriesWidget extends StatelessWidget {
               Text(
                 'show more',
                 style: FontConfig.overline().copyWith(
-                  color: ColorConfig.primarySwatch.withOpacity(0.5),
+                  color: ColorConfig.primarySwatch
+                    ..withAlpha((0.5 * 255).toInt()),
                 ),
               ),
             ],

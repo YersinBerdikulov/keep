@@ -36,7 +36,7 @@ class UserInfoExpenseDetail extends ConsumerWidget {
                 color: ColorConfig.pureWhite,
               ),
               headerStringStyle: FontConfig.overline().copyWith(
-                color: ColorConfig.pureWhite.withOpacity(0.5),
+                color: ColorConfig.pureWhite..withAlpha((0.5 * 255).toInt()),
               ),
               leading: FriendWidget(
                 backgroundColor: ColorConfig.grey,
