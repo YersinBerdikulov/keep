@@ -4,13 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../../box/domain/models/box_model.dart';
 import '../../domain/models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
-import '../../../../widgets/appbar/appbar.dart';
-import '../../../../widgets/card/card.dart';
-import '../../../../widgets/text_field/text_field.dart';
+import '../../../../shared/widgets/appbar/appbar.dart';
+import '../../../../shared/widgets/card/card.dart';
+import '../../../../shared/widgets/text_field/text_field.dart';
 import '../../domain/di/expense_controller_di.dart';
 import '../widgets/update_expense_widget.dart';
 

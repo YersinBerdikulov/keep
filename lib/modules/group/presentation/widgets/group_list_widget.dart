@@ -3,12 +3,12 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/group_model.dart';
 import '../../../../core/router/router_notifier.dart';
-import '../../../../widgets/image/image_widget.dart';
-import '../../../../widgets/list_tile/list_tile_card.dart';
-import '../../../../widgets/long_press_menu/long_press_menu.dart';
+import '../../../../shared/widgets/image/image_widget.dart';
+import '../../../../shared/widgets/list_tile/list_tile_card.dart';
+import '../../../../shared/widgets/long_press_menu/long_press_menu.dart';
 import '../../domain/di/group_controller_di.dart';
 
 class GroupListView extends StatelessWidget {

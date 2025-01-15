@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../../../core/router/router_notifier.dart';
-import '../../../../widgets/appbar/sliver_appbar.dart';
-import '../../../../widgets/error/error.dart';
-import '../../../../widgets/floating_action_button/floating_action_button.dart';
-import '../../../../widgets/loading/loading.dart';
+import '../../../../shared/widgets/appbar/sliver_appbar.dart';
+import '../../../../shared/widgets/error/error.dart';
+import '../../../../shared/widgets/floating_action_button/floating_action_button.dart';
+import '../../../../shared/widgets/loading/loading.dart';
 import '../../domain/di/group_controller_di.dart';
 import '../widgets/group_detail_widget.dart';
 

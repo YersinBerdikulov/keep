@@ -1,4 +1,4 @@
-import 'package:dongi/core/types/type_defs.dart';
+import 'package:dongi/shared/types/type_defs.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
 
 abstract class UserRepository {

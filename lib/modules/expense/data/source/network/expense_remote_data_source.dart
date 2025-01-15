@@ -1,8 +1,8 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:dongi/core/constants/appwrite_config.dart';
-import 'package:dongi/core/types/failure.dart';
-import 'package:dongi/core/types/type_defs.dart';
+import 'package:dongi/shared/types/failure.dart';
+import 'package:dongi/shared/types/type_defs.dart';
 import 'package:dongi/modules/expense/domain/models/expense_model.dart';
 import 'package:dongi/modules/expense/domain/models/expense_user_model.dart';
 import 'package:fpdart/fpdart.dart';

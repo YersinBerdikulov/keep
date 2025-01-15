@@ -1,5 +1,5 @@
 import 'package:appwrite/models.dart';
-import 'package:dongi/core/types/type_defs.dart';
+import 'package:dongi/shared/types/type_defs.dart';
 import 'package:dongi/modules/box/data/source/network/box_remote_data_source.dart';
 import 'package:dongi/modules/box/domain/models/box_model.dart';
 import 'package:dongi/modules/box/domain/repository/box_repository.dart';

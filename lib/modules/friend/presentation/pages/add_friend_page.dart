@@ -1,10 +1,10 @@
-import 'package:dongi/models/user_friend_model.dart';
+import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
 import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
 import 'package:dongi/modules/friend/presentation/widgets/add_friend_widget.dart';
-import 'package:dongi/core/utilities/helpers/snackbar_helper.dart';
+import 'package:dongi/shared/utilities/helpers/snackbar_helper.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
-import 'package:dongi/widgets/appbar/appbar.dart';
-import 'package:dongi/widgets/text_field/text_field.dart';
+import 'package:dongi/shared/widgets/appbar/appbar.dart';
+import 'package:dongi/shared/widgets/text_field/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

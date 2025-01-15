@@ -1,9 +1,9 @@
 import 'package:dongi/core/constants/color_config.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
-import 'package:dongi/widgets/dialog/dialog_widget.dart';
-import 'package:dongi/widgets/image/image_widget.dart';
-import 'package:dongi/widgets/list_tile/list_tile_card.dart';
+import 'package:dongi/shared/widgets/dialog/dialog_widget.dart';
+import 'package:dongi/shared/widgets/image/image_widget.dart';
+import 'package:dongi/shared/widgets/list_tile/list_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

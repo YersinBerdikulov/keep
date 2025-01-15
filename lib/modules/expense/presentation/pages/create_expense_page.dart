@@ -4,11 +4,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../../box/domain/models/box_model.dart';
 import '../../../group/domain/models/group_model.dart';
-import '../../../../widgets/appbar/appbar.dart';
-import '../../../../widgets/card/card.dart';
+import '../../../../shared/widgets/appbar/appbar.dart';
+import '../../../../shared/widgets/card/card.dart';
 import '../../domain/di/expense_controller_di.dart';
 import '../widgets/create_expense_widget.dart';
 

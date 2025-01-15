@@ -1,17 +1,17 @@
-import 'package:dongi/core/utilities/extensions/date_extension.dart';
+import 'package:dongi/shared/utilities/extensions/date_extension.dart';
 import 'package:dongi/modules/expense/domain/models/expense_model.dart';
 import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
-import 'package:dongi/widgets/card/grey_card.dart';
-import 'package:dongi/widgets/list_tile/list_tile.dart';
-import 'package:dongi/widgets/list_tile/list_tile_card.dart';
+import 'package:dongi/shared/widgets/card/grey_card.dart';
+import 'package:dongi/shared/widgets/list_tile/list_tile.dart';
+import 'package:dongi/shared/widgets/list_tile/list_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
-import '../../../../widgets/error/error.dart';
-import '../../../../widgets/friends/friend.dart';
-import '../../../../widgets/loading/loading.dart';
+import '../../../../shared/widgets/error/error.dart';
+import '../../../../shared/widgets/friends/friend.dart';
+import '../../../../shared/widgets/loading/loading.dart';
 
 class UserInfoExpenseDetail extends ConsumerWidget {
   final String creatorId;

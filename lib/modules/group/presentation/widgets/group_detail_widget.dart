@@ -5,14 +5,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/group_model.dart';
 import '../../../auth/domain/models/user_model.dart';
-import '../../../../widgets/card/box_card.dart';
-import '../../../../widgets/card/card.dart';
-import '../../../../widgets/error/error.dart';
-import '../../../../widgets/friends/friend.dart';
-import '../../../../widgets/loading/loading.dart';
+import '../../../../shared/widgets/card/box_card.dart';
+import '../../../../shared/widgets/card/card.dart';
+import '../../../../shared/widgets/error/error.dart';
+import '../../../../shared/widgets/friends/friend.dart';
+import '../../../../shared/widgets/loading/loading.dart';
 import '../../domain/di/group_controller_di.dart';
 
 class GroupDetailTitle extends StatelessWidget {

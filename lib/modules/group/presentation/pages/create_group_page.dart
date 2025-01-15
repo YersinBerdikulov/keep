@@ -6,8 +6,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/utilities/helpers/snackbar_helper.dart';
-import '../../../../widgets/appbar/appbar.dart';
+import '../../../../shared/utilities/helpers/snackbar_helper.dart';
+import '../../../../shared/widgets/appbar/appbar.dart';
 import '../../domain/di/group_controller_di.dart';
 import '../widgets/create_group_widget.dart';
 

@@ -1,4 +1,4 @@
-import 'package:dongi/models/user_friend_model.dart';
+import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/friend/domain/repository/friend_repository.dart';

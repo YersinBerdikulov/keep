@@ -1,12 +1,12 @@
 import 'package:dongi/core/constants/font_config.dart';
-import 'package:dongi/core/utilities/extensions/round_double.dart';
+import 'package:dongi/shared/utilities/extensions/round_double.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
-import 'package:dongi/widgets/card/card.dart';
+import 'package:dongi/shared/widgets/card/card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
-import '../../../../widgets/checkbox/checkbox_widget.dart';
-import '../../../../widgets/list_tile/list_tile_card.dart';
+import '../../../../shared/widgets/checkbox/checkbox_widget.dart';
+import '../../../../shared/widgets/list_tile/list_tile_card.dart';
 import '../../domain/di/expense_controller_di.dart';
 
 class SplitFriendListWidget extends ConsumerWidget {

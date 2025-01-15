@@ -1,5 +1,5 @@
 import 'package:appwrite/models.dart';
-import 'package:dongi/core/types/failure.dart';
+import 'package:dongi/shared/types/failure.dart';
 import 'package:dongi/modules/group/data/source/network/group_remote_data_source.dart';
 import 'package:dongi/modules/group/domain/models/group_model.dart';
 import 'package:dongi/modules/group/domain/repository/group_repository.dart';

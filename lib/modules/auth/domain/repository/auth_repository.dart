@@ -1,5 +1,5 @@
 import 'package:appwrite/models.dart';
-import 'package:dongi/core/types/type_defs.dart';
+import 'package:dongi/shared/types/type_defs.dart';
 
 abstract class AuthRepository {
   FutureEither<User> signUp({
