@@ -16,4 +16,10 @@ abstract class AuthRepository {
   });
   Future<User?> currentUserAccount();
   FutureEitherVoid logout();
+
+  /// Sends an OTP to the given email for verification
+  FutureEitherVoid sendOTP({required String email});
+
+  /// Sends a Magic Link to the given email for authentication
+  FutureEitherVoid sendMagicLink({required String email});
 }

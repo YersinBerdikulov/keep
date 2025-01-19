@@ -106,13 +106,47 @@ class AuthRemoteDataSource {
 
   FutureEitherVoid forgetPassword({required String email}) async {
     try {
-      await _account.deleteSession(
-        sessionId: 'current',
-      );
+      await _account.createRecovery(email: email, url: 'YOUR_APP_URL');
       return right(null);
     } on AppwriteException catch (e, stackTrace) {
       return left(
         Failure(e.message ?? 'Some unexpected error occurred', stackTrace),
+      );
+    } catch (e, stackTrace) {
+      return left(
+        Failure(e.toString(), stackTrace),
+      );
+    }
+  }
+
+  /// Sends an OTP to the user's email for verification
+  FutureEitherVoid sendOTP({required String email}) async {
+    try {
+      await _account.createVerification(url: 'YOUR_APP_URL');
+      return right(null);
+    } on AppwriteException catch (e, stackTrace) {
+      return left(
+        Failure(e.message ?? 'Failed to send OTP', stackTrace),
+      );
+    } catch (e, stackTrace) {
+      return left(
+        Failure(e.toString(), stackTrace),
+      );
+    }
+  }
+
+  /// Sends a Magic Link to the user's email for authentication
+  FutureEitherVoid sendMagicLink({required String email}) async {
+    try {
+      await _account.createMagicURLToken(
+        userId: ID.unique(),
+        email: email,
+        url: 'YOUR_APP_URL',
+      );
+      return right(null);
+    } on AppwriteException catch (e, stackTrace) {
+      return left(
+        Failure(e.message ?? 'Failed to send Magic Link', stackTrace),
       );
     } catch (e, stackTrace) {
       return left(

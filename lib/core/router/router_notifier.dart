@@ -10,7 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../modules/auth/presentation/pages/sign_in_page.dart';
-import '../../modules/auth/presentation/pages/sign_up_page.dart';
+import '../../modules/auth/presentation/pages/sign_up_email_input_page.dart';
 import '../../modules/box/presentation/pages/create_box_page.dart';
 import '../../modules/box/presentation/pages/update_box_page.dart';
 import '../../modules/expense/presentation/pages/expense_detail_page.dart';
@@ -35,7 +35,8 @@ class RouteName {
   static String home = '/';
   static String splash = '/splash';
   static String signin = '/signin';
-  static String signup = '/signup';
+  static String signupEmailInput = '/signup/email';
+  static String signupOTPInput = 'signup/otp';
   static String onboarding = '/onboarding';
   static String groupList = '/group';
   static String createGroup = '/group/create';
@@ -68,8 +69,12 @@ GoRouter _goRouterConfig(Ref ref) {
         builder: (context, state) => const SplashPage(),
       ),
       GoRoute(
-        path: RouteName.signup,
-        builder: (context, state) => SignUpPage(),
+        path: RouteName.signupEmailInput,
+        builder: (context, state) => SignUpEmailInputPage(),
+      ),
+      GoRoute(
+        path: RouteName.signupOTPInput,
+        builder: (context, state) => SignUpEmailInputPage(),
       ),
       GoRoute(
         path: RouteName.signin,
@@ -179,7 +184,7 @@ GoRouter _goRouterConfig(Ref ref) {
           }),
     ],
     redirect: (context, state) async {
-      if (state.uri.toString() == RouteName.signup ||
+      if (state.uri.toString() == RouteName.signupEmailInput ||
           state.uri.toString() == RouteName.signin ||
           state.uri.toString() == RouteName.splash ||
           state.uri.toString() == RouteName.onboarding) {

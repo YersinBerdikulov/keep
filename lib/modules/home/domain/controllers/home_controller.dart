@@ -1,4 +1,5 @@
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/modules/group/domain/di/group_usecase_di.dart';
 import 'package:dongi/modules/group/domain/models/group_model.dart';
 import 'package:dongi/modules/group/domain/usecases/get_current_user_latest_group_usecase.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -10,6 +11,8 @@ class HomeNotifier extends AsyncNotifier<List<GroupModel>> {
   @override
   Future<List<GroupModel>> build() async {
     // _homeRepository = ref.watch(homeAPIProvider);
+    _currentUserLatestGroup = ref.watch(getCurrentUserLatestGroupUseCase);
+
     return getLatestGroupsInHome();
   }
 

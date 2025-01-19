@@ -30,6 +30,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  FutureEitherVoid sendMagicLink({required String email}) {
+    return _remoteDataSource.sendMagicLink(email: email);
+  }
+
+  @override
+  FutureEitherVoid sendOTP({required String email}) {
+    return _remoteDataSource.sendOTP(email: email);
+  }
+
+  @override
   FutureEither<User> signInWithGoogle() {
     return _remoteDataSource.signInWithGoogle();
   }

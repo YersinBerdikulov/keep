@@ -136,6 +136,34 @@ class AuthController extends AsyncNotifier<UserModel?> {
     );
   }
 
+  /// Sends OTP for email verification
+  Future<void> sendOTP(String email) async {
+    // Set state to loading
+    state = const AsyncValue.loading();
+
+    final res = await authRepository.sendOTP(email: email);
+
+    // Update state based on the result
+    state = res.fold(
+      (l) => AsyncValue.error(l.message, l.stackTrace),
+      (r) => const AsyncValue.data(null),
+    );
+  }
+
+  /// Sends Magic Link for login
+  Future<void> sendMagicLink(String email) async {
+    // Set state to loading
+    state = const AsyncValue.loading();
+
+    final res = await authRepository.sendMagicLink(email: email);
+
+    // Update state based on the result
+    state = res.fold(
+      (l) => AsyncValue.error(l.message, l.stackTrace),
+      (r) => const AsyncValue.data(null),
+    );
+  }
+
   void logout(BuildContext context) async {
     final res = await authRepository.logout();
     res.fold(
