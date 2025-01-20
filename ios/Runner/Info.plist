@@ -63,17 +63,19 @@
 	<string>Main</string>
 	<key>CFBundleURLTypes</key>
 	<array>
-    	<dict>
-        	<key>CFBundleURLSchemes</key>
-        	<array>
-            	<string>dongi</string>
-        	</array>
-    	</dict>
-	</array>
-	<!-- <key>LSApplicationQueriesSchemes</key>
+	    <dict>
+	        <key>CFBundleURLName</key>
+	        <string>ir.dispose.dongi</string>
+	        <key>CFBundleURLSchemes</key>
+	        <array>
+	            <string>dongi</string>
+	        </array>
+	    </dict>
+	</array>>
+	<key>LSApplicationQueriesSchemes</key>
 	<array>
-    	<string>heyo</string>
-    	<string>twitter</string>
-	</array> -->
+		<string>dongi</string>
+    	<!-- <string>twitter</string> -->
+	</array>
 </dict>
 </plist>

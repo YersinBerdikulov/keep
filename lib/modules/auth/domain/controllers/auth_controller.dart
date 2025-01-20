@@ -150,6 +150,20 @@ class AuthController extends AsyncNotifier<UserModel?> {
     );
   }
 
+  Future<void> verifyOTP({required String email, required String otp}) async {
+    try {
+      state = const AsyncValue.loading();
+
+      // Verify the OTP
+      await authRepository.verifyOTP(email: email, otp: otp);
+
+      // Set success state
+      state = const AsyncValue.data(null);
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e, stackTrace);
+    }
+  }
+
   /// Sends Magic Link for login
   Future<void> sendMagicLink(String email) async {
     // Set state to loading
@@ -187,6 +201,38 @@ class AuthController extends AsyncNotifier<UserModel?> {
           ),
           (route) => false,
         );
+      },
+    );
+  }
+
+  Future<void> setPasswordAndUsername({
+    required String userId,
+    required String password,
+    String? username,
+  }) async {
+    // Set state to loading
+    state = const AsyncValue.loading();
+
+    // Update password
+    final passwordRes = await authRepository.updatePassword(password: password);
+
+    // Handle password update result
+    state = await passwordRes.fold(
+      (l) => AsyncValue.error(l.message, l.stackTrace),
+      (r) async {
+        if (username != null) {
+          // Update username
+          final usernameRes = await userRepository.updateUsername(
+              userId: userId, username: username);
+
+          // Handle username update result
+          return usernameRes.fold(
+            (l) => AsyncValue.error(l.message, l.stackTrace),
+            (r) => const AsyncValue.data(null),
+          );
+        } else {
+          return const AsyncValue.data(null);
+        }
       },
     );
   }

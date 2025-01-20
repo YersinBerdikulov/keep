@@ -43,6 +43,11 @@
        	 		<action android:name="android.intent.action.VIEW" />
        	 		<category android:name="android.intent.category.DEFAULT" />
        	 		<category android:name="android.intent.category.BROWSABLE" />
+
+                        <!-- Handle custom scheme -->
+                <data android:scheme="dongi" android:host="verify-email" />
+                <data android:scheme="dongi" android:host="reset-password" />
+                <data android:scheme="dongi" android:host="magic-link" />
        	 		<data android:scheme="dongi" />
 			</intent-filter>
         </activity>

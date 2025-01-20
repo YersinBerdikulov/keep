@@ -38,4 +38,10 @@ class UserRepositoryImpl implements UserRepository {
   FutureEitherVoid updateUserData(UserModel userModel) {
     return _remoteDataSource.updateUserData(userModel);
   }
+
+  @override
+  FutureEitherVoid updateUsername(
+      {required String userId, required String username}) {
+    return _remoteDataSource.updateUsername(userId: userId, username: username);
+  }
 }

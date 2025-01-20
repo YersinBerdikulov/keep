@@ -117,4 +117,27 @@ class UserRemoteDataSource implements UserRepositoryImpl {
       return left(Failure(e.toString(), st));
     }
   }
+
+  @override
+  FutureEitherVoid updateUsername(
+      {required String userId, required String username}) async {
+    try {
+      await _db.updateDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.usersCollection,
+        documentId: userId,
+        data: {'username': username},
+      );
+      return right(null);
+    } on AppwriteException catch (e, st) {
+      return left(
+        Failure(
+          e.message ?? 'Some unexpected error occurred',
+          st,
+        ),
+      );
+    } catch (e, st) {
+      return left(Failure(e.toString(), st));
+    }
+  }
 }

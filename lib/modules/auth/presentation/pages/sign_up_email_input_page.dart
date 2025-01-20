@@ -1,12 +1,12 @@
 import 'package:dongi/core/constants/constant.dart';
 import 'package:dongi/shared/utilities/validation/validation.dart';
+import 'package:dongi/shared/widgets/button/button.dart';
 import 'package:dongi/shared/widgets/text_field/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/constants/color_config.dart';
 import '../../../../core/router/router_notifier.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../domain/di/auth_controller_di.dart';
@@ -27,8 +27,7 @@ class SignUpEmailInputPage extends HookConsumerWidget {
         next.when(
           data: (_) {
             // Proceed to OTP page on successful email submission
-            context.go(
-                RouteName.signupOTPInput); // Update with your OTP route name
+            context.go(RouteName.signupOTPInput);
           },
           loading: () {
             // Optional: Show a loading state (snackbar, etc.)
@@ -84,7 +83,12 @@ class SignUpEmailInputPage extends HookConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton(
+                    child: ButtonWidget(
+                      title: "Send OTP",
+                      isLoading: ref.watch(authControllerProvider).maybeWhen(
+                            loading: () => true,
+                            orElse: () => false,
+                          ),
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           await ref
@@ -92,12 +96,16 @@ class SignUpEmailInputPage extends HookConsumerWidget {
                               .sendOTP(emailController.text);
                         }
                       },
-                      child: const Text("Send OTP"),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton(
+                    child: ButtonWidget(
+                      title: "Send Magic Link",
+                      isLoading: ref.watch(authControllerProvider).maybeWhen(
+                            loading: () => true,
+                            orElse: () => false,
+                          ),
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           await ref
@@ -105,7 +113,6 @@ class SignUpEmailInputPage extends HookConsumerWidget {
                               .sendMagicLink(emailController.text);
                         }
                       },
-                      child: const Text("Send Magic Link"),
                     ),
                   ),
                 ],
@@ -117,13 +124,12 @@ class SignUpEmailInputPage extends HookConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: () => context
-                        .go(RouteName.signin), // Update with your sign-in route
+                    onPressed: () => context.go(RouteName.signin),
                     child: const Text("Sign In"),
                   ),
                   const SizedBox(width: 8),
                   TextButton(
-                    onPressed: () {}, // Update with your forgot password route
+                    onPressed: () {}, // Update with forgot password route
                     child: const Text("Forgot Password?"),
                   ),
                 ],

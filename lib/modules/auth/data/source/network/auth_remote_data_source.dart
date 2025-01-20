@@ -106,7 +106,9 @@ class AuthRemoteDataSource {
 
   FutureEitherVoid forgetPassword({required String email}) async {
     try {
-      await _account.createRecovery(email: email, url: 'YOUR_APP_URL');
+      await _account.createRecovery(
+          email: email, url: 'dongi://reset-password');
+
       return right(null);
     } on AppwriteException catch (e, stackTrace) {
       return left(
@@ -122,7 +124,26 @@ class AuthRemoteDataSource {
   /// Sends an OTP to the user's email for verification
   FutureEitherVoid sendOTP({required String email}) async {
     try {
-      await _account.createVerification(url: 'YOUR_APP_URL');
+      await _account.createVerification(url: 'dongi://verify-email');
+      return right(null);
+    } on AppwriteException catch (e, stackTrace) {
+      return left(
+        Failure(e.message ?? 'Failed to send OTP', stackTrace),
+      );
+    } catch (e, stackTrace) {
+      return left(
+        Failure(e.toString(), stackTrace),
+      );
+    }
+  }
+
+  /// Verifies the OTP sent to the user's email
+  FutureEitherVoid verifyOTP({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      await _account.updateVerification(userId: email, secret: otp);
       return right(null);
     } on AppwriteException catch (e, stackTrace) {
       return left(
@@ -141,12 +162,29 @@ class AuthRemoteDataSource {
       await _account.createMagicURLToken(
         userId: ID.unique(),
         email: email,
-        url: 'YOUR_APP_URL',
+        url: 'dongi://magic-link',
       );
       return right(null);
     } on AppwriteException catch (e, stackTrace) {
       return left(
         Failure(e.message ?? 'Failed to send Magic Link', stackTrace),
+      );
+    } catch (e, stackTrace) {
+      return left(
+        Failure(e.toString(), stackTrace),
+      );
+    }
+  }
+
+  FutureEitherVoid updatePassword({
+    required String password,
+  }) async {
+    try {
+      await _account.updatePassword(password: password);
+      return right(null);
+    } on AppwriteException catch (e, stackTrace) {
+      return left(
+        Failure(e.message ?? 'Failed to update password', stackTrace),
       );
     } catch (e, stackTrace) {
       return left(

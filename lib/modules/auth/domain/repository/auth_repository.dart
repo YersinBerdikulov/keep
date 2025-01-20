@@ -20,6 +20,12 @@ abstract class AuthRepository {
   /// Sends an OTP to the given email for verification
   FutureEitherVoid sendOTP({required String email});
 
+  /// Verifies the OTP sent to the given email
+  FutureEitherVoid verifyOTP({required String email, required String otp});
+
   /// Sends a Magic Link to the given email for authentication
   FutureEitherVoid sendMagicLink({required String email});
+
+  /// update password for the given user
+  FutureEitherVoid updatePassword({required String password});
 }

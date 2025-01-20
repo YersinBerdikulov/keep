@@ -8,6 +8,10 @@ abstract class UserRepository {
   Future<List<UserModel>> getUsersListData(List<String> userIds);
   Future<List<UserModel>> searchUserByName(String name);
   FutureEitherVoid updateUserData(UserModel userModel);
-  // Stream<RealtimeMessage> getLatestUserProfileData();
-  // FutureEitherVoid followUser(UserModel user);
+
+  /// update username for the given user
+  FutureEitherVoid updateUsername({
+    required String userId,
+    required String username,
+  });
 }

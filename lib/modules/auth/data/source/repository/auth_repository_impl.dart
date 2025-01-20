@@ -40,6 +40,11 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  FutureEitherVoid verifyOTP({required String email, required String otp}) {
+    return _remoteDataSource.verifyOTP(email: email, otp: otp);
+  }
+
+  @override
   FutureEither<User> signInWithGoogle() {
     return _remoteDataSource.signInWithGoogle();
   }
@@ -47,5 +52,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   FutureEither<User> signUp({required String email, required String password}) {
     return _remoteDataSource.signUp(email: email, password: password);
+  }
+
+  @override
+  FutureEitherVoid updatePassword({required String password}) {
+    return _remoteDataSource.updatePassword(password: password);
   }
 }
