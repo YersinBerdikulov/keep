@@ -107,7 +107,7 @@ class FriendListBoxDetail extends ConsumerWidget {
         children: [
           FriendWidget(image: user.profileImage),
           const SizedBox(height: 5),
-          Text(user.userName, style: FontConfig.overline()),
+          Text(user.userName ?? user.email, style: FontConfig.overline()),
         ],
       ),
     );
@@ -250,7 +250,7 @@ class ExpenseListBoxDetail extends ConsumerWidget {
             // Optionally handle loading state here
           },
           error: (error, stackTrace) {
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },
@@ -315,7 +315,7 @@ class ExpenseCardItem extends ConsumerWidget {
           .read(expenseNotifierProvider.notifier)
           .deleteExpense(expenseModel: expenseModel, boxModel: boxModel);
       if (context.mounted) {
-        showSnackBar(context, "Expense deleted successfully!!");
+        showSnackBar(context, content: "Expense deleted successfully!!");
       }
       return ref.refresh(getBoxDetailProvider(
         BoxDetailArgs(boxId: boxModel.id!, groupId: groupModel.id!),

@@ -55,15 +55,42 @@ class UserRemoteDataSource implements UserRepositoryImpl {
   }
 
   @override
-  Future<UserModel> getUserData(String uid) async {
+  Future<UserModel?> getUserDataById(String uid) async {
     final document = await _db.getDocument(
       databaseId: AppwriteConfig.databaseId,
       collectionId: AppwriteConfig.usersCollection,
       documentId: uid,
     );
 
-    final updatedUser = UserModel.fromJson(document.data);
-    return updatedUser;
+    final user = UserModel.fromJson(document.data);
+    return user;
+  }
+
+  @override
+  Future<UserModel?> getUserDataByEmail(String email) async {
+    try {
+      final document = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.usersCollection,
+        queries: [
+          Query.equal('email', email),
+        ],
+      );
+
+      if (document.documents.isEmpty) {
+        return null;
+      }
+
+      final user = UserModel.fromJson(document.documents.first.data);
+      return user;
+    } on AppwriteException catch (e, st) {
+      throw Failure(
+        e.message ?? 'Failed to fetch user data by email.',
+        st,
+      );
+    } catch (e, st) {
+      throw Failure(e.toString(), st);
+    }
   }
 
   @override

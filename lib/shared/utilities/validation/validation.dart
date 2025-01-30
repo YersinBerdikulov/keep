@@ -36,6 +36,14 @@ class FormValidatorNotifier extends StateNotifier<String?> {
     }
   }
 
+  String? validateLength(String? value) {
+    if (value != null && value.length == 6) {
+      return null;
+    } else {
+      return 'Length must be 6 digits';
+    }
+  }
+
   String? validateCost(String? value) {
     if (value != null && value.isNotEmpty) {
       try {

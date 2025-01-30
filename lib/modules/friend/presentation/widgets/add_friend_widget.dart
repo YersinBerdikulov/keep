@@ -45,7 +45,7 @@ class AddFriendList extends HookConsumerWidget {
                     width: 50,
                     height: 50,
                   ),
-                  titleString: result.userName,
+                  titleString: result.userName ?? result.email,
                   subtitleString: result.email,
                   visualDensity: const VisualDensity(vertical: -2),
                   trailing: Container(

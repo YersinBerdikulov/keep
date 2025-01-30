@@ -86,7 +86,7 @@ class OnboardingActionButtons extends StatelessWidget {
                   title: "Start",
                   textColor: ColorConfig.secondary,
                   onPressed: () => context.go(
-                    RouteName.signin,
+                    RouteName.authHome,
                   ),
                 ),
               ),

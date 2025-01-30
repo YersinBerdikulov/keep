@@ -29,7 +29,7 @@ class ExpenseDetailPage extends ConsumerWidget {
             // Optionally handle loading state
           },
           error: (error, stackTrace) {
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },

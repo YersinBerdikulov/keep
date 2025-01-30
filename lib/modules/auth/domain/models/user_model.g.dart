@@ -12,7 +12,7 @@ _$BoxModelImpl _$$BoxModelImplFromJson(Map<String, dynamic> json) =>
       createdAt: json[r'$createdAt'] as String?,
       updatedAt: json[r'$updatedAt'] as String?,
       email: json['email'] as String,
-      userName: json['userName'] as String,
+      userName: json['userName'] as String?,
       firstName: json['firstName'] as String?,
       lastName: json['lastName'] as String?,
       profileImage: json['profileImage'] as String?,

@@ -34,8 +34,12 @@ mixin _$GroupModel {
   List<String> get groupUsers => throw _privateConstructorUsedError;
   List<String> get boxIds => throw _privateConstructorUsedError;
 
+  /// Serializes this GroupModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of GroupModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $GroupModelCopyWith<GroupModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -69,6 +73,8 @@ class _$GroupModelCopyWithImpl<$Res, $Val extends GroupModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of GroupModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -157,6 +163,8 @@ class __$$GroupModelImplCopyWithImpl<$Res>
       _$GroupModelImpl _value, $Res Function(_$GroupModelImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of GroupModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -302,7 +310,7 @@ class _$GroupModelImpl implements _GroupModel {
             const DeepCollectionEquality().equals(other._boxIds, _boxIds));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -317,7 +325,9 @@ class _$GroupModelImpl implements _GroupModel {
       const DeepCollectionEquality().hash(_groupUsers),
       const DeepCollectionEquality().hash(_boxIds));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of GroupModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$GroupModelImplCopyWith<_$GroupModelImpl> get copyWith =>
@@ -370,8 +380,11 @@ abstract class _GroupModel implements GroupModel {
   List<String> get groupUsers;
   @override
   List<String> get boxIds;
+
+  /// Create a copy of GroupModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GroupModelImplCopyWith<_$GroupModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -30,8 +30,12 @@ mixin _$GroupUserModel {
   String get groupId => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
 
+  /// Serializes this GroupUserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of GroupUserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $GroupUserModelCopyWith<GroupUserModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -61,6 +65,8 @@ class _$GroupUserModelCopyWithImpl<$Res, $Val extends GroupUserModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of GroupUserModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -125,6 +131,8 @@ class __$$GroupUserModelImplCopyWithImpl<$Res>
       _$GroupUserModelImpl _value, $Res Function(_$GroupUserModelImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of GroupUserModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -215,12 +223,14 @@ class _$GroupUserModelImpl implements _GroupUserModel {
             (identical(other.status, status) || other.status == status));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, id, createdAt, updatedAt, userId, groupId, status);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of GroupUserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$GroupUserModelImplCopyWith<_$GroupUserModelImpl> get copyWith =>
@@ -262,8 +272,11 @@ abstract class _GroupUserModel implements GroupUserModel {
   String get groupId;
   @override
   String get status;
+
+  /// Create a copy of GroupUserModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GroupUserModelImplCopyWith<_$GroupUserModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

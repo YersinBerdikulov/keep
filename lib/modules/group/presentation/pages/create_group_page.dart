@@ -28,14 +28,14 @@ class CreateGroupPage extends HookConsumerWidget {
       (previous, next) {
         next.when(
           data: (_) {
-            showSnackBar(context, "Successfully Created!!");
+            showSnackBar(context, content: "Successfully Created!!");
             context.pop();
           },
           loading: () {
             // Optionally handle loading state if needed
           },
           error: (error, stackTrace) {
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },

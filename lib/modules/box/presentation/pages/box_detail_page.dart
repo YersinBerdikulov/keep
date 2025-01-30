@@ -47,7 +47,7 @@ class BoxDetailPage extends ConsumerWidget {
           },
           error: (error, stackTrace) {
             // Show error in a snackbar
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },
@@ -59,7 +59,7 @@ class BoxDetailPage extends ConsumerWidget {
     //  (previous, next) {
     //    next.whenOrNull(
     //      loaded: () => ref.refresh(getExpensesInBoxProvider(boxId)),
-    //      error: (message) => showSnackBar(context, message),
+    //      error: (message) => showSnackBar(context, content: message),
     //    );
     //  },
     //);

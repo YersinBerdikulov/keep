@@ -1,5 +1,6 @@
 import 'package:dongi/core/constants/constant.dart';
 import 'package:dongi/shared/utilities/validation/validation.dart';
+import 'package:dongi/shared/widgets/appbar/appbar.dart';
 import 'package:dongi/shared/widgets/button/button.dart';
 import 'package:dongi/shared/widgets/text_field/text_field.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,8 @@ import '../../../../core/router/router_notifier.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../domain/di/auth_controller_di.dart';
 
-class SignUpEmailInputPage extends HookConsumerWidget {
-  SignUpEmailInputPage({super.key});
+class SignUpEmailPage extends HookConsumerWidget {
+  SignUpEmailPage({super.key});
 
   final _formKey = GlobalKey<FormState>();
 
@@ -25,29 +26,21 @@ class SignUpEmailInputPage extends HookConsumerWidget {
       authControllerProvider,
       (previous, next) {
         next.when(
-          data: (_) {
-            // Proceed to OTP page on successful email submission
-            context.go(RouteName.signupOTPInput);
-          },
+          data: (_) {},
           loading: () {
             // Optional: Show a loading state (snackbar, etc.)
             debugPrint('Email submission in progress...');
           },
           error: (error, stack) {
             // Show error message
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },
     );
 
     return Scaffold(
-      backgroundColor: ColorConfig.background,
-      appBar: AppBar(
-        title: const Text("Sign Up - Email"),
-        backgroundColor: ColorConfig.primarySwatch,
-        elevation: 0,
-      ),
+      appBar: AppBarWidget(title: "Sign Up - Email"),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -61,7 +54,7 @@ class SignUpEmailInputPage extends HookConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                "We’ll send you an OTP or Magic Link to continue signing up.",
+                "We’ll send you an OTP to continue your signing up.",
                 style: FontConfig.body1(),
               ),
               const SizedBox(height: 32),
@@ -91,46 +84,75 @@ class SignUpEmailInputPage extends HookConsumerWidget {
                           ),
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          await ref
+                          final isRegistered = await ref
                               .read(authControllerProvider.notifier)
-                              .sendOTP(emailController.text);
+                              .isUserSignedUp(emailController.text);
+
+                          if (isRegistered) {
+                            if (context.mounted) {
+                              showSnackBar(
+                                context,
+                                content:
+                                    'User already registered. Please sign in.',
+                                seconds: 10,
+                                actionLabel: 'Sign In',
+                                onAction: () => context.go(
+                                  RouteName.signin,
+                                  extra: {'email': emailController.text},
+                                ),
+                              );
+                            }
+                          } else {
+                            final userId = await ref
+                                .read(authControllerProvider.notifier)
+                                .sendOTP(email: emailController.text);
+                            if (userId != null && context.mounted) {
+                              context.push(
+                                RouteName.signupOTPInput,
+                                extra: {
+                                  'userId': userId,
+                                  'email': emailController.text,
+                                },
+                              );
+                            }
+                          }
                         }
                       },
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ButtonWidget(
-                      title: "Send Magic Link",
-                      isLoading: ref.watch(authControllerProvider).maybeWhen(
-                            loading: () => true,
-                            orElse: () => false,
-                          ),
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          await ref
-                              .read(authControllerProvider.notifier)
-                              .sendMagicLink(emailController.text);
-                        }
-                      },
-                    ),
-                  ),
+                  // const SizedBox(width: 12),
+                  // Expanded(
+                  //   child: ButtonWidget(
+                  //     title: "Send Magic Link",
+                  //     isLoading: ref.watch(authControllerProvider).maybeWhen(
+                  //           loading: () => true,
+                  //           orElse: () => false,
+                  //         ),
+                  //     onPressed: () async {
+                  //       if (_formKey.currentState!.validate()) {
+                  //         await ref
+                  //             .read(authControllerProvider.notifier)
+                  //             .sendMagicLink(emailController.text);
+                  //       }
+                  //     },
+                  //   ),
+                  // ),
                 ],
               ),
               const SizedBox(height: 24),
 
-              // Sign In and Forgot Password Links
+              // Sign In Links
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextButton(
-                    onPressed: () => context.go(RouteName.signin),
-                    child: const Text("Sign In"),
+                  const Text(
+                    "Already have an account?",
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(width: 8),
                   TextButton(
-                    onPressed: () {}, // Update with forgot password route
-                    child: const Text("Forgot Password?"),
+                    onPressed: () => context.push(RouteName.signin),
+                    child: const Text("Sign In"),
                   ),
                 ],
               ),

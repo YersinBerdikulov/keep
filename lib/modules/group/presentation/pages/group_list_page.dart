@@ -27,7 +27,7 @@ class GroupListPage extends ConsumerWidget {
             //   ref.invalidate(getGroupsProvider);
             // }
           },
-          error: (error, _) => showSnackBar(context, error.toString()),
+          error: (error, _) => showSnackBar(context, content: error.toString()),
         );
       },
     );

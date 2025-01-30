@@ -122,10 +122,14 @@ class AuthRemoteDataSource {
   }
 
   /// Sends an OTP to the user's email for verification
-  FutureEitherVoid sendOTP({required String email}) async {
+  FutureEither<String?> sendOTP({required String email}) async {
     try {
-      await _account.createVerification(url: 'dongi://verify-email');
-      return right(null);
+      final sessionToken = await _account.createEmailToken(
+        email: email,
+        userId: ID.unique(),
+      );
+
+      return right(sessionToken.userId);
     } on AppwriteException catch (e, stackTrace) {
       return left(
         Failure(e.message ?? 'Failed to send OTP', stackTrace),
@@ -138,13 +142,25 @@ class AuthRemoteDataSource {
   }
 
   /// Verifies the OTP sent to the user's email
-  FutureEitherVoid verifyOTP({
-    required String email,
+  FutureEither<User> verifyOTP({
+    required String userId,
     required String otp,
   }) async {
     try {
-      await _account.updateVerification(userId: email, secret: otp);
-      return right(null);
+      // Check for active session
+      // final sessionList = await _account.listSessions();
+      // if (sessionList.sessions.isNotEmpty) {
+      //   await _account.deleteSessions();
+      // }
+
+      await _account.createSession(
+        userId: userId,
+        secret: otp,
+      );
+      final account = await currentUserAccount();
+      if (account == null) throw "account not found";
+
+      return right(account);
     } on AppwriteException catch (e, stackTrace) {
       return left(
         Failure(e.message ?? 'Failed to send OTP', stackTrace),

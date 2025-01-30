@@ -27,7 +27,7 @@ mixin _$UserModel {
   @JsonKey(name: '\$updatedAt')
   String? get updatedAt => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
-  String get userName => throw _privateConstructorUsedError;
+  String? get userName => throw _privateConstructorUsedError;
   String? get firstName => throw _privateConstructorUsedError;
   String? get lastName => throw _privateConstructorUsedError;
   String? get profileImage => throw _privateConstructorUsedError;
@@ -39,8 +39,12 @@ mixin _$UserModel {
   List<String> get firebaseTokens => throw _privateConstructorUsedError;
   List<String> get tokens => throw _privateConstructorUsedError;
 
+  /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of UserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $UserModelCopyWith<UserModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -55,7 +59,7 @@ abstract class $UserModelCopyWith<$Res> {
       @JsonKey(name: '\$createdAt') String? createdAt,
       @JsonKey(name: '\$updatedAt') String? updatedAt,
       String email,
-      String userName,
+      String? userName,
       String? firstName,
       String? lastName,
       String? profileImage,
@@ -78,6 +82,8 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of UserModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -85,7 +91,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? email = null,
-    Object? userName = null,
+    Object? userName = freezed,
     Object? firstName = freezed,
     Object? lastName = freezed,
     Object? profileImage = freezed,
@@ -114,10 +120,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      userName: null == userName
+      userName: freezed == userName
           ? _value.userName
           : userName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       firstName: freezed == firstName
           ? _value.firstName
           : firstName // ignore: cast_nullable_to_non_nullable
@@ -175,7 +181,7 @@ abstract class _$$BoxModelImplCopyWith<$Res>
       @JsonKey(name: '\$createdAt') String? createdAt,
       @JsonKey(name: '\$updatedAt') String? updatedAt,
       String email,
-      String userName,
+      String? userName,
       String? firstName,
       String? lastName,
       String? profileImage,
@@ -196,6 +202,8 @@ class __$$BoxModelImplCopyWithImpl<$Res>
       _$BoxModelImpl _value, $Res Function(_$BoxModelImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of UserModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -203,7 +211,7 @@ class __$$BoxModelImplCopyWithImpl<$Res>
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? email = null,
-    Object? userName = null,
+    Object? userName = freezed,
     Object? firstName = freezed,
     Object? lastName = freezed,
     Object? profileImage = freezed,
@@ -232,10 +240,10 @@ class __$$BoxModelImplCopyWithImpl<$Res>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      userName: null == userName
+      userName: freezed == userName
           ? _value.userName
           : userName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       firstName: freezed == firstName
           ? _value.firstName
           : firstName // ignore: cast_nullable_to_non_nullable
@@ -288,7 +296,7 @@ class _$BoxModelImpl implements _BoxModel {
       @JsonKey(name: '\$createdAt') this.createdAt,
       @JsonKey(name: '\$updatedAt') this.updatedAt,
       required this.email,
-      required this.userName,
+      this.userName,
       this.firstName,
       this.lastName,
       this.profileImage,
@@ -320,7 +328,7 @@ class _$BoxModelImpl implements _BoxModel {
   @override
   final String email;
   @override
-  final String userName;
+  final String? userName;
   @override
   final String? firstName;
   @override
@@ -415,7 +423,7 @@ class _$BoxModelImpl implements _BoxModel {
             const DeepCollectionEquality().equals(other._tokens, _tokens));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -435,7 +443,9 @@ class _$BoxModelImpl implements _BoxModel {
       const DeepCollectionEquality().hash(_firebaseTokens),
       const DeepCollectionEquality().hash(_tokens));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of UserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$BoxModelImplCopyWith<_$BoxModelImpl> get copyWith =>
@@ -455,7 +465,7 @@ abstract class _BoxModel implements UserModel {
       @JsonKey(name: '\$createdAt') final String? createdAt,
       @JsonKey(name: '\$updatedAt') final String? updatedAt,
       required final String email,
-      required final String userName,
+      final String? userName,
       final String? firstName,
       final String? lastName,
       final String? profileImage,
@@ -482,7 +492,7 @@ abstract class _BoxModel implements UserModel {
   @override
   String get email;
   @override
-  String get userName;
+  String? get userName;
   @override
   String? get firstName;
   @override
@@ -503,8 +513,11 @@ abstract class _BoxModel implements UserModel {
   List<String> get firebaseTokens;
   @override
   List<String> get tokens;
+
+  /// Create a copy of UserModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$BoxModelImplCopyWith<_$BoxModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

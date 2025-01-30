@@ -28,14 +28,18 @@ mixin _$UserFriendModel {
   String? get updatedAt => throw _privateConstructorUsedError;
   String get sendRequestUserId => throw _privateConstructorUsedError;
   String get receiveRequestUserId => throw _privateConstructorUsedError;
-  String get sendRequestUserName => throw _privateConstructorUsedError;
-  String get receiveRequestUserName => throw _privateConstructorUsedError;
+  String? get sendRequestUserName => throw _privateConstructorUsedError;
+  String? get receiveRequestUserName => throw _privateConstructorUsedError;
   String? get sendRequestProfilePic => throw _privateConstructorUsedError;
   String? get receiveRequestProfilePic => throw _privateConstructorUsedError;
   FriendRequestStatus get status => throw _privateConstructorUsedError;
 
+  /// Serializes this UserFriendModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of UserFriendModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $UserFriendModelCopyWith<UserFriendModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -52,8 +56,8 @@ abstract class $UserFriendModelCopyWith<$Res> {
       @JsonKey(name: '\$updatedAt') String? updatedAt,
       String sendRequestUserId,
       String receiveRequestUserId,
-      String sendRequestUserName,
-      String receiveRequestUserName,
+      String? sendRequestUserName,
+      String? receiveRequestUserName,
       String? sendRequestProfilePic,
       String? receiveRequestProfilePic,
       FriendRequestStatus status});
@@ -69,6 +73,8 @@ class _$UserFriendModelCopyWithImpl<$Res, $Val extends UserFriendModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of UserFriendModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -77,8 +83,8 @@ class _$UserFriendModelCopyWithImpl<$Res, $Val extends UserFriendModel>
     Object? updatedAt = freezed,
     Object? sendRequestUserId = null,
     Object? receiveRequestUserId = null,
-    Object? sendRequestUserName = null,
-    Object? receiveRequestUserName = null,
+    Object? sendRequestUserName = freezed,
+    Object? receiveRequestUserName = freezed,
     Object? sendRequestProfilePic = freezed,
     Object? receiveRequestProfilePic = freezed,
     Object? status = null,
@@ -104,14 +110,14 @@ class _$UserFriendModelCopyWithImpl<$Res, $Val extends UserFriendModel>
           ? _value.receiveRequestUserId
           : receiveRequestUserId // ignore: cast_nullable_to_non_nullable
               as String,
-      sendRequestUserName: null == sendRequestUserName
+      sendRequestUserName: freezed == sendRequestUserName
           ? _value.sendRequestUserName
           : sendRequestUserName // ignore: cast_nullable_to_non_nullable
-              as String,
-      receiveRequestUserName: null == receiveRequestUserName
+              as String?,
+      receiveRequestUserName: freezed == receiveRequestUserName
           ? _value.receiveRequestUserName
           : receiveRequestUserName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       sendRequestProfilePic: freezed == sendRequestProfilePic
           ? _value.sendRequestProfilePic
           : sendRequestProfilePic // ignore: cast_nullable_to_non_nullable
@@ -142,8 +148,8 @@ abstract class _$$UserFriendModelImplCopyWith<$Res>
       @JsonKey(name: '\$updatedAt') String? updatedAt,
       String sendRequestUserId,
       String receiveRequestUserId,
-      String sendRequestUserName,
-      String receiveRequestUserName,
+      String? sendRequestUserName,
+      String? receiveRequestUserName,
       String? sendRequestProfilePic,
       String? receiveRequestProfilePic,
       FriendRequestStatus status});
@@ -157,6 +163,8 @@ class __$$UserFriendModelImplCopyWithImpl<$Res>
       _$UserFriendModelImpl _value, $Res Function(_$UserFriendModelImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of UserFriendModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -165,8 +173,8 @@ class __$$UserFriendModelImplCopyWithImpl<$Res>
     Object? updatedAt = freezed,
     Object? sendRequestUserId = null,
     Object? receiveRequestUserId = null,
-    Object? sendRequestUserName = null,
-    Object? receiveRequestUserName = null,
+    Object? sendRequestUserName = freezed,
+    Object? receiveRequestUserName = freezed,
     Object? sendRequestProfilePic = freezed,
     Object? receiveRequestProfilePic = freezed,
     Object? status = null,
@@ -192,14 +200,14 @@ class __$$UserFriendModelImplCopyWithImpl<$Res>
           ? _value.receiveRequestUserId
           : receiveRequestUserId // ignore: cast_nullable_to_non_nullable
               as String,
-      sendRequestUserName: null == sendRequestUserName
+      sendRequestUserName: freezed == sendRequestUserName
           ? _value.sendRequestUserName
           : sendRequestUserName // ignore: cast_nullable_to_non_nullable
-              as String,
-      receiveRequestUserName: null == receiveRequestUserName
+              as String?,
+      receiveRequestUserName: freezed == receiveRequestUserName
           ? _value.receiveRequestUserName
           : receiveRequestUserName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       sendRequestProfilePic: freezed == sendRequestProfilePic
           ? _value.sendRequestProfilePic
           : sendRequestProfilePic // ignore: cast_nullable_to_non_nullable
@@ -225,8 +233,8 @@ class _$UserFriendModelImpl implements _UserFriendModel {
       @JsonKey(name: '\$updatedAt') this.updatedAt,
       required this.sendRequestUserId,
       required this.receiveRequestUserId,
-      required this.sendRequestUserName,
-      required this.receiveRequestUserName,
+      this.sendRequestUserName,
+      this.receiveRequestUserName,
       this.sendRequestProfilePic,
       this.receiveRequestProfilePic,
       this.status = FriendRequestStatus.pending});
@@ -248,9 +256,9 @@ class _$UserFriendModelImpl implements _UserFriendModel {
   @override
   final String receiveRequestUserId;
   @override
-  final String sendRequestUserName;
+  final String? sendRequestUserName;
   @override
-  final String receiveRequestUserName;
+  final String? receiveRequestUserName;
   @override
   final String? sendRequestProfilePic;
   @override
@@ -290,7 +298,7 @@ class _$UserFriendModelImpl implements _UserFriendModel {
             (identical(other.status, status) || other.status == status));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -305,7 +313,9 @@ class _$UserFriendModelImpl implements _UserFriendModel {
       receiveRequestProfilePic,
       status);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of UserFriendModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$UserFriendModelImplCopyWith<_$UserFriendModelImpl> get copyWith =>
@@ -327,8 +337,8 @@ abstract class _UserFriendModel implements UserFriendModel {
       @JsonKey(name: '\$updatedAt') final String? updatedAt,
       required final String sendRequestUserId,
       required final String receiveRequestUserId,
-      required final String sendRequestUserName,
-      required final String receiveRequestUserName,
+      final String? sendRequestUserName,
+      final String? receiveRequestUserName,
       final String? sendRequestProfilePic,
       final String? receiveRequestProfilePic,
       final FriendRequestStatus status}) = _$UserFriendModelImpl;
@@ -350,17 +360,20 @@ abstract class _UserFriendModel implements UserFriendModel {
   @override
   String get receiveRequestUserId;
   @override
-  String get sendRequestUserName;
+  String? get sendRequestUserName;
   @override
-  String get receiveRequestUserName;
+  String? get receiveRequestUserName;
   @override
   String? get sendRequestProfilePic;
   @override
   String? get receiveRequestProfilePic;
   @override
   FriendRequestStatus get status;
+
+  /// Create a copy of UserFriendModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$UserFriendModelImplCopyWith<_$UserFriendModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

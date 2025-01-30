@@ -4,7 +4,8 @@ import 'package:dongi/modules/auth/domain/models/user_model.dart';
 abstract class UserRepository {
   Future<UserModel> getCurrentUserData();
   FutureEitherVoid saveUserData(UserModel userModel, String uid);
-  Future<UserModel> getUserData(String uid);
+  Future<UserModel?> getUserDataById(String uid);
+  Future<UserModel?> getUserDataByEmail(String email);
   Future<List<UserModel>> getUsersListData(List<String> userIds);
   Future<List<UserModel>> searchUserByName(String name);
   FutureEitherVoid updateUserData(UserModel userModel);

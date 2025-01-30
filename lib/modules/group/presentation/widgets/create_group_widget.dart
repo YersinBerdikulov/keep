@@ -250,8 +250,10 @@ class CreateGroupAddFriend extends HookConsumerWidget {
                                 children: [
                                   Text(
                                     friend.sendRequestUserId == currentUserId
-                                        ? friend.receiveRequestUserName
-                                        : friend.sendRequestUserName,
+                                        ? friend.receiveRequestUserName ??
+                                            friend.receiveRequestUserId
+                                        : friend.sendRequestUserName ??
+                                            friend.sendRequestUserId,
                                     style: FontConfig.body2().copyWith(
                                       color: isSelected
                                           ? ColorConfig.secondary

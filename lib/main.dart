@@ -30,7 +30,7 @@ class MyApp extends ConsumerWidget {
         useMaterial3: false,
       ),
       debugShowCheckedModeBanner: false,
-      routerConfig: ref.watch(routerProvider(ref)),
+      routerConfig: ref.watch(goRouterProvider),
     );
   }
 }

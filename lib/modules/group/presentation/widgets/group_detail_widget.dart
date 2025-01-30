@@ -141,7 +141,7 @@ class GroupDetailFriendList extends ConsumerWidget {
           Row(
             children: [
               Text(
-                user.userName,
+                user.userName ?? user.email,
                 style: FontConfig.caption(),
               )
             ],
@@ -233,7 +233,7 @@ class GroupDetailBoxGrid extends ConsumerWidget {
           },
           error: (error, stackTrace) {
             // Displays the error message in a snackbar
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },

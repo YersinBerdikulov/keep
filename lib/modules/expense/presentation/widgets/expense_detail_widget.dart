@@ -31,7 +31,7 @@ class UserInfoExpenseDetail extends ConsumerWidget {
             ListTileWidget(
               contentPadding: const EdgeInsets.fromLTRB(0, 2, 10, 2),
               headerString: "Created By",
-              titleString: data.userName,
+              titleString: data!.userName ?? data.email,
               titleStringStyle: FontConfig.body1().copyWith(
                 color: ColorConfig.pureWhite,
               ),
@@ -168,7 +168,7 @@ class MemberListExpenseDetail extends ConsumerWidget {
                 padding: const EdgeInsets.only(bottom: 10),
                 child: ListTileCard(
                   //visualDensity: const VisualDensity(vertical: 3),
-                  titleString: data[index].userName,
+                  titleString: data[index].userName ?? data[index].email,
                   trailing: const Text("\$53"),
                   leading: Container(
                     width: 50,

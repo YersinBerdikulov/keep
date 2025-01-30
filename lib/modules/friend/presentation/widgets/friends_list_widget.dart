@@ -104,7 +104,8 @@ class UserFriendListCard extends StatelessWidget {
     return Column(
       children: [
         ListTileCard(
-          titleString: userFriendModel.receiveRequestUserName,
+          titleString: userFriendModel.receiveRequestUserName ??
+              userFriendModel.receiveRequestUserId,
           leading: ImageWidget(
             imageUrl: userFriendModel.receiveRequestProfilePic,
             borderRadius: 10,
@@ -131,7 +132,8 @@ class PendingFriendListCard extends StatelessWidget {
     return Column(
       children: [
         ListTileCard(
-          titleString: userFriendModel.receiveRequestUserName,
+          titleString: userFriendModel.receiveRequestUserName ??
+              userFriendModel.receiveRequestUserId,
           leading: ImageWidget(
             imageUrl: userFriendModel.receiveRequestProfilePic,
             borderRadius: 10,
@@ -192,7 +194,8 @@ class IncomingFriendListCard extends ConsumerWidget {
     return Column(
       children: [
         ListTileCard(
-          titleString: userFriendModel.sendRequestUserName,
+          titleString: userFriendModel.sendRequestUserName ??
+              userFriendModel.sendRequestUserId,
           leading: ImageWidget(
             imageUrl: userFriendModel.sendRequestProfilePic,
             borderRadius: 10,

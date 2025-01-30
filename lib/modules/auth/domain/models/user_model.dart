@@ -12,7 +12,7 @@ class UserModel with _$UserModel {
     @JsonKey(name: '\$createdAt') String? createdAt,
     @JsonKey(name: '\$updatedAt') String? updatedAt,
     required String email,
-    required String userName,
+    String? userName,
     String? firstName,
     String? lastName,
     String? profileImage,

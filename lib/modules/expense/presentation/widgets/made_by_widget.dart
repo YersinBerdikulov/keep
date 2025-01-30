@@ -40,7 +40,7 @@ class MadeByFriendListWidget extends ConsumerWidget {
             borderColor: ref.watch(expensePayerIdProvider) == users[index].id
                 ? ColorConfig.primarySwatch
                 : Colors.transparent,
-            titleString: users[index].userName,
+            titleString: users[index].userName ?? users[index].email,
             onTap: () => ref.read(expensePayerIdProvider.notifier).state =
                 users[index].id,
           ),

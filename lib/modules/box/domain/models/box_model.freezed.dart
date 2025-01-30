@@ -35,8 +35,12 @@ mixin _$BoxModel {
   num get total => throw _privateConstructorUsedError;
   String get creatorId => throw _privateConstructorUsedError;
 
+  /// Serializes this BoxModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of BoxModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $BoxModelCopyWith<BoxModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -70,6 +74,8 @@ class _$BoxModelCopyWithImpl<$Res, $Val extends BoxModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of BoxModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -164,6 +170,8 @@ class __$$BoxModelImplCopyWithImpl<$Res>
       _$BoxModelImpl _value, $Res Function(_$BoxModelImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of BoxModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -318,7 +326,7 @@ class _$BoxModelImpl implements _BoxModel {
                 other.creatorId == creatorId));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -334,7 +342,9 @@ class _$BoxModelImpl implements _BoxModel {
       total,
       creatorId);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of BoxModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$BoxModelImplCopyWith<_$BoxModelImpl> get copyWith =>
@@ -390,8 +400,11 @@ abstract class _BoxModel implements BoxModel {
   num get total;
   @override
   String get creatorId;
+
+  /// Create a copy of BoxModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$BoxModelImplCopyWith<_$BoxModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

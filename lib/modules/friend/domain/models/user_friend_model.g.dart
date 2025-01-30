@@ -14,8 +14,8 @@ _$UserFriendModelImpl _$$UserFriendModelImplFromJson(
       updatedAt: json[r'$updatedAt'] as String?,
       sendRequestUserId: json['sendRequestUserId'] as String,
       receiveRequestUserId: json['receiveRequestUserId'] as String,
-      sendRequestUserName: json['sendRequestUserName'] as String,
-      receiveRequestUserName: json['receiveRequestUserName'] as String,
+      sendRequestUserName: json['sendRequestUserName'] as String?,
+      receiveRequestUserName: json['receiveRequestUserName'] as String?,
       sendRequestProfilePic: json['sendRequestProfilePic'] as String?,
       receiveRequestProfilePic: json['receiveRequestProfilePic'] as String?,
       status:

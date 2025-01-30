@@ -24,9 +24,9 @@ class UserController extends AsyncNotifier<UserModel?> {
     }
   }
 
-  Future<UserModel> getUserData(String uid) async {
+  Future<UserModel?> getUserData(String uid) async {
     try {
-      final user = await _userRepository.getUserData(uid);
+      final user = await _userRepository.getUserDataById(uid);
       return user;
     } catch (e) {
       // state = AsyncValue.error(e, st);

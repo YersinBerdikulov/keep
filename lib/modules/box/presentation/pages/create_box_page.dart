@@ -30,7 +30,7 @@ class CreateBoxPage extends HookConsumerWidget {
         next.when(
           data: (boxes) {
             // Show success message
-            showSnackBar(context, "Successfully Created!!");
+            showSnackBar(context, content: "Successfully Created!!");
             context.pop(); // Navigate back
           },
           loading: () {
@@ -38,7 +38,7 @@ class CreateBoxPage extends HookConsumerWidget {
           },
           error: (error, stackTrace) {
             // Show error in a snackbar
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },

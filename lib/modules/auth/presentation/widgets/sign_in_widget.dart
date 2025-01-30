@@ -171,7 +171,7 @@ class SignInChangeActionButton extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         InkWell(
-          onTap: () => context.go(RouteName.signupEmailInput),
+          onTap: () => context.go(RouteName.signupEmail),
           child: Text(
             'Sign Up',
             style: FontConfig.body1().copyWith(

@@ -39,7 +39,7 @@ class GroupListCard extends ConsumerWidget {
     deleteGroup() async {
       await ref.read(groupNotifierProvider.notifier).deleteGroup(groupModel);
       if (context.mounted) {
-        showSnackBar(context, "Group deleted successfully!!");
+        showSnackBar(context, content: "Group deleted successfully!!");
       }
     }
 
@@ -56,7 +56,7 @@ class GroupListCard extends ConsumerWidget {
     //    child: const Text('Delete'),
     //  ),
     //  CupertinoContextMenuAction(
-    //    onPressed: () => showSnackBar(context, "Coming soon!!"),
+    //    onPressed: () => showSnackBar(context, content: "Coming soon!!"),
     //    child: const Text('Invite'),
     //  ),
     //];
@@ -74,7 +74,7 @@ class GroupListCard extends ConsumerWidget {
         child: const Text('Delete'),
       ),
       PopupMenuItem(
-        onTap: () => showSnackBar(context, "Coming soon!!"),
+        onTap: () => showSnackBar(context, content: "Coming soon!!"),
         child: const Text('Invite'),
       ),
     ];
@@ -98,7 +98,7 @@ class GroupListCard extends ConsumerWidget {
     //        );
     //      } else {
     //        //Delete dropdown action
-    //        showSnackBar(context, "Successfully deleted");
+    //        showSnackBar(context, content: "Successfully deleted");
     //        ref.read(groupNotifierProvider.notifier).deleteGroup(
     //            context: context, ref: ref, groupModel: groupModel);
     //      }
@@ -131,7 +131,8 @@ class GroupListCard extends ConsumerWidget {
                   topLeft: Radius.circular(10),
                   bottomLeft: Radius.circular(10),
                 ),
-                onPressed: (context) => showSnackBar(context, "Coming soon!!"),
+                onPressed: (context) =>
+                    showSnackBar(context, content: "Coming soon!!"),
                 backgroundColor: const Color(0xFF21B7CA),
                 foregroundColor: Colors.white,
                 icon: Icons.share,

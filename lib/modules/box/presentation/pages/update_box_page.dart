@@ -29,7 +29,7 @@ class UpdateBoxPage extends HookConsumerWidget {
       (previous, next) {
         next.when(
           data: (boxes) {
-            showSnackBar(context, "Successfully Updated!!");
+            showSnackBar(context, content: "Successfully Updated!!");
             context.pop(); // Navigate back after success
           },
           loading: () {
@@ -37,7 +37,7 @@ class UpdateBoxPage extends HookConsumerWidget {
             // For example, show a loading indicator
           },
           error: (error, stackTrace) {
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },

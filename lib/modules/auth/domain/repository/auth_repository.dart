@@ -18,10 +18,10 @@ abstract class AuthRepository {
   FutureEitherVoid logout();
 
   /// Sends an OTP to the given email for verification
-  FutureEitherVoid sendOTP({required String email});
+  FutureEither<String?> sendOTP({required String email});
 
-  /// Verifies the OTP sent to the given email
-  FutureEitherVoid verifyOTP({required String email, required String otp});
+  /// Verifies the OTP sent to the given userId
+  FutureEither<User> verifyOTP({required String userId, required String otp});
 
   /// Sends a Magic Link to the given email for authentication
   FutureEitherVoid sendMagicLink({required String email});

@@ -28,7 +28,7 @@ class AddFriendPage extends HookConsumerWidget {
             //   ref.invalidate(getGroupsProvider);
             // }
           },
-          error: (error, _) => showSnackBar(context, error.toString()),
+          error: (error, _) => showSnackBar(context, content: error.toString()),
         );
       },
     );

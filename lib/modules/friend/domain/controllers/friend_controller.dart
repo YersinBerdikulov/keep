@@ -20,7 +20,7 @@ class FriendNotifier extends AsyncNotifier<List<UserFriendModel>> {
         await ref.read(getUserDataUseCaseProvider).execute(currentUser!.id!);
 
     UserFriendModel friendModel = UserFriendModel(
-      sendRequestUserId: currentUserModel.id!,
+      sendRequestUserId: currentUserModel!.id!,
       sendRequestUserName: currentUserModel.userName,
       sendRequestProfilePic: currentUserModel.profileImage,
       receiveRequestUserId: userModel.id!,

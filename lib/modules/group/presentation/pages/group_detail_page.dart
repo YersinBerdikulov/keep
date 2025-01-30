@@ -28,10 +28,10 @@ class GroupDetailPage extends ConsumerWidget {
             // Trigger refresh for related providers
             // ref.invalidate(getGroupsProvider);
             // ref.invalidate(getGroupDetailProvider(groupId));
-            showSnackBar(context, "Successfully Updated!");
+            showSnackBar(context, content: "Successfully Updated!");
           },
           error: (error, stackTrace) {
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
           loading: () {
             // Optional: Handle loading state if needed

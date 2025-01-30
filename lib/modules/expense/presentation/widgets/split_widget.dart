@@ -42,7 +42,7 @@ class SplitFriendListWidget extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 5, 16, 5),
             child: ListTileCard(
               leading: cardIcon(),
-              titleString: users[index].userName,
+              titleString: users[index].userName ?? users[index].email,
               onTap: () => ref
                   .watch(splitUserProvider.notifier)
                   .select(users[index].id!),

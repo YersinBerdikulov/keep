@@ -59,7 +59,7 @@ class BoxCardWidget extends ConsumerWidget {
           .read(boxNotifierProvider(groupModel.id!).notifier)
           .deleteBox(boxModel: boxModel, groupModel: groupModel);
       if (context.mounted) {
-        showSnackBar(context, "box deleted successfully");
+        showSnackBar(context, content: "box deleted successfully");
       }
     }
 

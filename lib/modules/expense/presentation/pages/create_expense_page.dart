@@ -34,14 +34,14 @@ class CreateExpensePage extends HookConsumerWidget {
       (previous, next) {
         next.when(
           data: (_) {
-            showSnackBar(context, "Successfully Created!!");
+            showSnackBar(context, content: "Successfully Created!!");
             context.pop();
           },
           loading: () {
             // Optionally show a loading spinner
           },
           error: (error, stackTrace) {
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },

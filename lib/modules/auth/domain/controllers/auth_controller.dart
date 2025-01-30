@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:dongi/modules/auth/data/di/auth_di.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/auth/domain/repository/auth_repository.dart';
-import 'package:dongi/modules/auth/presentation/pages/sign_in_page.dart';
 import 'package:dongi/core/router/router_notifier.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/modules/user/data/di/user_di.dart';
@@ -136,32 +135,71 @@ class AuthController extends AsyncNotifier<UserModel?> {
     );
   }
 
-  /// Sends OTP for email verification
-  Future<void> sendOTP(String email) async {
+  /// Sends OTP for email verification and returns userId
+  Future<String?> sendOTP({required String email}) async {
     // Set state to loading
     state = const AsyncValue.loading();
 
     final res = await authRepository.sendOTP(email: email);
 
-    // Update state based on the result
-    state = res.fold(
-      (l) => AsyncValue.error(l.message, l.stackTrace),
-      (r) => const AsyncValue.data(null),
+    // Update state based on the result and return userId if successful
+    return res.fold(
+      (l) {
+        state = AsyncValue.error(l.message, l.stackTrace);
+        return null;
+      },
+      (userId) {
+        state = const AsyncValue.data(null);
+        return userId;
+      },
     );
   }
 
-  Future<void> verifyOTP({required String email, required String otp}) async {
-    try {
-      state = const AsyncValue.loading();
+  Future<bool> isUserSignedUp(String email) async {
+    // Set state to loading just to show the loading indicator
+    state = const AsyncValue.loading();
 
-      // Verify the OTP
-      await authRepository.verifyOTP(email: email, otp: otp);
+    // Check if the user exists in the repository
+    final user = await userRepository.getUserDataByEmail(email);
 
-      // Set success state
-      state = const AsyncValue.data(null);
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
-    }
+    // Update state based on the result
+    state = const AsyncValue.data(null);
+
+    return user != null ? true : false;
+  }
+
+  Future<void> verifyOTP({required String userId, required String otp}) async {
+    state = const AsyncValue.loading();
+
+    final res = await authRepository.verifyOTP(userId: userId, otp: otp);
+
+    // Update state based on the result
+    state = await res.fold(
+      (l) => AsyncValue.error(l.message, l.stackTrace),
+      (r) async {
+        // Check if the user is already signed up
+        final user = await userRepository.getUserDataByEmail(r.email);
+        if (user != null) {
+          // If the user is already signed up, just get the user data
+
+          ref.read(currentUserProvider.notifier).state = user;
+          return const AsyncValue.data(null);
+        } else {
+          UserModel userModel = r.toUserModel();
+
+          // Save User data to provider
+          ref.read(currentUserProvider.notifier).state = userModel;
+
+          // Save user data in backend
+          final res2 =
+              await userRepository.saveUserData(userModel, userModel.id!);
+          return res2.fold(
+            (l) => AsyncValue.error(l.message, l.stackTrace),
+            (r) => const AsyncValue.data(null),
+          );
+        }
+      },
+    );
   }
 
   /// Sends Magic Link for login
@@ -179,31 +217,27 @@ class AuthController extends AsyncNotifier<UserModel?> {
   }
 
   void logout(BuildContext context) async {
-    final res = await authRepository.logout();
-    res.fold(
-      (l) => null,
-      (r) {
-        ref.read(currentUserProvider.notifier).state = null;
-        context.go(RouteName.signin);
-      },
-    );
+    await authRepository.logout();
+    ref.read(currentUserProvider.notifier).state = null;
+    state = const AsyncValue.data(null);
   }
 
-  void forgetPassword(BuildContext context) async {
-    final res = await authRepository.logout();
-    res.fold(
-      (l) => null,
-      (r) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SignInPage(),
-          ),
-          (route) => false,
-        );
-      },
-    );
-  }
+  // void forgetPassword(BuildContext context) async {
+  //   final res = await authRepository.logout();
+  //   res.fold(
+  //     (l) => null,
+  //     (r) {
+  //       Navigator.pushAndRemoveUntil(
+  //         context,
+  //         MaterialPageRoute(
+
+  //           builder: (context) => SignInPage(),
+  //         ),
+  //         (route) => false,
+  //       );
+  //     },
+  //   );
+  // }
 
   Future<void> setPasswordAndUsername({
     required String userId,

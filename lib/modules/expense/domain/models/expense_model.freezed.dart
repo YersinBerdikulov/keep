@@ -37,8 +37,12 @@ mixin _$ExpenseModel {
   bool get equal => throw _privateConstructorUsedError;
   List<String> get expenseUsers => throw _privateConstructorUsedError;
 
+  /// Serializes this ExpenseModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ExpenseModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ExpenseModelCopyWith<ExpenseModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -75,6 +79,8 @@ class _$ExpenseModelCopyWithImpl<$Res, $Val extends ExpenseModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ExpenseModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -181,6 +187,8 @@ class __$$ExpenseModelImplCopyWithImpl<$Res>
       _$ExpenseModelImpl _value, $Res Function(_$ExpenseModelImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ExpenseModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -346,7 +354,7 @@ class _$ExpenseModelImpl implements _ExpenseModel {
                 .equals(other._expenseUsers, _expenseUsers));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -364,7 +372,9 @@ class _$ExpenseModelImpl implements _ExpenseModel {
       equal,
       const DeepCollectionEquality().hash(_expenseUsers));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ExpenseModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ExpenseModelImplCopyWith<_$ExpenseModelImpl> get copyWith =>
@@ -426,8 +436,11 @@ abstract class _ExpenseModel implements ExpenseModel {
   bool get equal;
   @override
   List<String> get expenseUsers;
+
+  /// Create a copy of ExpenseModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ExpenseModelImplCopyWith<_$ExpenseModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

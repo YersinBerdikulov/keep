@@ -6,7 +6,7 @@ class GetUserDataUseCase {
 
   GetUserDataUseCase(this._userRepository);
 
-  Future<UserModel> execute(String uid) async {
-    return await _userRepository.getUserData(uid);
+  Future<UserModel?> execute(String uid) async {
+    return await _userRepository.getUserDataById(uid);
   }
 }

@@ -35,13 +35,13 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  FutureEitherVoid sendOTP({required String email}) {
+  FutureEither<String?> sendOTP({required String email}) {
     return _remoteDataSource.sendOTP(email: email);
   }
 
   @override
-  FutureEitherVoid verifyOTP({required String email, required String otp}) {
-    return _remoteDataSource.verifyOTP(email: email, otp: otp);
+  FutureEither<User> verifyOTP({required String userId, required String otp}) {
+    return _remoteDataSource.verifyOTP(userId: userId, otp: otp);
   }
 
   @override

@@ -31,14 +31,14 @@ class UpdateGroupPage extends HookConsumerWidget {
       (_, state) {
         state.when(
           data: (_) {
-            showSnackBar(context, "Successfully updated!!");
+            showSnackBar(context, content: "Successfully updated!!");
             context.pop();
           },
           loading: () {
             // Handle loading if needed (optional)
           },
           error: (error, stackTrace) {
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },

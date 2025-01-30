@@ -57,14 +57,14 @@ class _UpdateExpensePageState extends ConsumerState<UpdateExpensePage> {
       (previous, next) {
         next.when(
           data: (_) {
-            showSnackBar(context, "Successfully Created!!");
+            showSnackBar(context, content: "Successfully Created!!");
             context.pop();
           },
           loading: () {
             // Optionally, show a loading indicator or log the state
           },
           error: (error, stackTrace) {
-            showSnackBar(context, error.toString());
+            showSnackBar(context, content: error.toString());
           },
         );
       },

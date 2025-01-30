@@ -13,7 +13,7 @@ final getUsersListData = FutureProvider.family((ref, List<String> uid) {
 });
 
 final getUserDataForExpenseProvider =
-    FutureProvider.autoDispose.family<UserModel, String>((ref, userId) async {
+    FutureProvider.autoDispose.family<UserModel?, String>((ref, userId) async {
   final getUserDataUseCase = ref.read(getUserDataUseCaseProvider);
   return await getUserDataUseCase.execute(userId);
 });
