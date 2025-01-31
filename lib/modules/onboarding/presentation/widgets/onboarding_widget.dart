@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/content/onboarding_contents.dart';
 import '../../../../core/constants/font_config.dart';
-import '../../../../core/router/router_notifier.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/widgets/button/button.dart';
 
 class OnboardingTitle extends StatelessWidget {

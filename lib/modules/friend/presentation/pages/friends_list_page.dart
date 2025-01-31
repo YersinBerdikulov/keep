@@ -1,6 +1,6 @@
 import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
 import 'package:dongi/shared/utilities/helpers/snackbar_helper.dart';
-import 'package:dongi/core/router/router_notifier.dart';
+import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
 import 'package:dongi/shared/widgets/floating_action_button/floating_action_button.dart';
 import 'package:flutter/material.dart';

@@ -11,7 +11,7 @@ import 'package:dongi/shared/utilities/validation/validation.dart';
 import 'package:dongi/shared/widgets/button/button.dart';
 import 'package:dongi/shared/widgets/text_field/text_field.dart';
 
-import '../../../../core/router/router_notifier.dart';
+import '../../../../core/router/router_names.dart';
 
 class SignInTitle extends StatelessWidget {
   const SignInTitle({super.key});

@@ -6,7 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/router/router_notifier.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../../../shared/widgets/button/button.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
@@ -147,9 +147,9 @@ class SignInPage extends HookConsumerWidget {
                       hintText: "Password",
                       controller: passwordController,
                       obscureText: true,
-                      validator: ref
-                          .read(formValidatorProvider.notifier)
-                          .validatePassword,
+                      // validator: ref
+                      //     .read(formValidatorProvider.notifier)
+                      //     .validatePassword,
                     ),
                   ],
 

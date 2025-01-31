@@ -1,0 +1,28 @@
+class RouteName {
+  const RouteName._();
+
+  static String home = '/';
+  static String splash = '/splash';
+  static String signin = '/signin';
+  static String authHome = '/auth';
+  static String signupEmail = '/signup/email';
+  static String signupOTPInput = '/signup/otp';
+  static String setPassword = '/set-password';
+  static String onboarding = '/onboarding';
+  static String groupList = '/group';
+  static String createGroup = '/group/create';
+  static String updateGroup = '/group/update';
+  static String createBox = '/box/create';
+  static String updateBox = '/box/update';
+  static String friendList = '/friend/list';
+  static String addFriend = '/friend/add';
+  static String createExpense = '/expense/create';
+  static String updateExpense = '/expense/update';
+  static String expenseMadeBy = '/expense/madeBy';
+  static String expenseSplit = '/expense/split';
+  static String expenseDetail = '/expense/detail';
+
+  static String groupDetail(String? groupId) =>
+      '/group/${groupId ?? ":groupId"}';
+  static String boxDetail(String? boxId) => '/box/${boxId ?? ":boxId"}';
+}

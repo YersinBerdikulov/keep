@@ -8,7 +8,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/router/router_notifier.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../domain/di/auth_controller_di.dart';
 

@@ -5,7 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/group_model.dart';
-import '../../../../core/router/router_notifier.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/widgets/image/image_widget.dart';
 import '../../../../shared/widgets/list_tile/list_tile_card.dart';
 import '../../../../shared/widgets/long_press_menu/long_press_menu.dart';

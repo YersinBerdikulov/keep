@@ -8,7 +8,7 @@ import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
 import '../../../../core/constants/size_config.dart';
-import '../../../../core/router/router_notifier.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/error/error.dart';
 import '../../../../shared/widgets/image/image_widget.dart';

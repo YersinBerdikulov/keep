@@ -8,7 +8,7 @@ import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/content/register/sign_up_contents.dart';
 import '../../../../core/constants/font_config.dart';
 import '../../../../shared/utilities/validation/validation.dart';
-import '../../../../core/router/router_notifier.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/widgets/button/button.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
 

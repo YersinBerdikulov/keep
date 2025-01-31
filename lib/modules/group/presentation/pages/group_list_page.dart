@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
-import '../../../../core/router/router_notifier.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/widgets/appbar/appbar.dart';
 import '../../../../shared/widgets/floating_action_button/floating_action_button.dart';
 import '../../domain/di/group_controller_di.dart';

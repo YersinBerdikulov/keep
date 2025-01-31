@@ -7,7 +7,7 @@ import '../../../core/constants/font_config.dart';
 import '../../utilities/helpers/snackbar_helper.dart';
 import '../../../modules/box/domain/models/box_model.dart';
 import '../../../modules/group/domain/models/group_model.dart';
-import '../../../core/router/router_notifier.dart';
+import '../../../core/router/router_names.dart';
 import '../image/image_widget.dart';
 import '../long_press_menu/long_press_menu.dart';
 import 'card.dart';

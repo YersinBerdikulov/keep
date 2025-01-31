@@ -10,7 +10,7 @@ import '../../../../core/constants/color_config.dart';
 import '../../../../shared/utilities/validation/validation.dart';
 import '../../../box/domain/models/box_model.dart';
 import '../../../group/domain/models/group_model.dart';
-import '../../../../core/router/router_notifier.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/widgets/button/button.dart';
 import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/card/grey_card.dart';

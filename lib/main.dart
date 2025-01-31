@@ -1,4 +1,4 @@
-import 'package:dongi/core/router/router_notifier.dart';
+import 'package:dongi/core/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'core/constants/color_config.dart';

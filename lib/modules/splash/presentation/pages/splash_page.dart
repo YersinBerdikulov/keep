@@ -1,9 +1,8 @@
+import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import '../../../../core/router/router_notifier.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});

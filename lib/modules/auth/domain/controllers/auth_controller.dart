@@ -3,14 +3,12 @@ import 'dart:async';
 import 'package:dongi/modules/auth/data/di/auth_di.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/auth/domain/repository/auth_repository.dart';
-import 'package:dongi/core/router/router_notifier.dart';
 import 'package:dongi/modules/auth/domain/models/user_model.dart';
 import 'package:dongi/modules/user/data/di/user_di.dart';
 import 'package:dongi/modules/user/domain/repository/user_repository.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class AuthController extends AsyncNotifier<UserModel?> {
   late final AuthRepository authRepository;

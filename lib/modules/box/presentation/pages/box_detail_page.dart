@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../../group/domain/models/group_model.dart';
-import '../../../../core/router/router_notifier.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/widgets/appbar/sliver_appbar.dart';
 import '../../../../shared/widgets/error/error.dart';
 import '../../../../shared/widgets/floating_action_button/floating_action_button.dart';
