@@ -51,6 +51,9 @@ class AuthHomePage extends HookConsumerWidget {
                 await ref
                     .read(authControllerProvider.notifier)
                     .signInWithGoogle();
+                if (context.mounted) {
+                  context.go(RouteName.home);
+                }
               },
               isLoading: ref.watch(authControllerProvider).maybeWhen(
                     loading: () => true,

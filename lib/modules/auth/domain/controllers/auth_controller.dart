@@ -115,20 +115,30 @@ class AuthController extends AsyncNotifier<UserModel?> {
     state = await res.fold(
       (l) => AsyncValue.error(l.message, l.stackTrace),
       (r) async {
-        UserModel userModel = UserModel(
-          email: r.email,
-          userName: r.name,
-        );
-
         // Save User data to provider
         ref.read(currentUserProvider.notifier).state = r.toUserModel();
 
-        // Save/Update user data in backend
-        final res2 = await userRepository.saveUserData(userModel, r.$id);
-        return res2.fold(
-          (l) => AsyncValue.error(l.message, l.stackTrace),
-          (r) => const AsyncValue.data(null),
-        );
+        // Check if the user is already signed up
+        final user = await userRepository.getUserDataByEmail(r.email);
+        if (user != null) {
+          // If the user is already signed up, just get the user data
+
+          ref.read(currentUserProvider.notifier).state = user;
+          return const AsyncValue.data(null);
+        } else {
+          UserModel userModel = r.toUserModel();
+
+          // Save User data to provider
+          ref.read(currentUserProvider.notifier).state = userModel;
+
+          // Save user data in backend
+          final res2 =
+              await userRepository.saveUserData(userModel, userModel.id!);
+          return res2.fold(
+            (l) => AsyncValue.error(l.message, l.stackTrace),
+            (r) => const AsyncValue.data(null),
+          );
+        }
       },
     );
   }

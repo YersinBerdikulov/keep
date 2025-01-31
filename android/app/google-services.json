@@ -1,43 +1,26 @@
 {
   "project_info": {
-    "project_number": "439074732981",
-    "project_id": "dispose-9ffc6",
-    "storage_bucket": "dispose-9ffc6.appspot.com"
+    "project_number": "493524608587",
+    "project_id": "hero-73343",
+    "storage_bucket": "hero-73343.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:439074732981:android:f0ba098401dfc9a9c237fc",
+        "mobilesdk_app_id": "1:493524608587:android:d0eab4ae9f066cc7838fce",
         "android_client_info": {
           "package_name": "ir.dispose.dongi"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "439074732981-0orbj0fe4n576nj2tde2o7c4s4jqmhcf.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC24ZR0M9_0S-xe4WNHBA9sU5i5qKKR2yo"
+          "current_key": "AIzaSyAhYpyYkiN84rYFaGxYSlttsZp1ORQDZEI"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "439074732981-0orbj0fe4n576nj2tde2o7c4s4jqmhcf.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "439074732981-m5jd8365vi1c86gsqd01p5kietunucba.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "ir.dispose.dongi"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
