@@ -33,15 +33,17 @@ class UserRemoteDataSource implements UserRepositoryImpl {
   }
 
   @override
-  FutureEitherVoid saveUserData(UserModel userModel, String authUid) async {
+  FutureEither<UserModel?> saveUserData(UserModel userModel) async {
     try {
-      await _db.createDocument(
+      final document = await _db.createDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.usersCollection,
-        documentId: authUid,
+        documentId: ID.unique(),
         data: userModel.toJson(),
       );
-      return right(null);
+
+      final user = UserModel.fromJson(document.data);
+      return right(user);
     } on AppwriteException catch (e, st) {
       return left(
         Failure(

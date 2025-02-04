@@ -32,7 +32,7 @@ class AuthController extends AsyncNotifier<UserModel?> {
   }
 
   /// Handles Sign-Up Logic
-  Future<void> signUp({
+  Future<void> signUpWithEmail({
     required String email,
     required String userName,
     required String password,
@@ -41,7 +41,10 @@ class AuthController extends AsyncNotifier<UserModel?> {
     state = const AsyncValue.loading();
 
     // Perform sign-up operation
-    final res = await authRepository.signUp(email: email, password: password);
+    final res = await authRepository.signUpWithEmail(
+      email: email,
+      password: password,
+    );
 
     // Update state based on the result
     state = await res.fold(
@@ -53,28 +56,17 @@ class AuthController extends AsyncNotifier<UserModel?> {
           userName: userName,
         );
 
+        // In here we know that the user isn't signed up before
         // Save user data to backend
-        final res2 = await userRepository.saveUserData(userModel, r.$id);
+        final res2 = await userRepository.saveUserData(userModel);
 
         // Handle result of saveUserData
         return await res2.fold(
           (l) => AsyncValue.error(l.message, l.stackTrace),
           (r) async {
             // Automatically sign in the user to create a session
-            final signInRes = await authRepository.signIn(
-              email: email,
-              password: password,
-            );
-
-            // Handle sign-in result
-            return signInRes.fold(
-              (l) => AsyncValue.error(l.message, l.stackTrace),
-              (r) {
-                // Save user data to currentUserProvider
-                ref.read(currentUserProvider.notifier).state = r.toUserModel();
-                return const AsyncValue.data(null);
-              },
-            );
+            await signIn(email: email, password: password);
+            return const AsyncValue.data(null);
           },
         );
       },
@@ -104,39 +96,36 @@ class AuthController extends AsyncNotifier<UserModel?> {
   }
 
   /// Handles Google Sign-In
-  Future<void> signInWithGoogle() async {
+  Future<void> authWithGoogle() async {
     // Set state to loading
     state = const AsyncValue.loading();
 
     // Perform the Google sign-in operation
-    final res = await authRepository.signInWithGoogle();
+    final googleAuthResult = await authRepository.authWithGoogle();
 
     // Update state based on the result
-    state = await res.fold(
+    state = await googleAuthResult.fold(
       (l) => AsyncValue.error(l.message, l.stackTrace),
       (r) async {
-        // Save User data to provider
-        ref.read(currentUserProvider.notifier).state = r.toUserModel();
-
         // Check if the user is already signed up
         final user = await userRepository.getUserDataByEmail(r.email);
         if (user != null) {
-          // If the user is already signed up, just get the user data
-
+          // If the user is already signed up, just set the user data
           ref.read(currentUserProvider.notifier).state = user;
           return const AsyncValue.data(null);
         } else {
           UserModel userModel = r.toUserModel();
 
-          // Save User data to provider
-          ref.read(currentUserProvider.notifier).state = userModel;
-
           // Save user data in backend
-          final res2 =
-              await userRepository.saveUserData(userModel, userModel.id!);
-          return res2.fold(
+          final saveUserResult = await userRepository.saveUserData(userModel);
+
+          return saveUserResult.fold(
             (l) => AsyncValue.error(l.message, l.stackTrace),
-            (r) => const AsyncValue.data(null),
+            (r2) {
+              // Save User data to provider
+              ref.read(currentUserProvider.notifier).state = r2;
+              return const AsyncValue.data(null);
+            },
           );
         }
       },
@@ -193,17 +182,17 @@ class AuthController extends AsyncNotifier<UserModel?> {
           ref.read(currentUserProvider.notifier).state = user;
           return const AsyncValue.data(null);
         } else {
-          UserModel userModel = r.toUserModel();
-
-          // Save User data to provider
-          ref.read(currentUserProvider.notifier).state = userModel;
+          final userModel = UserModel(email: r.email);
 
           // Save user data in backend
-          final res2 =
-              await userRepository.saveUserData(userModel, userModel.id!);
+          final res2 = await userRepository.saveUserData(userModel);
           return res2.fold(
             (l) => AsyncValue.error(l.message, l.stackTrace),
-            (r) => const AsyncValue.data(null),
+            (r2) {
+              // Save User data to provider
+              ref.read(currentUserProvider.notifier).state = r2;
+              return const AsyncValue.data(null);
+            },
           );
         }
       },

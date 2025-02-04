@@ -50,7 +50,7 @@ class AuthHomePage extends HookConsumerWidget {
                 // Google OAuth Logic
                 await ref
                     .read(authControllerProvider.notifier)
-                    .signInWithGoogle();
+                    .authWithGoogle();
                 if (context.mounted) {
                   context.go(RouteName.home);
                 }

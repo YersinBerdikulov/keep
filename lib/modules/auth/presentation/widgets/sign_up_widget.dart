@@ -134,7 +134,9 @@ class SignUpAction extends ConsumerWidget {
                     ),
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
-                    await ref.read(authControllerProvider.notifier).signUp(
+                    await ref
+                        .read(authControllerProvider.notifier)
+                        .signUpWithEmail(
                           userName: username.text,
                           email: email.text,
                           password: password.text,

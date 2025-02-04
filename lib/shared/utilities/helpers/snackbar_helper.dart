@@ -20,7 +20,7 @@ void showSnackBar(
       backgroundColor = ColorConfig.error;
       break;
     case SnackBarType.info:
-      backgroundColor = ColorConfig.grey;
+      backgroundColor = ColorConfig.darkGrey;
       break;
   }
 

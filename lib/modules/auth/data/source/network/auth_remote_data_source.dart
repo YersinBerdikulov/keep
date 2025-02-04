@@ -20,7 +20,7 @@ class AuthRemoteDataSource {
     }
   }
 
-  FutureEither<User> signUp({
+  FutureEither<User> signUpWithEmail({
     required String email,
     required String password,
   }) async {
@@ -67,7 +67,7 @@ class AuthRemoteDataSource {
     }
   }
 
-  FutureEither<User> signInWithGoogle() async {
+  FutureEither<User> authWithGoogle() async {
     try {
       await _account.createOAuth2Session(
         provider: OAuthProvider.google,

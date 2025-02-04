@@ -2,7 +2,7 @@ import 'package:appwrite/models.dart';
 import 'package:dongi/shared/types/type_defs.dart';
 
 abstract class AuthRepository {
-  FutureEither<User> signUp({
+  FutureEither<User> signUpWithEmail({
     required String email,
     required String password,
   });
@@ -10,7 +10,7 @@ abstract class AuthRepository {
     required String email,
     required String password,
   });
-  FutureEither<User> signInWithGoogle();
+  FutureEither<User> authWithGoogle();
   FutureEitherVoid forgetPassword({
     required String email,
   });

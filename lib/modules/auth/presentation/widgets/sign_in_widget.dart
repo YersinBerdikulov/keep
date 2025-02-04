@@ -136,7 +136,7 @@ class SignInGoogleButton extends ConsumerWidget {
     return InkWell(
       onTap: isLoading
           ? null
-          : () => ref.read(authControllerProvider.notifier).signInWithGoogle(),
+          : () => ref.read(authControllerProvider.notifier).authWithGoogle(),
       child: Container(
         height: 50,
         width: 50,

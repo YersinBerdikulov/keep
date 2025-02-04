@@ -6,7 +6,7 @@ class ColorConfig {
   static Color background = const Color(0xffF2F2F2);
   static Color pureWhite = const Color(0xffFFFFFF);
   static Color baseGrey = const Color(0xffE6E6E6);
-  static Color darkGrey = const Color(0xffD9D9D9);
+  static Color darkGrey = const Color(0xff3A3B3C);
   static Color midnight = const Color(0xff0C1A26);
   static Color secondary = const Color(0xff48BF7B);
   static Color error = const Color(0xffD94F04);

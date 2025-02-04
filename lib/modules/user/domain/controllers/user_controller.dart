@@ -34,8 +34,8 @@ class UserController extends AsyncNotifier<UserModel?> {
     }
   }
 
-  Future<void> saveUser(UserModel userModel, String authUid) async {
-    final result = await _userRepository.saveUserData(userModel, authUid);
+  Future<void> saveUser(UserModel userModel) async {
+    final result = await _userRepository.saveUserData(userModel);
 
     result.fold(
       (failure) {

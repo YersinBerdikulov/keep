@@ -69,7 +69,7 @@ final goRouterProvider = Provider<GoRouter>(
         GoRoute(
           path: RouteName.signupOTPInput,
           builder: (context, state) {
-            Map<String, String> extra = state.extra as Map<String, String>;
+            Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
             return SignUpOTPInputPage(
                 userId: extra['userId']!, email: extra['email']!);
           },
@@ -77,14 +77,14 @@ final goRouterProvider = Provider<GoRouter>(
         GoRoute(
           path: RouteName.signin,
           builder: (context, state) {
-            Map<String, String>? extra = state.extra as Map<String, String>?;
+            Map<String, dynamic>? extra = state.extra as Map<String, dynamic>?;
             return SignInPage(email: extra?["email"]);
           },
         ),
         GoRoute(
           path: RouteName.setPassword,
           builder: (context, state) {
-            Map<String, String> extra = state.extra as Map<String, String>;
+            Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
             return SetPasswordPage(userId: extra["userId"]!);
           },
         ),

@@ -30,8 +30,8 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  FutureEitherVoid saveUserData(UserModel userModel, String uid) {
-    return _remoteDataSource.saveUserData(userModel, uid);
+  FutureEither<UserModel?> saveUserData(UserModel userModel) {
+    return _remoteDataSource.saveUserData(userModel);
   }
 
   @override

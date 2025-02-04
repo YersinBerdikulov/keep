@@ -45,13 +45,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  FutureEither<User> signInWithGoogle() {
-    return _remoteDataSource.signInWithGoogle();
+  FutureEither<User> authWithGoogle() {
+    return _remoteDataSource.authWithGoogle();
   }
 
   @override
-  FutureEither<User> signUp({required String email, required String password}) {
-    return _remoteDataSource.signUp(email: email, password: password);
+  FutureEither<User> signUpWithEmail(
+      {required String email, required String password}) {
+    return _remoteDataSource.signUpWithEmail(email: email, password: password);
   }
 
   @override
