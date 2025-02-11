@@ -10,7 +10,7 @@ import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/box_model.dart';
 import '../../../expense/domain/models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
-import '../../../auth/domain/models/user_model.dart';
+import '../../../user/domain/models/user_model.dart';
 import '../../../../core/router/router_names.dart';
 import '../../../../shared/widgets/card/category_card.dart';
 import '../../../../shared/widgets/error/error.dart';

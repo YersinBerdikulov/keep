@@ -8,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../models/box_model.dart';
 import '../../../group/domain/models/group_model.dart';
-import '../../../auth/domain/models/user_model.dart';
+import '../../../user/domain/models/user_model.dart';
 import '../../../../core/data/storage/storage_service.dart';
 import '../../../expense/domain/di/expense_controller_di.dart';
 import '../../../group/domain/di/group_controller_di.dart';

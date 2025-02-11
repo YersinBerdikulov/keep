@@ -4,20 +4,18 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SetPasswordPage extends HookConsumerWidget {
-  final String userId; // Pass this from the previous screen
-
-  const SetPasswordPage({required this.userId, super.key});
+  const SetPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final passwordController = TextEditingController();
-    final usernameController = TextEditingController();
+    // final usernameController = TextEditingController();
 
     final isLoading = useState(false);
 
     void save() async {
       final password = passwordController.text.trim();
-      final username = usernameController.text.trim();
+      // final username = usernameController.text.trim();
 
       if (password.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -28,11 +26,9 @@ class SetPasswordPage extends HookConsumerWidget {
 
       isLoading.value = true;
 
-      await ref.read(authControllerProvider.notifier).setPasswordAndUsername(
-            userId: userId,
-            password: password,
-            username: username.isEmpty ? null : username,
-          );
+      await ref
+          .read(authControllerProvider.notifier)
+          .setPassword(password: password);
 
       isLoading.value = false;
     }
@@ -50,11 +46,11 @@ class SetPasswordPage extends HookConsumerWidget {
               decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
-            SizedBox(height: 16),
-            TextField(
-              controller: usernameController,
-              decoration: InputDecoration(labelText: 'Username (Optional)'),
-            ),
+            // SizedBox(height: 16),
+            // TextField(
+            //   controller: usernameController,
+            //   decoration: InputDecoration(labelText: 'Username (Optional)'),
+            // ),
             SizedBox(height: 32),
             isLoading.value
                 ? CircularProgressIndicator()

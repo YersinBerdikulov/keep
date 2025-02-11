@@ -1,7 +1,7 @@
 import 'package:dongi/modules/group/domain/controllers/group_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../models/group_model.dart';
-import '../../../auth/domain/models/user_model.dart';
+import '../../../user/domain/models/user_model.dart';
 
 final groupNotifierProvider =
     AsyncNotifierProvider<GroupNotifier, List<GroupModel>>(

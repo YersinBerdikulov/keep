@@ -1,5 +1,5 @@
 import 'package:dongi/shared/types/type_defs.dart';
-import 'package:dongi/modules/auth/domain/models/user_model.dart';
+import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:dongi/modules/user/data/source/network/user_remote_data_source.dart';
 import 'package:dongi/modules/user/domain/repository/user_repository.dart';
 

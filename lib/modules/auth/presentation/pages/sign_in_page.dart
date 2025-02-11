@@ -175,7 +175,7 @@ class SignInPage extends HookConsumerWidget {
 
                           if (context.mounted) {
                             // Redirect to the home page or dashboard
-                            context.go(RouteName.home);
+                            context.go(RouteName.setPassword);
                           }
                         } else {
                           // Check if the user is available
@@ -184,14 +184,6 @@ class SignInPage extends HookConsumerWidget {
                               .isUserSignedUp(emailController.text);
 
                           if (!isUserAvailable) {
-                            if (context.mounted) {
-                              showSnackBar(
-                                context,
-                                type: SnackBarType.error,
-                                content:
-                                    "User with this email is not registered.",
-                              );
-                            }
                             return;
                           }
 

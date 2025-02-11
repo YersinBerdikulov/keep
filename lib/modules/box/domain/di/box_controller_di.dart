@@ -1,4 +1,4 @@
-import 'package:dongi/modules/auth/domain/models/user_model.dart';
+import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:dongi/modules/box/domain/controllers/box_controller.dart';
 import 'package:dongi/modules/box/domain/models/box_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

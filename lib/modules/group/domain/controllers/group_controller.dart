@@ -9,7 +9,7 @@ import 'package:dongi/modules/group/domain/repository/group_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../models/group_model.dart';
-import '../../../auth/domain/models/user_model.dart';
+import '../../../user/domain/models/user_model.dart';
 import '../../../../core/data/storage/storage_service.dart';
 
 class GroupNotifier extends AsyncNotifier<List<GroupModel>> {

@@ -7,7 +7,7 @@ import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/group_model.dart';
-import '../../../auth/domain/models/user_model.dart';
+import '../../../user/domain/models/user_model.dart';
 import '../../../../shared/widgets/card/box_card.dart';
 import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/error/error.dart';

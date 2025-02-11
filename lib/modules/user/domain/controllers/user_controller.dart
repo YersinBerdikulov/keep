@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:dongi/modules/auth/domain/models/user_model.dart';
+import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:dongi/modules/user/data/di/user_di.dart';
 import 'package:dongi/modules/user/domain/repository/user_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

@@ -82,12 +82,8 @@ final goRouterProvider = Provider<GoRouter>(
           },
         ),
         GoRoute(
-          path: RouteName.setPassword,
-          builder: (context, state) {
-            Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
-            return SetPasswordPage(userId: extra["userId"]!);
-          },
-        ),
+            path: RouteName.setPassword,
+            builder: (context, state) => const SetPasswordPage()),
         GoRoute(
             path: RouteName.onboarding,
             builder: (context, state) => OnboardingPage()),
