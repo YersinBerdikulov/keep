@@ -28,6 +28,12 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
+def storeFilePath = project.hasProperty('STORE_FILE') ? project.property('STORE_FILE') : null
+def storePassword = project.hasProperty('STORE_PASSWORD') ? project.property('STORE_PASSWORD') : null
+def keyAlias = project.hasProperty('KEY_ALIAS') ? project.property('KEY_ALIAS') : null
+def keyPassword = project.hasProperty('KEY_PASSWORD') ? project.property('KEY_PASSWORD') : null
+
+
 android {
     compileSdkVersion 34
     ndkVersion flutter.ndkVersion

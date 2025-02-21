@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/content/register/new_password_contents.dart';
 import '../../../../core/constants/font_config.dart';
-import '../../../../shared/widgets/button/button.dart';
+import '../../../../shared/widgets/button/button_widget.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
 
 // Title widget

@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../modules/auth/domain/di/auth_controller_di.dart';
-import '../../modules/auth/presentation/pages/auth_home_page.dart';
+import '../../modules/auth/presentation/pages/auth_entry_page.dart';
 import '../../modules/auth/presentation/pages/sign_in_page.dart';
 import '../../modules/auth/presentation/pages/sign_up_email_page.dart';
 import '../../modules/auth/presentation/pages/sign_up_otp_input_page.dart';
@@ -62,7 +62,7 @@ final goRouterProvider = Provider<GoRouter>(
             builder: (context, state) => const SplashPage()),
         GoRoute(
             path: RouteName.authHome,
-            builder: (context, state) => const AuthHomePage()),
+            builder: (context, state) => const AuthEntryPage()),
         GoRoute(
             path: RouteName.signupEmail,
             builder: (context, state) => SignUpEmailPage()),

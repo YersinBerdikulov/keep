@@ -8,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/router/router_names.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
-import '../../../../shared/widgets/button/button.dart';
+import '../../../../shared/widgets/button/button_widget.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
 import '../../domain/di/auth_controller_di.dart';
 

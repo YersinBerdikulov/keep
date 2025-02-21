@@ -3,6 +3,14 @@ import 'package:flutter/material.dart';
 import 'color_config.dart';
 
 class FontConfig {
+  static TextStyle headlineSmall() => TextStyle(
+        fontFamily: "Comfortaa",
+        fontWeight: FontWeight.w400,
+        fontSize: 24,
+        height: 32 / 24,
+        color: ColorConfig.midnight,
+      );
+
   static TextStyle h4() => TextStyle(
         fontFamily: "Comfortaa",
         fontWeight: FontWeight.w700,

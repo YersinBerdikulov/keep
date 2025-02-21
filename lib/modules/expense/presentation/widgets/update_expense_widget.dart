@@ -11,7 +11,7 @@ import '../../../box/domain/models/box_model.dart';
 import '../../domain/models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
 import '../../../../core/router/router_names.dart';
-import '../../../../shared/widgets/button/button.dart';
+import '../../../../shared/widgets/button/button_widget.dart';
 import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/card/grey_card.dart';
 import '../../../../shared/widgets/list_tile/list_tile_card.dart';

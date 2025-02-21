@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/content/onboarding_contents.dart';
 import '../../../../core/constants/font_config.dart';
 import '../../../../core/router/router_names.dart';
-import '../../../../shared/widgets/button/button.dart';
+import '../../../../shared/widgets/button/button_widget.dart';
 
 class OnboardingTitle extends StatelessWidget {
   final int index;
@@ -94,7 +94,7 @@ class OnboardingActionButtons extends StatelessWidget {
           : [
               SizedBox(
                 width: 50,
-                child: ButtonWidget.outline(
+                child: ButtonWidget(
                   title: "Skip",
                   textColor:
                       ColorConfig.midnight.withAlpha((0.6 * 255).toInt()),

@@ -3,7 +3,7 @@ import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/shared/utilities/helpers/snackbar_helper.dart';
 import 'package:dongi/shared/utilities/validation/validation.dart';
 import 'package:dongi/shared/widgets/appbar/appbar.dart';
-import 'package:dongi/shared/widgets/button/button.dart';
+import 'package:dongi/shared/widgets/button/button_widget.dart';
 import 'package:dongi/shared/widgets/text_field/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

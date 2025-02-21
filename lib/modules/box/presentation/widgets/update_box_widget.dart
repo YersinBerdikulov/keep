@@ -10,7 +10,7 @@ import '../../../../core/constants/font_config.dart';
 import '../../../../core/constants/size_config.dart';
 import '../../../../shared/utilities/validation/validation.dart';
 import '../../domain/models/box_model.dart';
-import '../../../../shared/widgets/button/button.dart';
+import '../../../../shared/widgets/button/button_widget.dart';
 import '../../../../shared/widgets/friends/friend.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
 

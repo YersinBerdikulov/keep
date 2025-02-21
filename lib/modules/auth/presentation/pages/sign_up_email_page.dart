@@ -1,7 +1,7 @@
 import 'package:dongi/core/constants/constant.dart';
 import 'package:dongi/shared/utilities/validation/validation.dart';
 import 'package:dongi/shared/widgets/appbar/appbar.dart';
-import 'package:dongi/shared/widgets/button/button.dart';
+import 'package:dongi/shared/widgets/button/button_widget.dart';
 import 'package:dongi/shared/widgets/text_field/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
