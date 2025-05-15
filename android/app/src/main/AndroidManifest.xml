@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ir.dispose.dongi">
+    package="com.keep-com.keep">
 	<queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -15,7 +15,7 @@
         </intent>
     </queries>
    <application
-        android:label="dongi"
+        android:label="keep"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
