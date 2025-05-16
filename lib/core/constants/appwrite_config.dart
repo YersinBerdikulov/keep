@@ -1,5 +1,5 @@
 class AppwriteConfig {
-  static String endPoint = 'https://cloud.appwrite.io/v1';
+  static String endPoint = 'https://fra.cloud.appwrite.io/v1';
   static String projectId = '6825a463002d35b87b9c';
   static String databaseId = '682606330003d48f1808';
   static String boxCollection = '68260679002e501c45f6';
@@ -12,5 +12,6 @@ class AppwriteConfig {
   static String userFriendCollection = '6826078f001b57cc9d37';
   static String imagesBucket = '682607b2003c4d883989';
   static String imageUrl(String imageId) =>
-      'https://cloud.appwrite.io/v1/storage/buckets/$imagesBucket/files/$imageId/view?project=$projectId&mode=admin';
+      'https://fra.cloud.appwrite.io/v1/storage/buckets/$imagesBucket/files/$imageId/view?project=$projectId&mode=admin';
 }
+
