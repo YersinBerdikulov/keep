@@ -47,24 +47,27 @@ class CreateBoxPage extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: ColorConfig.white,
       appBar: AppBarWidget(title: "Create Box"),
-      body: Column(
-        children: [
-          CreateBoxInfoCard(
-            image: image,
-            boxTitle: boxTitle,
-            boxDescription: boxDescription,
-            formKey: _formKey,
-          ),
-          const CreateBoxSelectFriends(),
-          const Spacer(),
-          CreateBoxButton(
-            formKey: _formKey,
-            image: image,
-            boxTitle: boxTitle,
-            boxDescription: boxDescription,
-            groupModel: groupModel,
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            CreateBoxInfoCard(
+              image: image,
+              boxTitle: boxTitle,
+              boxDescription: boxDescription,
+              formKey: _formKey,
+            ),
+            CreateBoxSelectFriends(groupModel: groupModel),
+            const SizedBox(height: 20),
+            CreateBoxButton(
+              formKey: _formKey,
+              image: image,
+              boxTitle: boxTitle,
+              boxDescription: boxDescription,
+              groupModel: groupModel,
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

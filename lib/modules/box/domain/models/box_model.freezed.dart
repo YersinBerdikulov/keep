@@ -33,6 +33,7 @@ mixin _$BoxModel {
   List<String> get boxUsers => throw _privateConstructorUsedError;
   List<String> get expenseIds => throw _privateConstructorUsedError;
   num get total => throw _privateConstructorUsedError;
+  String get currency => throw _privateConstructorUsedError;
   String get creatorId => throw _privateConstructorUsedError;
 
   /// Serializes this BoxModel to a JSON map.
@@ -61,6 +62,7 @@ abstract class $BoxModelCopyWith<$Res> {
       List<String> boxUsers,
       List<String> expenseIds,
       num total,
+      String currency,
       String creatorId});
 }
 
@@ -89,6 +91,7 @@ class _$BoxModelCopyWithImpl<$Res, $Val extends BoxModel>
     Object? boxUsers = null,
     Object? expenseIds = null,
     Object? total = null,
+    Object? currency = null,
     Object? creatorId = null,
   }) {
     return _then(_value.copyWith(
@@ -132,6 +135,10 @@ class _$BoxModelCopyWithImpl<$Res, $Val extends BoxModel>
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
               as num,
+      currency: null == currency
+          ? _value.currency
+          : currency // ignore: cast_nullable_to_non_nullable
+              as String,
       creatorId: null == creatorId
           ? _value.creatorId
           : creatorId // ignore: cast_nullable_to_non_nullable
@@ -159,6 +166,7 @@ abstract class _$$BoxModelImplCopyWith<$Res>
       List<String> boxUsers,
       List<String> expenseIds,
       num total,
+      String currency,
       String creatorId});
 }
 
@@ -185,6 +193,7 @@ class __$$BoxModelImplCopyWithImpl<$Res>
     Object? boxUsers = null,
     Object? expenseIds = null,
     Object? total = null,
+    Object? currency = null,
     Object? creatorId = null,
   }) {
     return _then(_$BoxModelImpl(
@@ -228,6 +237,10 @@ class __$$BoxModelImplCopyWithImpl<$Res>
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
               as num,
+      currency: null == currency
+          ? _value.currency
+          : currency // ignore: cast_nullable_to_non_nullable
+              as String,
       creatorId: null == creatorId
           ? _value.creatorId
           : creatorId // ignore: cast_nullable_to_non_nullable
@@ -250,6 +263,7 @@ class _$BoxModelImpl implements _BoxModel {
       final List<String> boxUsers = const [],
       final List<String> expenseIds = const [],
       this.total = 0,
+      this.currency = "KZT",
       required this.creatorId})
       : _boxUsers = boxUsers,
         _expenseIds = expenseIds;
@@ -296,11 +310,14 @@ class _$BoxModelImpl implements _BoxModel {
   @JsonKey()
   final num total;
   @override
+  @JsonKey()
+  final String currency;
+  @override
   final String creatorId;
 
   @override
   String toString() {
-    return 'BoxModel(id: $id, createdAt: $createdAt, updatedAt: $updatedAt, title: $title, description: $description, image: $image, groupId: $groupId, boxUsers: $boxUsers, expenseIds: $expenseIds, total: $total, creatorId: $creatorId)';
+    return 'BoxModel(id: $id, createdAt: $createdAt, updatedAt: $updatedAt, title: $title, description: $description, image: $image, groupId: $groupId, boxUsers: $boxUsers, expenseIds: $expenseIds, total: $total, currency: $currency, creatorId: $creatorId)';
   }
 
   @override
@@ -322,6 +339,8 @@ class _$BoxModelImpl implements _BoxModel {
             const DeepCollectionEquality()
                 .equals(other._expenseIds, _expenseIds) &&
             (identical(other.total, total) || other.total == total) &&
+            (identical(other.currency, currency) ||
+                other.currency == currency) &&
             (identical(other.creatorId, creatorId) ||
                 other.creatorId == creatorId));
   }
@@ -340,6 +359,7 @@ class _$BoxModelImpl implements _BoxModel {
       const DeepCollectionEquality().hash(_boxUsers),
       const DeepCollectionEquality().hash(_expenseIds),
       total,
+      currency,
       creatorId);
 
   /// Create a copy of BoxModel
@@ -370,6 +390,7 @@ abstract class _BoxModel implements BoxModel {
       final List<String> boxUsers,
       final List<String> expenseIds,
       final num total,
+      final String currency,
       required final String creatorId}) = _$BoxModelImpl;
 
   factory _BoxModel.fromJson(Map<String, dynamic> json) =
@@ -398,6 +419,8 @@ abstract class _BoxModel implements BoxModel {
   List<String> get expenseIds;
   @override
   num get total;
+  @override
+  String get currency;
   @override
   String get creatorId;
 

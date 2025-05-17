@@ -14,6 +14,13 @@ import '../../../group/domain/models/group_model.dart';
 import '../../../../shared/widgets/button/button_widget.dart';
 import '../../../../shared/widgets/friends/friend.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
+import '../../../../shared/widgets/loading/loading.dart';
+import '../../../../shared/widgets/error/error.dart';
+import '../../domain/models/box_model.dart';
+import '../../domain/controllers/box_controller.dart';
+
+final selectedCurrencyProvider = StateProvider<String>((ref) => 'KZT');
+final selectedMembersProvider = StateProvider<List<String>>((ref) => []);
 
 class CreateBoxInfoCard extends ConsumerWidget {
   final TextEditingController boxTitle;
@@ -29,6 +36,37 @@ class CreateBoxInfoCard extends ConsumerWidget {
     required this.formKey,
   });
 
+  void _showCurrencyDialog(BuildContext context, WidgetRef ref) {
+    final currencies = [
+      {'code': 'KZT', 'name': 'Tenge'},
+      {'code': 'USD', 'name': 'US Dollar'},
+      {'code': 'EUR', 'name': 'Euro'},
+      {'code': 'RUB', 'name': 'Russian Ruble'},
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Select Currency', style: FontConfig.body1()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: currencies
+              .map((currency) => ListTile(
+                    title: Text('${currency['name']} (${currency['code']})',
+                        style: FontConfig.body2()),
+                    onTap: () {
+                      ref.read(selectedCurrencyProvider.notifier).state =
+                          currency['code']!;
+                      Navigator.pop(context);
+                    },
+                  ))
+              .toList(),
+        ),
+      ),
+    );
+  }
+
+  /// * ----- select option button
   selectOptionButton({
     required Function onTap,
     required String icon,
@@ -98,6 +136,8 @@ class CreateBoxInfoCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedCurrency = ref.watch(selectedCurrencyProvider);
+
     return Form(
       key: formKey,
       child: Container(
@@ -128,9 +168,9 @@ class CreateBoxInfoCard extends ConsumerWidget {
             ),
             const SizedBox(height: 10),
             selectOptionButton(
-              onTap: () {},
+              onTap: () => _showCurrencyDialog(context, ref),
               icon: 'assets/svg/currency_icon.svg',
-              title: 'currency',
+              title: 'Currency ($selectedCurrency)',
             ),
             const SizedBox(height: 10),
             TextFieldWidget(
@@ -147,48 +187,80 @@ class CreateBoxInfoCard extends ConsumerWidget {
 }
 
 class CreateBoxSelectFriends extends ConsumerWidget {
-  const CreateBoxSelectFriends({super.key});
+  final GroupModel groupModel;
+  const CreateBoxSelectFriends({super.key, required this.groupModel});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'select member',
-            style: FontConfig.body1(),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
-            width: SizeConfig.width(context),
-            decoration: BoxDecoration(
-              color: ColorConfig.grey,
-              borderRadius: BorderRadius.circular(15),
+    final selectedMembers = ref.watch(selectedMembersProvider);
+    final users = ref.watch(getUsersInBoxProvider(
+      UsersInBoxArgs(userIds: groupModel.groupUsers, groupId: groupModel.id!),
+    ));
+
+    return users.when(
+      loading: () => const LoadingWidget(),
+      error: (error, stackTrace) => ErrorTextWidget(error),
+      data: (users) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Select Members',
+              style: FontConfig.body1(),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 12,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    // childAspectRatio: ,
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
+              width: SizeConfig.width(context),
+              decoration: BoxDecoration(
+                color: ColorConfig.grey,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: users.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemBuilder: (context, i) {
+                      final user = users[i];
+                      final isSelected = selectedMembers.contains(user.id);
+                      return GestureDetector(
+                        onTap: () {
+                          if (isSelected) {
+                            ref.read(selectedMembersProvider.notifier).state =
+                                selectedMembers
+                                    .where((id) => id != user.id)
+                                    .toList();
+                          } else {
+                            ref.read(selectedMembersProvider.notifier).state = [
+                              ...selectedMembers,
+                              user.id!
+                            ];
+                          }
+                        },
+                        child: FriendWidget(
+                          image: user.profileImage,
+                          backgroundColor: isSelected
+                              ? ColorConfig.primarySwatch
+                              : ColorConfig.white,
+                        ),
+                      );
+                    },
                   ),
-                  itemBuilder: (context, i) => FriendWidget(
-                    backgroundColor: ColorConfig.white,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -212,6 +284,9 @@ class CreateBoxButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedCurrency = ref.watch(selectedCurrencyProvider);
+    final selectedMembers = ref.watch(selectedMembersProvider);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
       child: ButtonWidget(
@@ -221,15 +296,20 @@ class CreateBoxButton extends ConsumerWidget {
             ),
         onPressed: () {
           if (formKey.currentState!.validate()) {
+            // Reset selected members after successful creation
+            ref.read(selectedMembersProvider.notifier).state = [];
+
             ref.read(boxNotifierProvider(groupModel.id!).notifier).addBox(
                   image: image,
                   boxTitle: boxTitle,
                   boxDescription: boxDescription,
                   groupModel: groupModel,
+                  currency: selectedCurrency,
+                  selectedMembers: selectedMembers,
                 );
           }
         },
-        title: 'create',
+        title: 'Create',
         textColor: ColorConfig.secondary,
       ),
     );

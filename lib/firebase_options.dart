@@ -67,7 +67,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '493524608587',
     projectId: 'hero-73343',
     storageBucket: 'hero-73343.firebasestorage.app',
-    iosBundleId: 'ir.dispose.dongi',
+    iosBundleId: 'com.example.keep_app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -78,6 +78,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'dispose-9ffc6.appspot.com',
     iosClientId:
         '439074732981-m5jd8365vi1c86gsqd01p5kietunucba.apps.googleusercontent.com',
-    iosBundleId: 'ir.dispose.dongi',
+    iosBundleId: 'com.example.keep_app',
   );
 }

@@ -1,26 +1,51 @@
 {
   "project_info": {
-    "project_number": "493524608587",
-    "project_id": "hero-73343",
-    "storage_bucket": "hero-73343.firebasestorage.app"
+    "project_number": "555376389883",
+    "project_id": "keep-b4b24",
+    "storage_bucket": "keep-b4b24.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:493524608587:android:d0eab4ae9f066cc7838fce",
+        "mobilesdk_app_id": "1:555376389883:android:0c8039685d070e16d30a5e",
         "android_client_info": {
-          "package_name": "ir.dispose.dongi"
+          "package_name": "com.example.keep_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "555376389883-v6sqlmvsvr7mku3ku97j0a8sdpru3rto.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.keep_app",
+            "certificate_hash": "f326aec6c365e8d77dd17f225ef1a6d0edfd37f4"
+          }
+        },
+        {
+          "client_id": "555376389883-llfd4hrkfgauin8j73rj263jram89lh4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAhYpyYkiN84rYFaGxYSlttsZp1ORQDZEI"
+          "current_key": "AIzaSyCDKZtbQ5SHhosylUqtUiZkQ2BpttWzV5I"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "555376389883-elljbj4kcc7jskq10bicig2ak2fc4q8q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "555376389883-atdoe4fvnmd8mjifhqko8l5astd88019.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.keepApp"
+              }
+            }
+          ]
         }
       }
     }

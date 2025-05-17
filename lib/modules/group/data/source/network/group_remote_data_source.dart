@@ -12,14 +12,24 @@ class GroupRemoteDataSource {
 
   Future<Either<Failure, Document>> addGroup(GroupModel groupModel) async {
     try {
+      print('Creating group with data: ${groupModel.toJson()}');
+
       final document = await _db.createDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.groupCollection,
         documentId: ID.unique(),
         data: groupModel.toJson(),
       );
+
+      print('Created document: ${document.toMap()}');
+      print('Document ID: ${document.$id}');
+      print('Document data: ${document.data}');
+
       return right(document);
     } on AppwriteException catch (e, st) {
+      print('Error creating group: ${e.message}');
+      print('Error type: ${e.type}');
+      print('Error code: ${e.code}');
       return left(Failure(e.message ?? 'Unexpected error occurred', st));
     }
   }

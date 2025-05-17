@@ -24,6 +24,7 @@ _$BoxModelImpl _$$BoxModelImplFromJson(Map<String, dynamic> json) =>
               .toList() ??
           const [],
       total: json['total'] as num? ?? 0,
+      currency: json['currency'] as String? ?? "KZT",
       creatorId: json['creatorId'] as String,
     );
 
@@ -39,5 +40,6 @@ Map<String, dynamic> _$$BoxModelImplToJson(_$BoxModelImpl instance) =>
       'boxUsers': instance.boxUsers,
       'expenseIds': instance.expenseIds,
       'total': instance.total,
+      'currency': instance.currency,
       'creatorId': instance.creatorId,
     };

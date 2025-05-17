@@ -17,6 +17,7 @@ class BoxModel with _$BoxModel {
     @Default([]) List<String> boxUsers,
     @Default([]) List<String> expenseIds,
     @Default(0) num total,
+    @Default("KZT") String currency,
     required String creatorId,
   }) = _BoxModel;
 

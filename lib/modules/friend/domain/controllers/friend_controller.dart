@@ -3,6 +3,7 @@ import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/friend/domain/repository/friend_repository.dart';
 import 'package:dongi/modules/user/domain/di/user_usecase_di.dart';
+import 'package:dongi/modules/friend/data/di/friend_di.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FriendNotifier extends AsyncNotifier<List<UserFriendModel>> {
@@ -10,6 +11,7 @@ class FriendNotifier extends AsyncNotifier<List<UserFriendModel>> {
 
   @override
   Future<List<UserFriendModel>> build() async {
+    _friendRepository = ref.watch(friendRepositoryProvider);
     return getFriends();
   }
 

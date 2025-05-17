@@ -61,8 +61,15 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
         totalBalance: 0,
       );
 
-      await _groupRepository.addGroup(groupModel);
-      state = AsyncValue.data([...state.value ?? [], groupModel]);
+      final result = await _groupRepository.addGroup(groupModel);
+      state = await result.fold(
+        (l) => AsyncValue.error(l.message, StackTrace.current),
+        (document) async {
+          final createdGroup = GroupModel.fromJson(document.data);
+          final currentGroups = state.value ?? [];
+          return AsyncValue.data([...currentGroups, createdGroup]);
+        },
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

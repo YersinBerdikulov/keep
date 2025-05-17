@@ -62,7 +62,7 @@ class SignInPage extends HookConsumerWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              "Log in to continue using Dongi.",
+              "Log in to continue using Keep.",
               style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
             const SizedBox(height: 32),

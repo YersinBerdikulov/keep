@@ -37,10 +37,17 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
     required TextEditingController boxTitle,
     required TextEditingController boxDescription,
     required GroupModel groupModel,
+    required String currency,
+    required List<String> selectedMembers,
   }) async {
     state = const AsyncValue.loading();
     try {
-      final currentUser = ref.watch(currentUserProvider);
+      final currentUserValue = ref.read(currentUserProvider);
+      if (currentUserValue == null) throw Exception('User not logged in');
+
+      final currentUser = currentUserValue;
+      if (currentUser.id == null) throw Exception('User ID not found');
+
       List<String> imageLinks = [];
 
       if (image.value != null) {
@@ -51,14 +58,19 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
         );
       }
 
+      // Make sure creator is included in members and convert to List<String>
+      final Set<String> memberSet = {...selectedMembers, currentUser.id};
+      final List<String> boxUsers = memberSet.toList();
+
       BoxModel boxModel = BoxModel(
         title: boxTitle.text,
         description: boxDescription.text,
-        creatorId: currentUser!.id!,
+        creatorId: currentUser.id,
         groupId: groupModel.id!,
         image: imageLinks.isNotEmpty ? imageLinks[0] : null,
-        boxUsers: [currentUser.id!],
+        boxUsers: boxUsers,
         total: 0,
+        currency: currency,
       );
 
       final res = await boxRepository.addBox(boxModel);

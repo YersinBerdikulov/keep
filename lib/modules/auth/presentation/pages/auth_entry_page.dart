@@ -90,10 +90,10 @@ class AuthEntryPage extends HookConsumerWidget {
                   child: PrimaryButtonWidget(
                     title: "Next",
                     onPressed: () {
-                      // final email = emailController.text.trim();
-                      // if (email.isNotEmpty) {
-                      //   context.push("${RouteName.checkEmail}?email=$email");
-                      // }
+                      final email = emailController.text.trim();
+                      if (email.isNotEmpty) {
+                        context.go(RouteName.signupEmail);
+                      }
                     },
                     isLoading: false,
                   ),
