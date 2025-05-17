@@ -48,19 +48,18 @@ class GroupDetailPage extends ConsumerWidget {
           //backgroundColor: ColorConfig.primarySwatch,
           //appBar: AppBar(elevation: 0),
           body: SliverAppBarWidget(
-            //collapsedHeight: 90,
             height: 200,
             appbarTitle: GroupDetailTitle(groupName: data.title),
             image: data.image,
             child: ListView(
               padding: EdgeInsets.zero,
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(),
               children: [
                 GroupDetailInfo(groupModel: data),
                 GroupDetailFriendList(userIds: data.groupUsers),
-                //* Get boxes
-                GroupDetailBoxGrid(groupModel: data)
+                GroupDetailBoxGrid(groupModel: data),
+                const SizedBox(height: 80),
               ],
             ),
           ),

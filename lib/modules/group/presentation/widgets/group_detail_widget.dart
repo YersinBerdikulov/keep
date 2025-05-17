@@ -216,32 +216,54 @@ class GroupDetailBoxGrid extends ConsumerWidget {
   final GroupModel groupModel;
   const GroupDetailBoxGrid({super.key, required this.groupModel});
 
+  Widget _buildEmptyState() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: ColorConfig.grey,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.add_box_outlined,
+              size: 48,
+              color: ColorConfig.primarySwatch,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Boxes Yet',
+              style: FontConfig.body1(),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Create your first box to start tracking expenses',
+              style: FontConfig.body2().copyWith(color: ColorConfig.secondary),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final boxesInGroup = ref.watch(boxNotifierProvider(groupModel.id!));
 
-    ref.listen<AsyncValue<List<BoxModel>>>(
-      boxNotifierProvider(groupModel.id!),
-      (previous, next) {
-        next.when(
-          data: (boxes) {
-            // Refreshes the provider when the operation succeeds
-            // ref.refresh(getBoxesInGroupProvider(groupModel.id!));
-          },
-          loading: () {
-            // Optionally handle loading state if needed
-          },
-          error: (error, stackTrace) {
-            // Displays the error message in a snackbar
-            showSnackBar(context, content: error.toString());
-          },
-        );
-      },
-    );
-
     return boxesInGroup.when(
-      loading: () => const LoadingWidget(),
-      error: (error, stackTrace) => ErrorTextWidget(error),
+      loading: () => const Padding(
+        padding: EdgeInsets.all(20),
+        child: LoadingWidget(),
+      ),
+      error: (error, stackTrace) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: ErrorTextWidget(error),
+      ),
       data: (data) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -253,26 +275,28 @@ class GroupDetailBoxGrid extends ConsumerWidget {
               style: FontConfig.body1(),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-            child: GridView.builder(
-              padding: EdgeInsets.zero,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 0,
-                mainAxisSpacing: 10,
-                childAspectRatio: 1.3,
-              ),
-              //scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: data.length,
-              itemBuilder: (context, i) => BoxCardWidget(
-                boxModel: data[i],
-                groupModel: groupModel,
+          if (data.isEmpty)
+            _buildEmptyState()
+          else
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+              child: GridView.builder(
+                padding: EdgeInsets.zero,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 1.3,
+                ),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: data.length,
+                itemBuilder: (context, i) => BoxCardWidget(
+                  boxModel: data[i],
+                  groupModel: groupModel,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

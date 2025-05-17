@@ -17,14 +17,16 @@ final getBoxDetailProvider =
 
 final getUsersInBoxProvider = FutureProvider.family
     .autoDispose((ref, UsersInBoxArgs usersInBoxArgs) async {
-  //TODO: Think about it, not the best way
+  if (usersInBoxArgs.userIds.isEmpty) {
+    return <UserModel>[];
+  }
   final boxesController =
       ref.read(boxNotifierProvider(usersInBoxArgs.groupId).notifier);
-  final usersInBox =
-      await boxesController.getUsersInBox(usersInBoxArgs.userIds);
-  ref.read(userInBoxStoreProvider.notifier).state = usersInBox;
-  return usersInBox;
+  return boxesController.getUsersInBox(usersInBoxArgs.userIds);
 });
+
+final selectedMembersProvider = StateProvider<List<String>>((ref) => []);
+final selectedCurrencyProvider = StateProvider<String>((ref) => 'KZT');
 
 final userInBoxStoreProvider = StateProvider<List<UserModel>>((ref) {
   return [];

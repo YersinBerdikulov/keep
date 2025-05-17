@@ -111,14 +111,19 @@ class BoxRemoteDataSource {
   }
 
   Future<List<Document>> getBoxesInGroup(String groupId) async {
-    final document = await _db.listDocuments(
-      databaseId: AppwriteConfig.databaseId,
-      collectionId: AppwriteConfig.boxCollection,
-      queries: [
-        Query.equal('groupId', groupId),
-      ],
-    );
-    return document.documents;
+    try {
+      final document = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.boxCollection,
+        queries: [
+          Query.equal('groupId', groupId),
+        ],
+      );
+      return document.documents;
+    } catch (e) {
+      print('Error fetching boxes: $e');
+      return [];
+    }
   }
 
   Future<Document> getBoxDetail(String boxId) async {

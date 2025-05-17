@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -190,11 +191,56 @@ class CreateBoxSelectFriends extends ConsumerWidget {
   final GroupModel groupModel;
   const CreateBoxSelectFriends({super.key, required this.groupModel});
 
+  Widget _buildEmptyMembersMessage() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: ColorConfig.grey,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.group_add_outlined,
+              size: 48,
+              color: ColorConfig.primarySwatch,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Members Available',
+              style: FontConfig.body1(),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Invite friends to your group first before creating a box with them.',
+              style: FontConfig.body2().copyWith(color: ColorConfig.secondary),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Filter out the creator from the group users
+    final currentUser = ref.watch(currentUserProvider);
+    final otherGroupUsers = groupModel.groupUsers
+        .where((userId) => userId != currentUser?.id)
+        .toList();
+
+    if (otherGroupUsers.isEmpty) {
+      return _buildEmptyMembersMessage();
+    }
+
     final selectedMembers = ref.watch(selectedMembersProvider);
     final users = ref.watch(getUsersInBoxProvider(
-      UsersInBoxArgs(userIds: groupModel.groupUsers, groupId: groupModel.id!),
+      UsersInBoxArgs(userIds: otherGroupUsers, groupId: groupModel.id!),
     ));
 
     return users.when(
@@ -294,12 +340,9 @@ class CreateBoxButton extends ConsumerWidget {
               loading: () => true,
               orElse: () => false,
             ),
-        onPressed: () {
+        onPressed: () async {
           if (formKey.currentState!.validate()) {
-            // Reset selected members after successful creation
-            ref.read(selectedMembersProvider.notifier).state = [];
-
-            ref.read(boxNotifierProvider(groupModel.id!).notifier).addBox(
+            await ref.read(boxNotifierProvider(groupModel.id!).notifier).addBox(
                   image: image,
                   boxTitle: boxTitle,
                   boxDescription: boxDescription,
@@ -307,9 +350,13 @@ class CreateBoxButton extends ConsumerWidget {
                   currency: selectedCurrency,
                   selectedMembers: selectedMembers,
                 );
+
+            // Reset selected members and currency after successful creation
+            ref.read(selectedMembersProvider.notifier).state = [];
+            ref.read(selectedCurrencyProvider.notifier).state = 'KZT';
           }
         },
-        title: 'Create',
+        title: 'Create Box',
         textColor: ColorConfig.secondary,
       ),
     );

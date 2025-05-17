@@ -22,14 +22,17 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
   @override
   Future<List<BoxModel>> build(String arg) async {
     if (!_isInitialized) {
-      // Initialize dependencies
       boxRepository = ref.watch(boxRepositoryProvider);
       storageAPI = ref.watch(storageProvider);
-
       _isInitialized = true;
     }
 
-    return getBoxesInGroup(arg);
+    try {
+      return await getBoxesInGroup(arg);
+    } catch (e) {
+      print('Error in build: $e');
+      return [];
+    }
   }
 
   Future<void> addBox({
@@ -59,12 +62,16 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
       }
 
       // Make sure creator is included in members and convert to List<String>
-      final Set<String> memberSet = {...selectedMembers, currentUser.id};
+      final Set<String> memberSet = {...selectedMembers};
+      if (currentUser.id != null) {
+        memberSet.add(currentUser.id);
+      }
       final List<String> boxUsers = memberSet.toList();
 
       BoxModel boxModel = BoxModel(
         title: boxTitle.text,
-        description: boxDescription.text,
+        description:
+            boxDescription.text.isNotEmpty ? boxDescription.text : null,
         creatorId: currentUser.id,
         groupId: groupModel.id!,
         image: imageLinks.isNotEmpty ? imageLinks[0] : null,
@@ -78,7 +85,7 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
       res.fold(
         (l) => state = AsyncValue.error(l.message, l.stackTrace),
         (r) async {
-          ref.read(groupNotifierProvider.notifier).updateGroup(
+          await ref.read(groupNotifierProvider.notifier).updateGroup(
             groupModel: groupModel,
             boxIds: [...groupModel.boxIds, r.$id],
           );
@@ -223,8 +230,13 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
   // }
 
   Future<List<BoxModel>> getBoxesInGroup(String groupId) async {
-    final boxList = await boxRepository.getBoxesInGroup(groupId);
-    return boxList.map((box) => BoxModel.fromJson(box.data)).toList();
+    try {
+      final boxList = await boxRepository.getBoxesInGroup(groupId);
+      return boxList.map((box) => BoxModel.fromJson(box.data)).toList();
+    } catch (e) {
+      print('Error in getBoxesInGroup: $e');
+      return [];
+    }
   }
 
   Future<BoxModel> getBoxDetail(String boxId) async {
