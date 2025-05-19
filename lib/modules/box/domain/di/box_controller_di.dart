@@ -8,11 +8,34 @@ final boxNotifierProvider =
   BoxNotifier.new, // Leverage the default constructor
 );
 
+// Cache to store box details and prevent redundant fetches
+final _boxDetailCache = StateProvider<Map<String, BoxModel>>((ref) => {});
+
 final getBoxDetailProvider =
     FutureProvider.family.autoDispose((ref, BoxDetailArgs boxDetailArgs) {
+  // Check if we have this box in cache
+  final cache = ref.watch(_boxDetailCache);
+  final cacheKey = "${boxDetailArgs.boxId}_${boxDetailArgs.groupId}";
+
+  if (cache.containsKey(cacheKey)) {
+    return cache[cacheKey]!;
+  }
+
+  // If not in cache, fetch it and store in cache
   final boxesController =
       ref.read(boxNotifierProvider(boxDetailArgs.groupId).notifier);
-  return boxesController.getBoxDetail(boxDetailArgs.boxId);
+
+  // Keep provider alive for 5 minutes to prevent constant rebuilds
+  ref.keepAlive();
+
+  return boxesController.getBoxDetail(boxDetailArgs.boxId).then((boxDetail) {
+    // Store the result in cache
+    ref.read(_boxDetailCache.notifier).update((state) => {
+          ...state,
+          cacheKey: boxDetail,
+        });
+    return boxDetail;
+  });
 });
 
 final getUsersInBoxProvider = FutureProvider.family

@@ -10,10 +10,31 @@ final expenseNotifierProvider =
   ExpenseNotifier.new,
 );
 
+// Cache to store expenses by boxId
+final _expensesByBoxCache =
+    StateProvider<Map<String, List<ExpenseModel>>>((ref) => {});
+
 final getExpensesInBoxProvider =
     FutureProvider.family.autoDispose((ref, String boxId) {
+  // Check if we have expenses for this box in cache
+  final cache = ref.watch(_expensesByBoxCache);
+
+  if (cache.containsKey(boxId)) {
+    return cache[boxId]!;
+  }
+
+  // Keep provider alive to prevent constant rebuilds
+  ref.keepAlive();
+
   final expenseController = ref.watch(expenseNotifierProvider.notifier);
-  return expenseController.getExpensesInBox(boxId);
+  return expenseController.getExpensesInBox(boxId).then((expenses) {
+    // Store the result in cache
+    ref.read(_expensesByBoxCache.notifier).update((state) => {
+          ...state,
+          boxId: expenses,
+        });
+    return expenses;
+  });
 });
 
 final getExpensesDetailProvider =

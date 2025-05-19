@@ -1,5 +1,7 @@
+import 'package:dongi/modules/box/data/di/box_di.dart';
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:dongi/modules/box/domain/models/box_model.dart';
+import 'package:dongi/modules/box/domain/repository/box_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,10 +13,10 @@ import '../../../../shared/widgets/appbar/sliver_appbar.dart';
 import '../../../../shared/widgets/error/error.dart';
 import '../../../../shared/widgets/floating_action_button/floating_action_button.dart';
 import '../../../../shared/widgets/loading/loading.dart';
-import '../../domain/controllers/box_controller.dart';
 import '../widgets/box_detail_widget.dart';
 
-class BoxDetailPage extends ConsumerWidget {
+// Convert to StatefulWidget to prevent infinite refreshes
+class BoxDetailPage extends ConsumerStatefulWidget {
   final String boxId;
   final GroupModel groupModel;
   const BoxDetailPage({
@@ -24,81 +26,101 @@ class BoxDetailPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final boxDetail = ref.watch(getBoxDetailProvider(
-      BoxDetailArgs(boxId: boxId, groupId: groupModel.id!),
-    ));
+  ConsumerState<BoxDetailPage> createState() => _BoxDetailPageState();
+}
 
-    ref.listen<AsyncValue<List<BoxModel>>>(
-      boxNotifierProvider(groupModel.id!),
-      (previous, next) {
-        next.when(
-          data: (boxes) {
-            // Refresh the group boxes provider
-            // ref.read(getBoxesInGroupProvider(groupModel.id!));
+class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
+  BoxModel? _boxModel;
+  bool _isLoading = true;
+  String? _error;
+  bool _isInitialized = false;
 
-            // Refresh the box details provider for the specific box
-            // ref.refresh(getBoxDetailProvider(
-            //   BoxDetailArgs(boxId: boxId, groupId: groupModel.id!),
-            // ));
-          },
-          loading: () {
-            // Optionally handle loading state
-          },
-          error: (error, stackTrace) {
-            // Show error in a snackbar
-            showSnackBar(context, content: error.toString());
-          },
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    // Load data once when widget initializes
+    _fetchBoxDetail();
+  }
 
-    //this section moved to ExpenseListBoxDetail
-    //ref.listen<ExpenseState>(
-    //  expenseNotifierProvider,
-    //  (previous, next) {
-    //    next.whenOrNull(
-    //      loaded: () => ref.refresh(getExpensesInBoxProvider(boxId)),
-    //      error: (message) => showSnackBar(context, content: message),
-    //    );
-    //  },
-    //);
+  Future<void> _fetchBoxDetail() async {
+    // Prevent loading multiple times
+    if (_isInitialized) return;
 
-    return boxDetail.when(
-      loading: () => const LoadingWidget(),
-      error: (error, stackTrace) => ErrorTextWidget(error),
-      data: (data) {
-        //print(data.boxUser);
-        return Scaffold(
-          body: SliverAppBarWidget(
-            image: data.image,
-            //collapsedHeight: 120,
-            height: 200,
-            appbarTitle: TotalExpenseBoxDetail(data.total),
-            child: ListView(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                FriendListBoxDetail(data),
-                //TODO: Think about the structure
-                const CategoryListBoxDetail(),
-                ExpenseListBoxDetail(
-                  boxModel: data,
-                  groupModel: groupModel,
-                ),
-              ],
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      // Get repository directly to bypass provider system
+      final boxRepository = ref.read(boxRepositoryProvider);
+
+      // Fetch box details directly from repository
+      final boxResult = await boxRepository.getBoxDetail(widget.boxId);
+
+      // Handle the repository response based on its structure
+      if (boxResult != null) {
+        setState(() {
+          _boxModel = BoxModel.fromJson(boxResult.data);
+          _isLoading = false;
+          _isInitialized = true;
+        });
+      } else {
+        setState(() {
+          _error = "Failed to load box details";
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Use local state instead of watching providers
+    if (_isLoading) {
+      return const LoadingWidget();
+    }
+
+    if (_error != null) {
+      return ErrorTextWidget(_error!);
+    }
+
+    // Make sure box model is available
+    if (_boxModel == null) {
+      return const ErrorTextWidget("Box not found");
+    }
+
+    return Scaffold(
+      body: SliverAppBarWidget(
+        image: _boxModel!.image,
+        height: 200,
+        appbarTitle: TotalExpenseBoxDetail(_boxModel!.total),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            FriendListBoxDetail(_boxModel!),
+            const CategoryListBoxDetail(),
+            ExpenseListBoxDetail(
+              boxModel: _boxModel!,
+              groupModel: widget.groupModel,
             ),
-          ),
-          floatingActionButton: FABWidget(
-            title: 'Expense',
-            onPressed: () => context.push(
-              RouteName.createExpense,
-              extra: {"boxModel": data, "groupModel": groupModel},
-            ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
+      floatingActionButton: FABWidget(
+        title: 'Expense',
+        onPressed: () => context.push(
+          RouteName.createExpense,
+          extra: {"boxModel": _boxModel, "groupModel": widget.groupModel},
+        ),
+      ),
     );
   }
 }

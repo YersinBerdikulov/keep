@@ -96,11 +96,68 @@ class ReviewBodyBoxDetail extends ConsumerWidget {
   }
 }
 
-class FriendListBoxDetail extends ConsumerWidget {
+class FriendListBoxDetail extends ConsumerStatefulWidget {
   final BoxModel boxModel;
   const FriendListBoxDetail(this.boxModel, {super.key});
 
-  friendItem(UserModel user) {
+  @override
+  ConsumerState<FriendListBoxDetail> createState() =>
+      _FriendListBoxDetailState();
+}
+
+class _FriendListBoxDetailState extends ConsumerState<FriendListBoxDetail> {
+  List<UserModel>? _users;
+  bool _isLoading = true;
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsers();
+  }
+
+  Future<void> _fetchUsers() async {
+    if (_isInitialized) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      if (widget.boxModel.boxUsers.isEmpty) {
+        setState(() {
+          _users = [];
+          _isLoading = false;
+          _isInitialized = true;
+        });
+        return;
+      }
+
+      // Get users directly from controller
+      final boxesController =
+          ref.read(boxNotifierProvider(widget.boxModel.groupId).notifier);
+      final users =
+          await boxesController.getUsersInBox(widget.boxModel.boxUsers);
+
+      if (mounted) {
+        setState(() {
+          _users = users;
+          _isLoading = false;
+          _isInitialized = true;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _users = [];
+          _isLoading = false;
+          _isInitialized = true;
+        });
+      }
+    }
+  }
+
+  Widget friendItem(UserModel user) {
     return Padding(
       padding: const EdgeInsets.only(right: 10),
       child: Column(
@@ -113,7 +170,7 @@ class FriendListBoxDetail extends ConsumerWidget {
     );
   }
 
-  addFriendCard() {
+  Widget addFriendCard() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
       child: Column(
@@ -134,47 +191,41 @@ class FriendListBoxDetail extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final users = ref.watch(
-      getUsersInBoxProvider(
-        UsersInBoxArgs(userIds: boxModel.boxUsers, groupId: boxModel.groupId),
-      ),
-    );
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const LoadingWidget();
+    }
 
-    return users.when(
-      loading: () => const LoadingWidget(),
-      error: (error, stackTrace) => ErrorTextWidget(error),
-      data: (data) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 0, 10),
-            child: Text(
-              'Friends',
-              style: FontConfig.body1(),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 0, 10),
+          child: Text(
+            'Friends',
+            style: FontConfig.body1(),
           ),
-          SizedBox(
-            height: 90,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                const SizedBox(width: 11),
+        ),
+        SizedBox(
+          height: 90,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              const SizedBox(width: 11),
+              if (_users != null && _users!.isNotEmpty)
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   scrollDirection: Axis.horizontal,
-                  itemCount: data.length,
-                  itemBuilder: (context, index) => friendItem(data[index]),
+                  itemCount: _users!.length,
+                  itemBuilder: (context, index) => friendItem(_users![index]),
                 ),
-                //const SizedBox(width: 6),
-                addFriendCard(),
-              ],
-            ),
+              addFriendCard(),
+            ],
           ),
-          const SizedBox(height: 25),
-        ],
-      ),
+        ),
+        const SizedBox(height: 25),
+      ],
     );
   }
 }
@@ -224,7 +275,7 @@ class CategoryListBoxDetail extends ConsumerWidget {
   }
 }
 
-class ExpenseListBoxDetail extends ConsumerWidget {
+class ExpenseListBoxDetail extends ConsumerStatefulWidget {
   final BoxModel boxModel;
   final GroupModel groupModel;
   const ExpenseListBoxDetail({
@@ -234,28 +285,61 @@ class ExpenseListBoxDetail extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final expenses = ref.watch(getExpensesInBoxProvider(boxModel.id!));
+  ConsumerState<ExpenseListBoxDetail> createState() =>
+      _ExpenseListBoxDetailState();
+}
 
-    /// by using listen we are not gonna rebuild our app
-    ref.listen<AsyncValue<void>>(
-      expenseNotifierProvider,
-      (previous, next) {
-        next.when(
-          data: (_) {
-            // Refreshing the list of expenses in the box
-            ref.refresh(getExpensesInBoxProvider(boxModel.id!));
-          },
-          loading: () {
-            // Optionally handle loading state here
-          },
-          error: (error, stackTrace) {
-            showSnackBar(context, content: error.toString());
-          },
-        );
-      },
-    );
+class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
+  List<ExpenseModel>? _expenses;
+  bool _isLoading = true;
+  String? _error;
+  bool _isInitialized = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchExpenses();
+  }
+
+  Future<void> _fetchExpenses() async {
+    // Only load expenses once
+    if (_isInitialized) return;
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      // Direct access to expense controller to bypass providers
+      final expenseController = ref.read(expenseNotifierProvider.notifier);
+
+      if (widget.boxModel.id != null) {
+        final expenses =
+            await expenseController.getExpensesInBox(widget.boxModel.id!);
+
+        setState(() {
+          _expenses = expenses;
+          _isLoading = false;
+          _isInitialized = true;
+        });
+      } else {
+        setState(() {
+          _expenses = [];
+          _isLoading = false;
+          _isInitialized = true;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 25, 16, 25),
       child: Column(
@@ -266,39 +350,49 @@ class ExpenseListBoxDetail extends ConsumerWidget {
             style: FontConfig.body1(),
           ),
           const SizedBox(height: 10),
-          expenses.when(
-            skipLoadingOnRefresh: false,
-            loading: () => const LoadingWidget(),
-            error: (error, stackTrace) => ErrorTextWidget(error),
-            data: (data) {
-              return SlidableAutoCloseBehavior(
-                closeWhenOpened: true,
-                child: ListView.builder(
-                  padding: const EdgeInsets.only(top: 10),
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    return ExpenseCardItem(
-                      expenseModel: data[index],
-                      boxModel: boxModel,
-                      groupModel: groupModel,
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+          _buildExpenseList(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildExpenseList() {
+    if (_isLoading) {
+      return const LoadingWidget();
+    }
+
+    if (_error != null) {
+      return ErrorTextWidget(_error!);
+    }
+
+    if (_expenses == null || _expenses!.isEmpty) {
+      return const Center(child: Text("No expenses yet"));
+    }
+
+    return SlidableAutoCloseBehavior(
+      closeWhenOpened: true,
+      child: ListView.builder(
+        padding: const EdgeInsets.only(top: 10),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _expenses!.length,
+        itemBuilder: (context, index) {
+          return ExpenseCardItem(
+            expenseModel: _expenses![index],
+            boxModel: widget.boxModel,
+            groupModel: widget.groupModel,
+          );
+        },
       ),
     );
   }
 }
 
-class ExpenseCardItem extends ConsumerWidget {
+class ExpenseCardItem extends ConsumerStatefulWidget {
   final ExpenseModel expenseModel;
   final BoxModel boxModel;
   final GroupModel groupModel;
+
   const ExpenseCardItem({
     super.key,
     required this.expenseModel,
@@ -307,34 +401,47 @@ class ExpenseCardItem extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final GlobalKey key = GlobalKey();
+  ConsumerState<ExpenseCardItem> createState() => _ExpenseCardItemState();
+}
 
-    deleteExpense() async {
-      await ref
-          .read(expenseNotifierProvider.notifier)
-          .deleteExpense(expenseModel: expenseModel, boxModel: boxModel);
-      if (context.mounted) {
+class _ExpenseCardItemState extends ConsumerState<ExpenseCardItem> {
+  bool _isDeleting = false;
+
+  Future<void> _deleteExpense() async {
+    if (_isDeleting) return;
+
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      await ref.read(expenseNotifierProvider.notifier).deleteExpense(
+          expenseModel: widget.expenseModel, boxModel: widget.boxModel);
+
+      if (mounted) {
         showSnackBar(context, content: "Expense deleted successfully!!");
-      }
-      return ref.refresh(getBoxDetailProvider(
-        BoxDetailArgs(boxId: boxModel.id!, groupId: groupModel.id!),
-      ));
-    }
 
-    //    List<CupertinoContextMenuAction> menuItems = [
-    //  CupertinoContextMenuAction(
-    //    child: const Text('Edit'),
-    //    onPressed: () => context.push(
-    //      RouteName.updateExpense,
-    //      extra: {"expenseModel": expenseModel},
-    //    ),
-    //  ),
-    //  CupertinoContextMenuAction(
-    //    onPressed: deleteExpense,
-    //    child: const Text('Delete'),
-    //  ),
-    //];
+        // Instead of refreshing, navigate back if this was the last expense
+        if (widget.boxModel.expenseIds.length <= 1) {
+          if (context.mounted) {
+            context.pop();
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context,
+            content: "Failed to delete expense: ${e.toString()}");
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final GlobalKey key = GlobalKey();
 
     List<PopupMenuEntry> menuItems = [
       PopupMenuItem(
@@ -342,101 +449,85 @@ class ExpenseCardItem extends ConsumerWidget {
         onTap: () => context.push(
           RouteName.updateExpense,
           extra: {
-            "expenseModel": expenseModel,
-            "boxModel": boxModel,
-            "groupModel": groupModel,
+            "expenseModel": widget.expenseModel,
+            "boxModel": widget.boxModel,
+            "groupModel": widget.groupModel,
           },
         ),
       ),
       PopupMenuItem(
-        onTap: deleteExpense,
+        onTap: _deleteExpense,
         child: const Text('Delete'),
       ),
     ];
 
     return Column(
       children: [
-        Slidable(
-          key: key,
-          startActionPane: ActionPane(
-            extentRatio: 0.25,
-            motion: const ScrollMotion(),
-            //dismissible: DismissiblePane(
-            //  onDismissed: () => context.push(
-            //    RouteName.updateExpense,
-            //    extra: {
-            //      "expenseModel": expenseModel,
-            //    },
-            //  ),
-            //),
-            children: [
-              SlidableAction(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  bottomLeft: Radius.circular(10),
+        _isDeleting
+            ? const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            : Slidable(
+                key: key,
+                startActionPane: ActionPane(
+                  extentRatio: 0.25,
+                  motion: const ScrollMotion(),
+                  children: [
+                    SlidableAction(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                      ),
+                      onPressed: (context) => context.push(
+                        RouteName.updateExpense,
+                        extra: {
+                          "expenseModel": widget.expenseModel,
+                          "boxModel": widget.boxModel,
+                          "groupModel": widget.groupModel,
+                        },
+                      ),
+                      backgroundColor: const Color(0xFF0392CF),
+                      foregroundColor: Colors.white,
+                      icon: Icons.edit,
+                      label: 'Edit',
+                    ),
+                  ],
                 ),
-                onPressed: (context) => context.push(
-                  RouteName.updateExpense,
-                  extra: {
-                    "expenseModel": expenseModel,
-                    "boxModel": boxModel,
-                    "groupModel": groupModel,
-                  },
+                endActionPane: ActionPane(
+                  extentRatio: 0.25,
+                  motion: const ScrollMotion(),
+                  dismissible: DismissiblePane(
+                    onDismissed: _deleteExpense,
+                  ),
+                  children: [
+                    SlidableAction(
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      ),
+                      onPressed: (context) => _deleteExpense(),
+                      backgroundColor: const Color(0xFFFE4A49),
+                      foregroundColor: Colors.white,
+                      icon: Icons.delete,
+                      label: 'Delete',
+                    ),
+                  ],
                 ),
-                backgroundColor: const Color(0xFF0392CF),
-                foregroundColor: Colors.white,
-                icon: Icons.edit,
-                label: 'Edit',
+                child: LongPressMenuWidget(
+                  items: menuItems,
+                  onTap: () => context.push(
+                    RouteName.expenseDetail,
+                    extra: {"expenseId": widget.expenseModel.id},
+                  ),
+                  child: ListTileCard(
+                    titleString: widget.expenseModel.title,
+                    trailing: Text("\$${widget.expenseModel.cost}"),
+                    visualDensity: const VisualDensity(vertical: -2),
+                    subtitleString: widget.expenseModel.createdAt!.toTimeAgo(),
+                  ),
+                ),
               ),
-            ],
-          ),
-          endActionPane: ActionPane(
-            extentRatio: 0.25,
-            motion: const ScrollMotion(),
-            dismissible: DismissiblePane(
-              onDismissed: deleteExpense,
-              //confirmDismiss: () async {
-              //  return await showDialog(
-              //    context: context,
-              //    builder: (context) {
-              //      return AlertDialog(
-              //        title: Text("Are you sure?"),
-              //        actions: [],
-              //      );
-              //    },
-              //  );
-              //},
-            ),
-            children: [
-              SlidableAction(
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
-                onPressed: (context) => deleteExpense(),
-                backgroundColor: const Color(0xFFFE4A49),
-                foregroundColor: Colors.white,
-                icon: Icons.delete,
-                label: 'Delete',
-              ),
-            ],
-          ),
-          child: LongPressMenuWidget(
-            items: menuItems,
-            onTap: () => context.push(
-              RouteName.expenseDetail,
-              extra: {"expenseId": expenseModel.id},
-            ),
-            child: ListTileCard(
-              titleString: expenseModel.title,
-              trailing: Text("\$${expenseModel.cost}"),
-              visualDensity: const VisualDensity(vertical: -2),
-              subtitleString: expenseModel.createdAt!.toTimeAgo(),
-              //subtitleString: "subtitle",
-              //headerString: "header",
-            ),
-          ),
-        ),
         const SizedBox(height: 10),
       ],
     );
