@@ -12,7 +12,7 @@ class OnboardingContents {
 
 List<OnboardingContents> onboardingContents = [
   OnboardingContents(
-    title: "Welcome to Dongi Expense Tracker!",
+    title: "Welcome to 'Keep' Expense Tracker!",
     image: "assets/images/image1.png",
     desc:
         "We're thrilled to have you on board. Let's simplify expense tracking together.",

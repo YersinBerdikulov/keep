@@ -69,16 +69,49 @@ class AuthRemoteDataSource {
 
   FutureEither<User> authWithGoogle() async {
     try {
+      // First, check if there's an existing session and clear it
+      try {
+        final sessions = await _account.listSessions();
+        if (sessions.sessions.isNotEmpty) {
+          await _account.deleteSessions();
+        }
+      } catch (e) {
+        // Ignore session clearing errors
+      }
+
+      // Create the OAuth2 session with Google
       await _account.createOAuth2Session(
         provider: OAuthProvider.google,
       );
-      final account = await currentUserAccount();
-      if (account == null) throw "account not found";
+
+      // Add a small delay to ensure the session is properly created
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Try to get the account multiple times in case of initial delay
+      User? account;
+      int retries = 3;
+
+      while (retries > 0 && account == null) {
+        try {
+          account = await currentUserAccount();
+          if (account != null) break;
+        } catch (e) {
+          // Ignore errors during retry
+        }
+
+        await Future.delayed(const Duration(milliseconds: 500));
+        retries--;
+      }
+
+      if (account == null) {
+        throw "Failed to get account after Google authentication. Please try again.";
+      }
 
       return right(account);
     } on AppwriteException catch (e, stackTrace) {
       return left(
-        Failure(e.message ?? 'Some unexpected error occurred', stackTrace),
+        Failure(e.message ?? 'Google authentication failed. Please try again.',
+            stackTrace),
       );
     } catch (e, stackTrace) {
       return left(
