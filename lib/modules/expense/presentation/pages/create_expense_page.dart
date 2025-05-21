@@ -62,7 +62,10 @@ class CreateExpensePage extends HookConsumerWidget {
                       padding: const EdgeInsets.all(10),
                       child: Column(
                         children: [
-                          CreateExpenseAmount(expenseCost: expenseCost),
+                          CreateExpenseAmount(
+                            expenseCost: expenseCost,
+                            boxModel: boxModel,
+                          ),
                           const SizedBox(height: 10),
                           CreateExpenseTitle(expenseTitle: expenseTitle),
                           const SizedBox(height: 10),

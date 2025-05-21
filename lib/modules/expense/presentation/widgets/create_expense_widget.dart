@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
+import '../../../../core/constants/font_config.dart';
 import '../../../../shared/utilities/validation/validation.dart';
 import '../../../box/domain/models/box_model.dart';
 import '../../../group/domain/models/group_model.dart';
@@ -20,7 +21,12 @@ import '../../domain/di/expense_controller_di.dart';
 
 class CreateExpenseAmount extends ConsumerWidget {
   final TextEditingController expenseCost;
-  const CreateExpenseAmount({super.key, required this.expenseCost});
+  final BoxModel boxModel;
+  const CreateExpenseAmount({
+    super.key,
+    required this.expenseCost,
+    required this.boxModel,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,11 +59,11 @@ class CreateExpenseAmount extends ConsumerWidget {
           ),
         ),
         const SizedBox(width: 10),
-        const GreyCardWidget(
+        GreyCardWidget(
           width: 50,
           height: 50,
           child: Center(
-            child: Text("USD"),
+            child: Text(boxModel.currency),
           ),
         ),
       ],
@@ -221,8 +227,8 @@ class CreateExpenseCreateButton extends ConsumerWidget {
   final TextEditingController expenseDescription;
   final TextEditingController expenseCost;
   final GlobalKey<FormState> formKey;
-  final BoxModel boxModel;
   final GroupModel groupModel;
+  final BoxModel boxModel;
 
   const CreateExpenseCreateButton({
     required this.expenseTitle,
