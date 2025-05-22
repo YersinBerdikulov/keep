@@ -1,11 +1,9 @@
-
-
-import 'package:dongi/modules/expense/domain/models/category_model.dart';
+import 'package:dongi/modules/expense/domain/controllers/category_controller.dart';
 
 abstract class CategoryRepository {
-  Future<List<CategoryModel>> getCategories();
-  Future<CategoryModel> getCategory(String id);
-  Future<CategoryModel> addCategory(CategoryModel category, String customId);
-  Future<CategoryModel> updateCategory(CategoryModel category);
+  Future<List<Category>> getCategories();
+  Future<Category> getCategory(String id);
+  Future<Category> addCategory(Category category, String customId);
+  Future<Category> updateCategory(Category category);
   Future<bool> deleteCategory(String id);
 }

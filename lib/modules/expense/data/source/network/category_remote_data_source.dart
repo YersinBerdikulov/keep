@@ -1,29 +1,42 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:dongi/core/constants/appwrite_config.dart';
-import 'package:dongi/modules/expense/domain/models/category_model.dart';
+import 'package:dongi/modules/expense/domain/controllers/category_controller.dart';
 
 class CategoryRemoteDataSource {
   final Databases _db;
 
   CategoryRemoteDataSource({required Databases db}) : _db = db;
 
-  Future<CategoryModel> addCategory(CategoryModel category, {required String customId}) async {
+  Future<Category> addCategory(Category category,
+      {required String customId}) async {
+    final data = {
+      'name': category.name,
+      'icon': category.icon,
+    };
+
     _db.createDocument(
       databaseId: AppwriteConfig.databaseId,
       collectionId: AppwriteConfig.categoryCollection,
       documentId: customId,
-      data: category.toJson(),
+      data: data,
     );
     return category;
   }
 
-  Future<CategoryModel> updateCategory(CategoryModel category) async {
-    _db.updateDocument(
-      databaseId: AppwriteConfig.databaseId,
-      collectionId: AppwriteConfig.categoryCollection,
-      documentId: category.id,
-      data: category.toJson(),
-    );
+  Future<Category> updateCategory(Category category) async {
+    final data = {
+      'name': category.name,
+      'icon': category.icon,
+    };
+
+    if (category.id != null) {
+      _db.updateDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.categoryCollection,
+        documentId: category.id!,
+        data: data,
+      );
+    }
     return category;
   }
 
@@ -31,22 +44,34 @@ class CategoryRemoteDataSource {
     return false;
   }
 
-  Future<List<CategoryModel>> getCategories() async {
+  Future<List<Category>> getCategories() async {
     final categories = await _db.listDocuments(
       databaseId: AppwriteConfig.databaseId,
       collectionId: AppwriteConfig.categoryCollection,
     );
-    return categories.documents.map((e) => CategoryModel.fromJson(e)).toList();
+
+    return categories.documents
+        .map((doc) => Category(
+              id: doc.$id,
+              name: doc.data['name'] as String,
+              icon: doc.data['icon'] as String,
+            ))
+        .toList();
   }
 
-  Future<CategoryModel> getCategory(String id) async {
+  Future<Category> getCategory(String id) async {
     try {
-      final category = await _db.getDocument(
+      final document = await _db.getDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.categoryCollection,
         documentId: id,
       );
-      return CategoryModel.fromJson(category);
+
+      return Category(
+        id: document.$id,
+        name: document.data['name'] as String,
+        icon: document.data['icon'] as String,
+      );
     } catch (e) {
       rethrow;
     }

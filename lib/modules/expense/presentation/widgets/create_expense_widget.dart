@@ -1,5 +1,8 @@
 import 'dart:math';
 
+import 'package:dongi/modules/expense/domain/controllers/category_controller.dart';
+import 'package:dongi/modules/expense/domain/di/category_controller_di.dart';
+import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
 import 'package:dongi/shared/utilities/extensions/format_with_comma.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +20,6 @@ import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/card/grey_card.dart';
 import '../../../../shared/widgets/list_tile/list_tile_card.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
-import '../../domain/di/expense_controller_di.dart';
 
 class CreateExpenseAmount extends ConsumerWidget {
   final TextEditingController expenseCost;
@@ -89,18 +91,109 @@ class CreateExpenseTitle extends ConsumerWidget {
 class CreateExpenseCategory extends ConsumerWidget {
   const CreateExpenseCategory({super.key});
 
+  // Map of category icons to use
+  Map<String, IconData> getCategoryIcon() {
+    return {
+      'food': Icons.restaurant,
+      'transportation': Icons.directions_car,
+      'entertainment': Icons.movie,
+      'shopping': Icons.shopping_bag,
+      'bills': Icons.receipt,
+      'health': Icons.medical_services,
+      'travel': Icons.flight,
+      'education': Icons.school,
+      'others': Icons.category_outlined,
+    };
+  }
+
+  void _showCategoryPicker(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: Consumer(
+            builder: (context, ref, child) {
+              final categoriesAsyncValue = ref.watch(categoryNotifierProvider);
+
+              return categoriesAsyncValue.when(
+                data: (categories) {
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'Select Category',
+                          style: FontConfig.h6(),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            final category = categories[index];
+                            final iconMap = getCategoryIcon();
+                            final icon = iconMap[category.icon.toLowerCase()] ??
+                                Icons.category_outlined;
+
+                            return ListTile(
+                              leading:
+                                  Icon(icon, color: ColorConfig.primarySwatch),
+                              title: Text(category.name),
+                              onTap: () {
+                                // Update both the category model and the ID
+                                ref
+                                    .read(selectedCategoryProvider.notifier)
+                                    .state = category;
+                                ref
+                                    .read(expenseCategoryIdProvider.notifier)
+                                    .state = category.id;
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => Center(child: Text('Error: $error')),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedCategory = ref.watch(selectedCategoryProvider);
+    final iconMap = getCategoryIcon();
+    final icon = selectedCategory != null
+        ? iconMap[selectedCategory.icon.toLowerCase()] ??
+            Icons.category_outlined
+        : Icons.category_outlined;
+    final categoryName = selectedCategory?.name ?? "Category";
+
     return Expanded(
-      child: CardWidget(
-        backColor: ColorConfig.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.category_outlined, color: ColorConfig.primarySwatch),
-            const SizedBox(width: 5),
-            const Text("Category"),
-          ],
+      child: InkWell(
+        onTap: () => _showCategoryPicker(context, ref),
+        child: CardWidget(
+          backColor: ColorConfig.white,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: ColorConfig.primarySwatch),
+              const SizedBox(width: 5),
+              Text(categoryName),
+            ],
+          ),
         ),
       ),
     );
@@ -259,6 +352,10 @@ class CreateExpenseCreateButton extends ConsumerWidget {
                     groupModel: groupModel,
                     boxModel: boxModel,
                   );
+
+              // Reset the category selection
+              ref.read(selectedCategoryProvider.notifier).state = null;
+              ref.read(expenseCategoryIdProvider.notifier).state = null;
             }
           },
           title: "Create",

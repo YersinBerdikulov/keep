@@ -48,6 +48,8 @@ final expensePayerIdProvider = StateProvider<String?>((ref) {
   return user?.id;
 });
 
+final expenseCategoryIdProvider = StateProvider<String?>((ref) => null);
+
 final splitUserProvider =
     StateNotifierProvider<SplitUserNotifier, List<String>>((ref) {
   // Retrieve all users in the box from the provider.

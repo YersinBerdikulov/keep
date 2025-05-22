@@ -40,6 +40,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     try {
       final currentUser = ref.read(currentUserProvider);
       final payerUserId = ref.read(expensePayerIdProvider);
+      final categoryId = ref.read(expenseCategoryIdProvider);
       final splitUsers = ref.read(splitUserProvider);
       num convertedCost = num.parse(expenseCost.text.replaceAll(',', ''));
       String expenseId = ID.custom(const Uuid().v4().substring(0, 32));
@@ -62,6 +63,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       ExpenseModel expenseModel = ExpenseModel(
         title: expenseTitle.text,
         description: expenseDescription.text,
+        categoryId: categoryId,
         boxId: boxModel.id!,
         groupId: groupModel.id!,
         creatorId: currentUser!.id!,

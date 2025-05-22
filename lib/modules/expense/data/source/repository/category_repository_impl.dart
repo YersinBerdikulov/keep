@@ -1,5 +1,5 @@
 import 'package:dongi/modules/expense/data/source/network/category_remote_data_source.dart';
-import 'package:dongi/modules/expense/domain/models/category_model.dart';
+import 'package:dongi/modules/expense/domain/controllers/category_controller.dart';
 import 'package:dongi/modules/expense/domain/repository/category_repository.dart';
 
 class CategoryRepositoryImpl implements CategoryRepository {
@@ -9,22 +9,22 @@ class CategoryRepositoryImpl implements CategoryRepository {
       : _remoteDataSource = remoteDataSource;
 
   @override
-  Future<List<CategoryModel>> getCategories() async {
+  Future<List<Category>> getCategories() async {
     return _remoteDataSource.getCategories();
   }
 
   @override
-  Future<CategoryModel> getCategory(String id) async {
+  Future<Category> getCategory(String id) async {
     return _remoteDataSource.getCategory(id);
   }
 
   @override
-  Future<CategoryModel> addCategory(CategoryModel category, String customId) async {
+  Future<Category> addCategory(Category category, String customId) async {
     return _remoteDataSource.addCategory(category, customId: customId);
   }
 
   @override
-  Future<CategoryModel> updateCategory(CategoryModel category) async {
+  Future<Category> updateCategory(Category category) async {
     return _remoteDataSource.updateCategory(category);
   }
 
