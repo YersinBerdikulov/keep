@@ -17,14 +17,28 @@ class ExpenseRemoteDataSource {
     required String customId,
   }) async {
     try {
+      // Create a copy of the data for better debugging
+      final data = expenseModel.toJson();
+
+      // Log the data being sent to Appwrite
+      print('Adding expense to Appwrite with data: $data');
+      print('Category ID in data: ${data['categoryId']}');
+
       final document = await _db.createDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.expenseCollection,
         documentId: customId,
-        data: expenseModel.toJson(),
+        data: data,
       );
+
+      print('Expense created with ID: ${document.$id}');
+      print('Category ID in created document: ${document.data['categoryId']}');
+
       return right(document);
     } on AppwriteException catch (e, st) {
+      print('Appwrite error creating expense: ${e.message}');
+      print('Data: ${e.response}');
+
       return left(
         Failure(
           e.message ?? 'Some unexpected error occurred',
@@ -32,6 +46,7 @@ class ExpenseRemoteDataSource {
         ),
       );
     } catch (e, st) {
+      print('General error creating expense: $e');
       return left(Failure(e.toString(), st));
     }
   }

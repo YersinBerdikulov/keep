@@ -97,17 +97,26 @@ class UserRemoteDataSource implements UserRepositoryImpl {
 
   @override
   Future<List<UserModel>> getUsersListData(List<String> userIds) async {
-    final document = await _db.listDocuments(
-      databaseId: AppwriteConfig.databaseId,
-      collectionId: AppwriteConfig.usersCollection,
-      queries: [
-        Query.equal('\$id', userIds),
-      ],
-    );
+    if (userIds.isEmpty) {
+      return [];
+    }
 
-    return document.documents
-        .map((user) => UserModel.fromJson(user.data))
-        .toList();
+    try {
+      final document = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.usersCollection,
+        queries: [
+          Query.equal('\$id', userIds),
+        ],
+      );
+
+      return document.documents
+          .map((user) => UserModel.fromJson(user.data))
+          .toList();
+    } catch (e) {
+      print('Error fetching users: $e');
+      return [];
+    }
   }
 
   @override

@@ -14,13 +14,27 @@ class CategoryRemoteDataSource {
       'icon': category.icon,
     };
 
-    _db.createDocument(
-      databaseId: AppwriteConfig.databaseId,
-      collectionId: AppwriteConfig.categoryCollection,
-      documentId: customId,
-      data: data,
-    );
-    return category;
+    print('Adding category to database: $data with id: $customId');
+
+    try {
+      final doc = await _db.createDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.categoryCollection,
+        documentId: customId,
+        data: data,
+      );
+      print('Category created successfully with ID: ${doc.$id}');
+
+      // Return category with the ID from Appwrite
+      return Category(
+        id: doc.$id,
+        name: category.name,
+        icon: category.icon,
+      );
+    } catch (e) {
+      print('Error creating category: $e');
+      rethrow;
+    }
   }
 
   Future<Category> updateCategory(Category category) async {
@@ -45,18 +59,31 @@ class CategoryRemoteDataSource {
   }
 
   Future<List<Category>> getCategories() async {
-    final categories = await _db.listDocuments(
-      databaseId: AppwriteConfig.databaseId,
-      collectionId: AppwriteConfig.categoryCollection,
-    );
+    print('Fetching all categories from database');
+    try {
+      final categories = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.categoryCollection,
+      );
 
-    return categories.documents
-        .map((doc) => Category(
-              id: doc.$id,
-              name: doc.data['name'] as String,
-              icon: doc.data['icon'] as String,
-            ))
-        .toList();
+      final result = categories.documents
+          .map((doc) => Category(
+                id: doc.$id,
+                name: doc.data['name'] as String,
+                icon: doc.data['icon'] as String,
+              ))
+          .toList();
+
+      print('Fetched ${result.length} categories from database');
+      for (var category in result) {
+        print('Category: ${category.name}, ID: ${category.id}');
+      }
+
+      return result;
+    } catch (e) {
+      print('Error fetching categories: $e');
+      rethrow;
+    }
   }
 
   Future<Category> getCategory(String id) async {

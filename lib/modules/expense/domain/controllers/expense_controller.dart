@@ -41,6 +41,10 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       final currentUser = ref.read(currentUserProvider);
       final payerUserId = ref.read(expensePayerIdProvider);
       final categoryId = ref.read(expenseCategoryIdProvider);
+
+      // Debug prints
+      print('Adding expense with categoryId: $categoryId');
+
       final splitUsers = ref.read(splitUserProvider);
       num convertedCost = num.parse(expenseCost.text.replaceAll(',', ''));
       String expenseId = ID.custom(const Uuid().v4().substring(0, 32));
@@ -59,18 +63,40 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         await addExpenseUser(expenseUser, customId: expenseUserId);
       }
 
+      // Create a map for the data to be saved
+      Map<String, dynamic> expenseData = {
+        'title': expenseTitle.text,
+        'description': expenseDescription.text,
+        'boxId': boxModel.id!,
+        'groupId': groupModel.id!,
+        'creatorId': currentUser!.id!,
+        'payerId': payerUserId ?? currentUser.id!,
+        'cost': convertedCost,
+        'equal': true,
+        'expenseUsers': expenseUserIds,
+      };
+
+      // Only add categoryId if it's not null
+      if (categoryId != null) {
+        expenseData['categoryId'] = categoryId;
+        print('Added categoryId to expense data: $categoryId');
+      }
+
       // Create the main ExpenseModel
       ExpenseModel expenseModel = ExpenseModel(
         title: expenseTitle.text,
         description: expenseDescription.text,
-        categoryId: categoryId,
+        categoryId: categoryId, // This might be null
         boxId: boxModel.id!,
         groupId: groupModel.id!,
-        creatorId: currentUser!.id!,
+        creatorId: currentUser.id!,
         payerId: payerUserId ?? currentUser.id!,
         cost: convertedCost,
         expenseUsers: expenseUserIds,
       );
+
+      print('ExpenseModel created with categoryId: ${expenseModel.categoryId}');
+      print('ExpenseModel JSON: ${expenseModel.toJson()}');
 
       final res = await _expenseRepository.addExpense(expenseModel,
           customId: expenseId);
@@ -91,6 +117,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       final updatedExpenses = await getExpensesInBox(boxModel.id!);
       state = AsyncValue.data(updatedExpenses);
     } catch (e, st) {
+      print('Error adding expense: $e');
       state = AsyncValue.error(e, st);
     }
   }

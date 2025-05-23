@@ -152,6 +152,11 @@ class CreateExpenseCategory extends ConsumerWidget {
                                 ref
                                     .read(expenseCategoryIdProvider.notifier)
                                     .state = category.id;
+
+                                // Debug prints
+                                print('Selected category: ${category.name}');
+                                print('Category ID: ${category.id}');
+
                                 Navigator.pop(context);
                               },
                             );

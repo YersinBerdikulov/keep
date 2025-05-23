@@ -14,6 +14,9 @@ class Category {
     required this.name,
     required this.icon,
   });
+
+  @override
+  String toString() => 'Category(id: $id, name: $name, icon: $icon)';
 }
 
 class CategoryNotifier extends AsyncNotifier<List<Category>> {
@@ -28,13 +31,45 @@ class CategoryNotifier extends AsyncNotifier<List<Category>> {
       final categories = await _categoryRepository.getCategories();
       if (categories.isNotEmpty) {
         return categories;
+      } else {
+        // No categories found, create default ones
+        return await _createDefaultCategories();
       }
     } catch (e) {
-      // If there's an error or no categories, return the defaults
+      print('Error fetching categories: $e');
+      // If there's an error, try to create default categories
+      return await _createDefaultCategories();
+    }
+  }
+
+  Future<List<Category>> _createDefaultCategories() async {
+    print('Creating default categories in database');
+    final defaults = _getDefaultCategories();
+    final created = <Category>[];
+
+    for (var category in defaults) {
+      try {
+        // Generate a unique ID for each category
+        final customId = DateTime.now().millisecondsSinceEpoch.toString() +
+            '_${category.name.toLowerCase().replaceAll(' ', '_')}';
+
+        final createdCategory =
+            await _categoryRepository.addCategory(category, customId);
+
+        created.add(createdCategory);
+        print(
+            'Created category: ${createdCategory.name} with ID: ${createdCategory.id}');
+      } catch (e) {
+        print('Error creating category ${category.name}: $e');
+      }
     }
 
-    // Return default categories if repository fetch fails or returns empty
-    return _getDefaultCategories();
+    if (created.isNotEmpty) {
+      return created;
+    }
+
+    // If we couldn't create categories in DB, return the defaults without IDs
+    return defaults;
   }
 
   List<Category> _getDefaultCategories() {

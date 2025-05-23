@@ -85,7 +85,7 @@ class InfoExpenseDetail extends ConsumerWidget {
 
   const InfoExpenseDetail({super.key, required this.expenseModel});
 
-  infoCard(String title, String content) {
+  infoCard(String title, String content, {IconData? icon}) {
     return Expanded(
       child: SizedBox(
         height: 90,
@@ -102,12 +102,10 @@ class InfoExpenseDetail extends ConsumerWidget {
                       color: ColorConfig.primarySwatch,
                       borderRadius: BorderRadius.circular(5),
                     ),
+                    child: icon != null
+                        ? Icon(icon, color: ColorConfig.white, size: 14)
+                        : null,
                   ),
-                  //const Spacer(),
-                  //Icon(
-                  //  Icons.more_vert,
-                  //  color: ColorConfig.primarySwatch,
-                  //),
                 ],
               ),
               const Spacer(),
@@ -129,16 +127,81 @@ class InfoExpenseDetail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // When adding a category section, first display the basic info cards
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+          child: Row(
+            children: [
+              infoCard("Cost", expenseModel.cost.toString()),
+              const SizedBox(width: 10),
+              infoCard("Date", expenseModel.createdAt!.toHumanReadableFormat()),
+              const SizedBox(width: 10),
+              infoCard("Split By", expenseModel.expenseUsers.length.toString()),
+            ],
+          ),
+        ),
+        if (expenseModel.categoryId != null)
+          CategoryInfoCard(categoryId: expenseModel.categoryId!),
+      ],
+    );
+  }
+}
+
+class CategoryInfoCard extends ConsumerWidget {
+  final String categoryId;
+
+  const CategoryInfoCard({super.key, required this.categoryId});
+
+  Map<String, IconData> getCategoryIcon() {
+    return {
+      'food': Icons.restaurant,
+      'transportation': Icons.directions_car,
+      'entertainment': Icons.movie,
+      'shopping': Icons.shopping_bag,
+      'bills': Icons.receipt,
+      'health': Icons.medical_services,
+      'travel': Icons.flight,
+      'education': Icons.school,
+      'others': Icons.category_outlined,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // For now, since we don't have a proper provider to get category by ID
+    // Just show the category ID, in future could fetch the actual category
+    print('Category ID in detail view: $categoryId');
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: Row(
-        children: [
-          infoCard("Cost", expenseModel.cost.toString()),
-          const SizedBox(width: 10),
-          infoCard("Date", expenseModel.createdAt!.toHumanReadableFormat()),
-          const SizedBox(width: 10),
-          infoCard("Split By", expenseModel.expenseUsers.length.toString()),
-        ],
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: GreyCardWidget(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              Icon(
+                Icons.category,
+                color: ColorConfig.primarySwatch,
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Category",
+                    style: FontConfig.overline(),
+                  ),
+                  Text(
+                    categoryId,
+                    style: FontConfig.body2(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -150,6 +213,26 @@ class MemberListExpenseDetail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Handle empty members list
+    if (members.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 25, 16, 25),
+        child: Center(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Icon(Icons.people_outline, size: 48, color: ColorConfig.grey),
+              const SizedBox(height: 10),
+              Text(
+                "No members in this expense",
+                style: FontConfig.body1().copyWith(color: ColorConfig.grey),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final expenseMember = ref.watch(getUsersListData(members));
 
     return expenseMember.when(
@@ -167,7 +250,6 @@ class MemberListExpenseDetail extends ConsumerWidget {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: ListTileCard(
-                  //visualDensity: const VisualDensity(vertical: 3),
                   titleString: data[index].userName ?? data[index].email,
                   trailing: const Text("\$53"),
                   leading: Container(
@@ -178,8 +260,6 @@ class MemberListExpenseDetail extends ConsumerWidget {
                       color: ColorConfig.primarySwatch,
                     ),
                   ),
-                  //subtitleString: "subtitle",
-                  //headerString: "header",
                 ),
               );
             },
