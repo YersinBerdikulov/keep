@@ -13,29 +13,73 @@ import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/error/error.dart';
 import '../../../../shared/widgets/image/image_widget.dart';
 import '../../../group/domain/models/group_model.dart';
+import '../../../user/domain/models/user_model.dart';
 
 class HomeExpenseSummery extends ConsumerWidget {
   const HomeExpenseSummery({super.key});
+
   _totalExpenseCard() {
     return AspectRatio(
       aspectRatio: 1,
-      child: CardWidget(
+      child: Container(
         margin: const EdgeInsets.only(right: 10),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              ColorConfig.secondary.withOpacity(0.8),
+              ColorConfig.secondary,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: ColorConfig.secondary.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Total Expense",
-              style: FontConfig.overline().copyWith(
-                color: ColorConfig.primarySwatch50,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Total Expense",
+                  style: FontConfig.body2().copyWith(
+                    color: ColorConfig.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Icon(
+                  Icons.account_balance_wallet,
+                  color: ColorConfig.white,
+                  size: 24,
+                ),
+              ],
             ),
-            Text(
-              "\$140.00",
-              style: FontConfig.body1().copyWith(
-                color: ColorConfig.secondary,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "\$140.00",
+                  style: FontConfig.h4().copyWith(
+                    color: ColorConfig.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "This Month",
+                  style: FontConfig.overline().copyWith(
+                    color: ColorConfig.white.withOpacity(0.8),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -45,9 +89,29 @@ class HomeExpenseSummery extends ConsumerWidget {
 
   _incomeCard() {
     return Expanded(
-      child: CardWidget(
+      child: Container(
         margin: const EdgeInsets.only(bottom: 5),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              ColorConfig.primarySwatch.withOpacity(0.8),
+              ColorConfig.primarySwatch,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: ColorConfig.primarySwatch.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(12),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -55,17 +119,24 @@ class HomeExpenseSummery extends ConsumerWidget {
               children: [
                 Text(
                   "Income",
-                  style: FontConfig.overline().copyWith(
-                    color: ColorConfig.primarySwatch50,
+                  style: FontConfig.body2().copyWith(
+                    color: ColorConfig.white,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
                   "\$140.00",
-                  style: FontConfig.body1().copyWith(
-                    color: ColorConfig.secondary,
+                  style: FontConfig.h6().copyWith(
+                    color: ColorConfig.white,
                   ),
                 ),
               ],
+            ),
+            Icon(
+              Icons.arrow_downward_rounded,
+              color: ColorConfig.white,
+              size: 24,
             ),
           ],
         ),
@@ -75,9 +146,29 @@ class HomeExpenseSummery extends ConsumerWidget {
 
   _outcomeCard() {
     return Expanded(
-      child: CardWidget(
+      child: Container(
         margin: const EdgeInsets.only(top: 5),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              ColorConfig.error.withOpacity(0.8),
+              ColorConfig.error,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: ColorConfig.error.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(12),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -85,17 +176,24 @@ class HomeExpenseSummery extends ConsumerWidget {
               children: [
                 Text(
                   "Outcome",
-                  style: FontConfig.overline().copyWith(
-                    color: ColorConfig.primarySwatch50,
+                  style: FontConfig.body2().copyWith(
+                    color: ColorConfig.white,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
                   "\$140.00",
-                  style: FontConfig.body1().copyWith(
-                    color: ColorConfig.secondary,
+                  style: FontConfig.h6().copyWith(
+                    color: ColorConfig.white,
                   ),
                 ),
               ],
+            ),
+            Icon(
+              Icons.arrow_upward_rounded,
+              color: ColorConfig.white,
+              size: 24,
             ),
           ],
         ),
@@ -106,7 +204,7 @@ class HomeExpenseSummery extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Row(
         children: [
           Expanded(child: _totalExpenseCard()),
@@ -141,12 +239,27 @@ class HomeRecentGroup extends StatelessWidget {
           height: 48,
           margin: const EdgeInsets.fromLTRB(10, 0, 16, 0),
           decoration: BoxDecoration(
-            color: ColorConfig.primarySwatch,
-            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                ColorConfig.secondary.withOpacity(0.8),
+                ColorConfig.secondary,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: ColorConfig.secondary.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Icon(
             Icons.arrow_forward_rounded,
-            color: ColorConfig.secondary,
+            color: ColorConfig.white,
+            size: 24,
           ),
         ),
       );
@@ -154,20 +267,34 @@ class HomeRecentGroup extends StatelessWidget {
 
     return Column(
       children: [
-        //* Group title
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 0, 10),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 "Groups",
                 style: FontConfig.h6(),
               ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: ColorConfig.secondary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  "View All",
+                  style: FontConfig.caption().copyWith(
+                    color: ColorConfig.secondary,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
         SizedBox(
-          height: 172,
+          height: 158,
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: [
@@ -189,34 +316,115 @@ class GroupCardWidget extends ConsumerWidget {
   final GroupModel group;
   const GroupCardWidget(this.group, {super.key});
 
-  boxCount() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildBoxCount() {
+    return Row(
       children: [
-        Text(
-          "Boxes",
-          style: FontConfig.overline().copyWith(
-            color: ColorConfig.midnight.withAlpha((0.5 * 255).toInt()),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: ColorConfig.primarySwatch.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
           ),
-        ),
-        const SizedBox(height: 5),
-        Text(
-          group.boxIds.length.toString(),
-          style: FontConfig.body2(),
+          child: Row(
+            children: [
+              Icon(
+                Icons.inbox_rounded,
+                color: ColorConfig.primarySwatch,
+                size: 14,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                "${group.boxIds.length} Boxes",
+                style: FontConfig.caption().copyWith(
+                  color: ColorConfig.primarySwatch,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Positioned positionedCircleBox({Color? color, double? left, String? url}) {
+  Widget _buildMemberStack(AsyncValue<List<UserModel>> groupMember) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Members",
+          style: FontConfig.overline().copyWith(
+            color: ColorConfig.primarySwatch50,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Expanded(
+              child: groupMember.when(
+                loading: () => _buildMemberAvatars(
+                  group.groupUsers.asMap().entries.map((val) {
+                    int index = group.groupUsers.length - val.key - 1;
+                    return _buildAvatar(
+                      color: Colors.grey[(800 - (index * 100))],
+                      left: index == 0 ? null : index * 16.0,
+                    );
+                  }).toList(),
+                ),
+                error: (error, stackTrace) => ErrorTextWidget(error),
+                data: (data) => _buildMemberAvatars(
+                  data.asMap().entries.map((val) {
+                    int index = data.length - val.key - 1;
+                    return _buildAvatar(
+                      url: val.value.profileImage,
+                      left: index == 0 ? null : index * 16.0,
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: ColorConfig.primarySwatch.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.share,
+                color: ColorConfig.primarySwatch,
+                size: 14,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMemberAvatars(Iterable<Widget> avatars) {
+    return Stack(children: avatars.toList());
+  }
+
+  Widget _buildAvatar({Color? color, double? left, String? url}) {
     return Positioned(
       left: left,
-      child: ImageWidget(
-        color: color ?? Colors.black54.withAlpha((0.3 * 255).toInt()),
-        width: 32,
-        height: 32,
-        imageUrl: url,
-        borderEnable: true,
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: ColorConfig.white,
+            width: 2,
+          ),
+        ),
+        child: ImageWidget(
+          color: color ?? Colors.black54.withAlpha((0.3 * 255).toInt()),
+          width: 28,
+          height: 28,
+          imageUrl: url,
+          borderEnable: true,
+        ),
       ),
     );
   }
@@ -225,149 +433,78 @@ class GroupCardWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final groupMember = ref.watch(groupMembersProvider(group.groupUsers));
 
-    return CardWidget(
-      onTap: () => context.push(RouteName.groupDetail(group.id)),
+    return Container(
+      width: 250,
       margin: const EdgeInsets.only(right: 10),
-      child: SizedBox(
-        width: 250,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ///* group name widget
-            Row(
-              children: [
-                ImageWidget(
-                  width: 40,
-                  height: 40,
-                  imageUrl: group.image,
-                  borderRadius: 5,
-                ),
-                const SizedBox(width: 5),
-                Text(group.title, style: FontConfig.body2())
-              ],
-            ),
-            const SizedBox(height: 15),
-            //box count
-            boxCount(),
-            const SizedBox(height: 15),
-            //member row
-            Column(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ColorConfig.primarySwatch25.withOpacity(0.5),
+            ColorConfig.primarySwatch25.withOpacity(0.3),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: ColorConfig.primarySwatch25.withOpacity(0.5),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: ColorConfig.primarySwatch.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push(RouteName.groupDetail(group.id)),
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Members",
-                  style: FontConfig.overline().copyWith(
-                    color: ColorConfig.midnight.withAlpha((0.5 * 255).toInt()),
-                  ),
-                ),
-                const SizedBox(height: 5),
                 Row(
                   children: [
-                    Expanded(
-                      child: groupMember.when(
-                        loading: () {
-                          return Stack(
-                            children:
-                                group.groupUsers.asMap().entries.map((val) {
-                              int index = group.groupUsers.length - val.key - 1;
-
-                              return positionedCircleBox(
-                                color: Colors.grey[(800 - (index * 100))],
-                                left: index == 0 ? null : index * 10.0,
-                              );
-                            }).toList(),
-                          );
-                          //return Stack(
-                          //  children: [
-                          //    positionedCircleBox(
-                          //      color: Colors.grey.shade900,
-                          //      left: 100,
-                          //    ),
-                          //    positionedCircleBox(
-                          //      color: Colors.grey.shade800,
-                          //      left: 80,
-                          //    ),
-                          //    positionedCircleBox(
-                          //      color: Colors.grey.shade700,
-                          //      left: 60,
-                          //    ),
-                          //    positionedCircleBox(
-                          //      color: Colors.grey.shade600,
-                          //      left: 40,
-                          //    ),
-                          //    positionedCircleBox(
-                          //      color: Colors.grey.shade400,
-                          //      left: 20,
-                          //    ),
-                          //    positionedCircleBox(
-                          //      color: Colors.grey.shade300,
-                          //    ),
-                          //  ],
-                          //);
-                        },
-                        error: (error, stackTrace) => ErrorTextWidget(error),
-                        data: (data) {
-                          return Stack(
-                            children: data.asMap().entries.map((val) {
-                              int index = data.length - val.key - 1;
-
-                              return positionedCircleBox(
-                                url: val.value.profileImage,
-                                color: Colors.grey[(800 - (index * 100))],
-                                left: index == 0 ? null : index * 10.0,
-                              );
-                            }).toList(),
-                          );
-
-                          // return Stack(
-                          //   children: [
-                          //     positionedCircleBox(
-                          //       color: Colors.grey.shade900,
-                          //       left: 50,
-                          //     ),
-                          //     positionedCircleBox(
-                          //       color: Colors.grey.shade800,
-                          //       left: 40,
-                          //     ),
-                          //     positionedCircleBox(
-                          //       color: Colors.grey.shade700,
-                          //       left: 30,
-                          //     ),
-                          //     positionedCircleBox(
-                          //       color: Colors.grey.shade600,
-                          //       left: 20,
-                          //     ),
-                          //     positionedCircleBox(
-                          //       color: Colors.grey.shade400,
-                          //       left: 10,
-                          //     ),
-                          //     positionedCircleBox(
-                          //       color: Colors.grey.shade300,
-                          //     ),
-                          //   ],
-                          // );
-                        },
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: ColorConfig.primarySwatch25,
+                          width: 2,
+                        ),
+                      ),
+                      child: ImageWidget(
+                        width: 36,
+                        height: 36,
+                        imageUrl: group.image,
+                        borderRadius: 6,
                       ),
                     ),
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: ColorConfig.white,
-                      ),
-                      child: Icon(
-                        Icons.share,
-                        color: ColorConfig.primarySwatch,
-                        size: 12,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        group.title,
+                        style: FontConfig.body2().copyWith(
+                          color: ColorConfig.midnight,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                _buildBoxCount(),
+                const SizedBox(height: 12),
+                _buildMemberStack(groupMember),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -389,49 +526,60 @@ class HomeWeeklyAnalytic extends StatelessWidget {
 
   chartWidget() {
     return SfCartesianChart(
-      margin: const EdgeInsets.only(left: 32),
+      margin: const EdgeInsets.fromLTRB(32, 32, 32, 16),
       plotAreaBorderWidth: 0,
       primaryYAxis: CategoryAxis(
-        //isVisible: false,
-        //labelStyle: const TextStyle(color: Colors.white),
         axisLine: const AxisLine(width: 0),
-        //labelPosition: ChartDataLabelPosition.inside,
         majorTickLines: const MajorTickLines(width: 0),
-        majorGridLines: const MajorGridLines(width: 1, dashArray: [10]),
+        majorGridLines: MajorGridLines(
+          width: 1,
+          dashArray: [5],
+          color: ColorConfig.primarySwatch50.withOpacity(0.3),
+        ),
         opposedPosition: true,
         maximum: 10,
         interval: 5,
         edgeLabelPlacement: EdgeLabelPlacement.hide,
         axisLabelFormatter: (axisLabelRenderArgs) => ChartAxisLabel(
           "\$${axisLabelRenderArgs.text}00",
-          FontConfig.overline(),
+          FontConfig.overline().copyWith(
+            color: ColorConfig.primarySwatch50,
+          ),
         ),
-        //isVisible: false,
       ),
-      primaryXAxis: const CategoryAxis(
-        //labelStyle: const TextStyle(color: Colors.white),
-        axisLine: AxisLine(width: 0),
-        //labelPosition: ChartDataLabelPosition.inside,
-        majorTickLines: MajorTickLines(width: 0),
-        majorGridLines: MajorGridLines(width: 0),
+      primaryXAxis: CategoryAxis(
+        axisLine: const AxisLine(width: 0),
+        majorTickLines: const MajorTickLines(width: 0),
+        majorGridLines: const MajorGridLines(width: 0),
+        labelStyle: FontConfig.overline().copyWith(
+          color: ColorConfig.primarySwatch50,
+        ),
       ),
-      // series: <ChartSeries<ChartData, String>>[
-      //   ColumnSeries<ChartData, String>(
-      //     animationDuration: 1000,
-      //     dataSource: chartData,
-      //     xValueMapper: (ChartData data, _) => data.x,
-      //     yValueMapper: (ChartData data, _) => data.y,
-      //     name: 'Unit Sold',
-      //     borderRadius: BorderRadius.circular(50),
-      //     spacing: 0.5,
-      //     color: ColorConfig.primarySwatch25,
-      //   ),
-      // ],
+      series: <CartesianSeries<ChartData, String>>[
+        ColumnSeries<ChartData, String>(
+          animationDuration: 1000,
+          dataSource: chartData,
+          xValueMapper: (ChartData data, _) => data.x,
+          yValueMapper: (ChartData data, _) => data.y,
+          name: 'Expenses',
+          borderRadius: BorderRadius.circular(50),
+          spacing: 0.2,
+          width: 0.8,
+          color: ColorConfig.secondary.withOpacity(0.3),
+          onPointTap: (pointInteractionDetails) {
+            // Handle bar tap
+          },
+        ),
+      ],
       tooltipBehavior: TooltipBehavior(
         enable: true,
         canShowMarker: false,
-        format: 'point.x',
+        format: 'point.x : \$point.y00',
         header: '',
+        textStyle: FontConfig.caption().copyWith(
+          color: ColorConfig.white,
+        ),
+        color: ColorConfig.secondary,
       ),
     );
   }
@@ -443,14 +591,33 @@ class HomeWeeklyAnalytic extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            "Analytics",
-            style: FontConfig.h6(),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Weekly Analytics",
+                style: FontConfig.h6(),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: ColorConfig.secondary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  "This Week",
+                  style: FontConfig.caption().copyWith(
+                    color: ColorConfig.secondary,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 10),
         SizedBox(
-          height: SizeConfig.width(context) / 2.5,
+          height: SizeConfig.width(context) / 2,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
             child: CardWidget(
@@ -477,10 +644,27 @@ class HomeRecentTransaction extends ConsumerWidget {
             style: FontConfig.h6(),
           ),
           const Spacer(),
-          Text(
-            "Show more",
-            style: FontConfig.overline().copyWith(
-              color: ColorConfig.midnight..withAlpha((0.5 * 255).toInt()),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: ColorConfig.secondary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  "View All",
+                  style: FontConfig.caption().copyWith(
+                    color: ColorConfig.secondary,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: ColorConfig.secondary,
+                  size: 12,
+                ),
+              ],
             ),
           ),
         ],
@@ -490,70 +674,103 @@ class HomeRecentTransaction extends ConsumerWidget {
 
   _recentTransactionsCardList(context) {
     return SizedBox(
-      height: 85,
+      height: 120,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
           const SizedBox(width: 16),
-          _recentTransactionsCard(context),
-          _recentTransactionsCard(context),
-          _recentTransactionsCard(context),
-          _recentTransactionsCard(context),
-          _recentTransactionsCard(context),
-          _recentTransactionsCard(context),
+          _recentTransactionsCard(
+            context,
+            title: "Trip to Bali",
+            amount: 150.0,
+            isExpense: true,
+            icon: Icons.flight_takeoff_rounded,
+          ),
+          _recentTransactionsCard(
+            context,
+            title: "Salary",
+            amount: 3000.0,
+            isExpense: false,
+            icon: Icons.work_rounded,
+          ),
+          _recentTransactionsCard(
+            context,
+            title: "Groceries",
+            amount: 85.5,
+            isExpense: true,
+            icon: Icons.shopping_cart_rounded,
+          ),
+          _recentTransactionsCard(
+            context,
+            title: "Freelance",
+            amount: 500.0,
+            isExpense: false,
+            icon: Icons.computer_rounded,
+          ),
           const SizedBox(width: 16),
         ],
       ),
     );
   }
 
-  _recentTransactionsCard(context) {
-    oweCost() {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "You owe",
-            style: FontConfig.overline().copyWith(
-              color: ColorConfig.midnight..withAlpha((0.5 * 255).toInt()),
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            "\$5",
-            style: FontConfig.caption(),
-          ),
-        ],
-      );
-    }
-
+  _recentTransactionsCard(
+    context, {
+    required String title,
+    required double amount,
+    required bool isExpense,
+    required IconData icon,
+  }) {
     return SizedBox(
-      width: 150,
-      //color: Colors.red,
+      width: 160,
       child: CardWidget(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(16),
         margin: const EdgeInsets.only(right: 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //group name widget
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Trip", style: FontConfig.body2()),
+                Text(title, style: FontConfig.body2()),
                 Container(
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: ColorConfig.primarySwatch,
+                    color: isExpense
+                        ? ColorConfig.error.withOpacity(0.1)
+                        : ColorConfig.secondary.withOpacity(0.1),
                     shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color:
+                        isExpense ? ColorConfig.error : ColorConfig.secondary,
+                    size: 16,
                   ),
                 ),
               ],
             ),
-            //box count
-            oweCost(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isExpense ? "You spent" : "You received",
+                  style: FontConfig.overline().copyWith(
+                    color: ColorConfig.midnight.withOpacity(0.5),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "\$${amount.toStringAsFixed(2)}",
+                  style: FontConfig.body1().copyWith(
+                    color:
+                        isExpense ? ColorConfig.error : ColorConfig.secondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
