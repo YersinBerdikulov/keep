@@ -32,33 +32,56 @@ class TotalExpenseBoxDetail extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Container(
-          padding: const EdgeInsets.only(bottom: 20),
-          alignment: Alignment.bottomLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.transparent,
+                Colors.black.withOpacity(0.6),
+              ],
+            ),
+          ),
           child: Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: ColorConfig.baseGrey,
-                  borderRadius: BorderRadius.circular(5),
+                  color: ColorConfig.secondary.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: ColorConfig.white.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.account_balance_wallet,
+                  color: ColorConfig.white,
+                  size: 24,
                 ),
               ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'total expense',
-                    style: FontConfig.body2()
-                        .copyWith(color: ColorConfig.pureWhite),
-                  ),
-                  Text(
-                    '\$$total',
-                    style:
-                        FontConfig.h6().copyWith(color: ColorConfig.pureWhite),
-                  ),
-                ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Total Expense',
+                      style: FontConfig.body2().copyWith(
+                        color: ColorConfig.white.withOpacity(0.8),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '\$${total.toStringAsFixed(2)}',
+                      style: FontConfig.h4().copyWith(
+                        color: ColorConfig.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -233,43 +256,116 @@ class _FriendListBoxDetailState extends ConsumerState<FriendListBoxDetail> {
 class CategoryListBoxDetail extends ConsumerWidget {
   const CategoryListBoxDetail({super.key});
 
+  List<Map<String, dynamic>> get _temporaryCategories => [
+        {
+          'icon': Icons.restaurant,
+          'name': 'Food',
+          'color': const Color(0xFFFF6B6B),
+        },
+        {
+          'icon': Icons.directions_car,
+          'name': 'Transport',
+          'color': const Color(0xFF4ECDC4),
+        },
+        {
+          'icon': Icons.shopping_bag,
+          'name': 'Shopping',
+          'color': const Color(0xFFFFBE0B),
+        },
+        {
+          'icon': Icons.movie,
+          'name': 'Entertainment',
+          'color': const Color(0xFF845EC2),
+        },
+        {
+          'icon': Icons.home,
+          'name': 'Bills',
+          'color': const Color(0xFF00B8A9),
+        },
+      ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 0, 10),
-          child: Text(
-            'Categories',
-            style: FontConfig.body1(),
-          ),
-        ),
-        SizedBox(
-          height: 110,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(width: 16),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.horizontal,
-                itemCount: 5,
-                itemBuilder: (context, i) => const Row(
-                  children: [
-                    CategoryCardWidget(
-                      name: 'category name',
-                      balance: '210,000',
-                    ),
-                    SizedBox(width: 10),
-                  ],
+              Text(
+                'Categories',
+                style: FontConfig.body1(),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: ColorConfig.secondary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  "View All",
+                  style: FontConfig.caption().copyWith(
+                    color: ColorConfig.secondary,
+                  ),
                 ),
               ),
-              const SizedBox(width: 6),
             ],
           ),
         ),
+        SizedBox(
+          height: 100,
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            scrollDirection: Axis.horizontal,
+            itemCount: _temporaryCategories.length,
+            itemBuilder: (context, index) {
+              final category = _temporaryCategories[index];
+              return Container(
+                width: 80,
+                margin: EdgeInsets.only(
+                  right: index != _temporaryCategories.length - 1 ? 12 : 0,
+                ),
+                decoration: BoxDecoration(
+                  color: category['color'].withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: category['color'].withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: category['color'].withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        category['icon'],
+                        color: category['color'],
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      category['name'],
+                      style: FontConfig.caption().copyWith(
+                        color: ColorConfig.midnight,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
       ],
     );
   }
@@ -366,7 +462,50 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
     }
 
     if (_expenses == null || _expenses!.isEmpty) {
-      return const Center(child: Text("No expenses yet"));
+      return Container(
+        margin: const EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: ColorConfig.grey,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: ColorConfig.primarySwatch25,
+            width: 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: ColorConfig.primarySwatch.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.receipt_long_outlined,
+                size: 32,
+                color: ColorConfig.primarySwatch,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "No Expenses Yet",
+              style: FontConfig.h6().copyWith(
+                color: ColorConfig.midnight,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Create your first expense by tapping the + button",
+              textAlign: TextAlign.center,
+              style: FontConfig.body2().copyWith(
+                color: ColorConfig.primarySwatch50,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     return SlidableAutoCloseBehavior(
