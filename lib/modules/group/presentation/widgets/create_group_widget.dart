@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
@@ -15,6 +16,7 @@ import '../../../../shared/utilities/validation/validation.dart';
 import '../../../../shared/widgets/button/button_widget.dart';
 import '../../../../shared/widgets/friends/friend.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
+import '../../../../shared/widgets/image/image_widget.dart';
 import '../../domain/di/group_controller_di.dart';
 
 class CreateGroupInfoCard extends ConsumerWidget {
@@ -30,33 +32,149 @@ class CreateGroupInfoCard extends ConsumerWidget {
     required this.formKey,
   });
 
+  String _getRandomImageUrl() {
+    final styles = [
+      'initials',
+      'shapes',
+      'pixel-art',
+      'rings',
+      'sunset',
+      'marble'
+    ];
+    final random = Random();
+    final style = styles[random.nextInt(styles.length)];
+    final seed = DateTime.now().millisecondsSinceEpoch.toString();
+    return 'https://api.dicebear.com/7.x/$style/svg?seed=$seed&backgroundColor=ffffff';
+  }
+
   /// * ----- add photo button
-  _addPhotoButton(ValueNotifier<File?> image) {
-    return InkWell(
-      onTap: () async {
-        image.value = await pickImage();
-      },
-      child: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          color: ColorConfig.white,
-          borderRadius: BorderRadius.circular(10),
-          image: image.value != null
-              ? DecorationImage(
-                  image: FileImage(image.value!),
-                  fit: BoxFit.cover,
-                )
-              : null,
-        ),
-        child: image.value == null
-            ? Center(
-                child: SvgPicture.asset(
-                  'assets/svg/add_photo_icon.svg',
-                  height: 14,
+  Widget _addPhotoButton(ValueNotifier<File?> image, BuildContext context) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: () async {
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (context) => Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: ColorConfig.white,
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(20)),
                 ),
-              )
-            : null,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Choose Image Source',
+                      style: FontConfig.body1()
+                          .copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _imageOptionButton(
+                          icon: Icons.photo_library,
+                          label: 'Gallery',
+                          onTap: () async {
+                            Navigator.pop(context);
+                            image.value = await pickImage();
+                          },
+                        ),
+                        _imageOptionButton(
+                          icon: Icons.auto_awesome,
+                          label: 'Random',
+                          onTap: () {
+                            Navigator.pop(context);
+                            image.value = null;
+                            groupTitle.addListener(() {
+                              if (image.value == null) {
+                                // This will trigger a rebuild with a new random image
+                                image.value = null;
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+          child: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: ColorConfig.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: ColorConfig.primarySwatch25,
+                width: 2,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: image.value != null
+                  ? Image.file(
+                      image.value!,
+                      fit: BoxFit.cover,
+                    )
+                  : groupTitle.text.isEmpty
+                      ? Center(
+                          child: SvgPicture.asset(
+                            'assets/svg/add_photo_icon.svg',
+                            height: 14,
+                          ),
+                        )
+                      : ImageWidget(
+                          imageUrl: _getRandomImageUrl(),
+                          borderRadius: 8,
+                        ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Tap to change',
+          style: FontConfig.overline().copyWith(
+            color: ColorConfig.primarySwatch50,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _imageOptionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: ColorConfig.primarySwatch.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: ColorConfig.primarySwatch,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: FontConfig.caption(),
+          ),
+        ],
       ),
     );
   }
@@ -78,7 +196,7 @@ class CreateGroupInfoCard extends ConsumerWidget {
           children: [
             Row(
               children: [
-                _addPhotoButton(image),
+                _addPhotoButton(image, context),
                 const SizedBox(width: 10),
                 Expanded(
                   child: SizedBox(
