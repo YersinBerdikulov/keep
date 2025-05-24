@@ -294,8 +294,9 @@ class HomeRecentGroup extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 158,
+          height: 170,
           child: ListView(
+            padding: EdgeInsets.zero,
             scrollDirection: Axis.horizontal,
             children: [
               const SizedBox(width: 16),
