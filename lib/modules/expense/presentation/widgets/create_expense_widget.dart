@@ -4,6 +4,7 @@ import 'package:dongi/modules/expense/domain/controllers/category_controller.dar
 import 'package:dongi/modules/expense/domain/di/category_controller_di.dart';
 import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
 import 'package:dongi/shared/utilities/extensions/format_with_comma.dart';
+import 'package:dongi/shared/utilities/helpers/snackbar_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +21,8 @@ import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/card/grey_card.dart';
 import '../../../../shared/widgets/list_tile/list_tile_card.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
+
+final selectedDateProvider = StateProvider<DateTime?>((ref) => DateTime.now());
 
 class CreateExpenseAmount extends ConsumerWidget {
   final TextEditingController expenseCost;
@@ -208,21 +211,73 @@ class CreateExpenseCategory extends ConsumerWidget {
 class CreateExpenseDate extends ConsumerWidget {
   const CreateExpenseDate({super.key});
 
+  Future<void> _selectDate(BuildContext context, WidgetRef ref) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: ref.read(selectedDateProvider) ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: ColorConfig.primarySwatch,
+              onPrimary: ColorConfig.white,
+              surface: ColorConfig.white,
+              onSurface: ColorConfig.midnight,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      ref.read(selectedDateProvider.notifier).state = picked;
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return '${date.day} ${months[date.month - 1]}, ${date.year}';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedDate = ref.watch(selectedDateProvider) ?? DateTime.now();
+
     return Expanded(
-      child: CardWidget(
-        backColor: ColorConfig.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.date_range,
-              color: ColorConfig.primarySwatch,
-            ),
-            const SizedBox(width: 5),
-            const Text("20 Nov, 2020"),
-          ],
+      child: InkWell(
+        onTap: () => _selectDate(context, ref),
+        child: CardWidget(
+          backColor: ColorConfig.white,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.date_range,
+                color: ColorConfig.primarySwatch,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _formatDate(selectedDate),
+                style: FontConfig.body2(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -237,49 +292,74 @@ class CreateExpenseAction extends ConsumerWidget {
     required String title,
     required String subtitle,
     required IconData icon,
+    required Color iconColor,
     required Function()? onTap,
   }) {
-    return ListTileCard(
+    return CardWidget(
       onTap: onTap,
       backColor: ColorConfig.white,
-      titleString: title,
-      subtitleString: subtitle,
-      leading: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: ColorConfig.pureWhite,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(icon),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: FontConfig.caption().copyWith(
+                    color: ColorConfig.primarySwatch50,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: FontConfig.body2().copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            Icons.arrow_forward_ios,
+            color: ColorConfig.primarySwatch50,
+            size: 16,
+          ),
+        ],
       ),
-      trailing: const Icon(Icons.arrow_forward_ios),
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return CardWidget(
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        children: [
-          _actionButton(
-            title: "made by",
-            subtitle: "Person name",
-            icon: Icons.account_box,
-            onTap: () => context.push(RouteName.expenseMadeBy),
-          ),
-          const SizedBox(height: 10),
-          _actionButton(
-            title: "split between",
-            subtitle: "Splitting method",
-            icon: Icons.call_split,
-            onTap: () => context.push(
-              RouteName.expenseSplit,
-              extra: {"expenseCost": expenseCost},
-            ),
-          ),
-        ],
-      ),
+    return Column(
+      children: [
+        _actionButton(
+          title: "Made by",
+          subtitle: "You",
+          icon: Icons.person,
+          iconColor: ColorConfig.secondary,
+          onTap: () => showSnackBar(context, content: "Coming soon!"),
+        ),
+        const SizedBox(height: 10),
+        _actionButton(
+          title: "Split between",
+          subtitle: "Equal split · 4 people",
+          icon: Icons.group,
+          iconColor: ColorConfig.primarySwatch,
+          onTap: () => showSnackBar(context, content: "Coming soon!"),
+        ),
+      ],
     );
   }
 }
@@ -292,29 +372,11 @@ class CreateExpenseDescription extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return CardWidget(
       padding: const EdgeInsets.all(15),
-      child: Row(
-        children: [
-          CardWidget(
-            backColor: ColorConfig.white,
-            child: SizedBox(
-              width: 75,
-              height: 75,
-              child: Icon(
-                Icons.description_outlined,
-                color: ColorConfig.primarySwatch,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextFieldWidget(
-              controller: expenseDescription,
-              hintText: "Description",
-              maxLines: 3,
-              fillColor: ColorConfig.white,
-            ),
-          ),
-        ],
+      child: TextFieldWidget(
+        controller: expenseDescription,
+        hintText: "Description",
+        maxLines: 3,
+        fillColor: ColorConfig.white,
       ),
     );
   }
