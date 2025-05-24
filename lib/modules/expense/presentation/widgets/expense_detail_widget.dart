@@ -23,7 +23,30 @@ class UserInfoExpenseDetail extends ConsumerWidget {
 
     return creator.when(
       loading: () => const LoadingWidget(),
-      error: (error, stackTrace) => ErrorTextWidget(error),
+      error: (error, stackTrace) => ListTileWidget(
+        contentPadding: const EdgeInsets.fromLTRB(0, 2, 10, 2),
+        headerString: "Created By",
+        titleString: "Unknown User",
+        titleStringStyle: FontConfig.body1().copyWith(
+          color: ColorConfig.pureWhite,
+        ),
+        headerStringStyle: FontConfig.overline().copyWith(
+          color: ColorConfig.pureWhite.withAlpha((0.5 * 255).toInt()),
+        ),
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: ColorConfig.grey.withOpacity(0.5),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.person_outline,
+            color: ColorConfig.pureWhite,
+            size: 24,
+          ),
+        ),
+      ),
       data: (data) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -31,17 +54,40 @@ class UserInfoExpenseDetail extends ConsumerWidget {
             ListTileWidget(
               contentPadding: const EdgeInsets.fromLTRB(0, 2, 10, 2),
               headerString: "Created By",
-              titleString: data!.userName ?? data.email,
+              titleString: data?.userName ?? data?.email ?? "Unknown User",
               titleStringStyle: FontConfig.body1().copyWith(
                 color: ColorConfig.pureWhite,
               ),
               headerStringStyle: FontConfig.overline().copyWith(
-                color: ColorConfig.pureWhite..withAlpha((0.5 * 255).toInt()),
+                color: ColorConfig.pureWhite.withAlpha((0.5 * 255).toInt()),
               ),
-              leading: FriendWidget(
-                backgroundColor: ColorConfig.grey,
-                height: 40,
+              leading: Container(
                 width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: data == null
+                      ? ColorConfig.grey.withOpacity(0.5)
+                      : ColorConfig.primarySwatch.withOpacity(0.8),
+                  shape: BoxShape.circle,
+                ),
+                child: data?.profileImage == null
+                    ? Icon(
+                        Icons.person_outline,
+                        color: ColorConfig.pureWhite,
+                        size: 24,
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.network(
+                          data!.profileImage!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            Icons.person_outline,
+                            color: ColorConfig.pureWhite,
+                            size: 24,
+                          ),
+                        ),
+                      ),
               ),
               trailing: Icon(
                 Icons.info_outline,
@@ -85,38 +131,53 @@ class InfoExpenseDetail extends ConsumerWidget {
 
   const InfoExpenseDetail({super.key, required this.expenseModel});
 
-  infoCard(String title, String content, {IconData? icon}) {
+  Widget infoCard(String title, String content,
+      {required IconData icon, Color? iconColor}) {
     return Expanded(
-      child: SizedBox(
-        height: 90,
-        child: GreyCardWidget(
+      child: Container(
+        height: 100,
+        decoration: BoxDecoration(
+          color: ColorConfig.grey,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: ColorConfig.primarySwatch25,
+            width: 1,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: ColorConfig.primarySwatch,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: icon != null
-                        ? Icon(icon, color: ColorConfig.white, size: 14)
-                        : null,
-                  ),
-                ],
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color:
+                      (iconColor ?? ColorConfig.primarySwatch).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: iconColor ?? ColorConfig.primarySwatch,
+                  size: 20,
+                ),
               ),
               const Spacer(),
               Text(
                 title,
-                style: FontConfig.overline(),
+                style: FontConfig.overline().copyWith(
+                  color: ColorConfig.primarySwatch50,
+                ),
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 4),
               Text(
                 content,
-                style: FontConfig.body2(),
+                style: FontConfig.body1().copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: ColorConfig.midnight,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -125,25 +186,45 @@ class InfoExpenseDetail extends ConsumerWidget {
     );
   }
 
+  String _formatCurrency(num amount) {
+    return '\$${amount.toStringAsFixed(2)}';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // When adding a category section, first display the basic info cards
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           child: Row(
             children: [
-              infoCard("Cost", expenseModel.cost.toString()),
+              infoCard(
+                "Amount",
+                _formatCurrency(expenseModel.cost),
+                icon: Icons.account_balance_wallet,
+                iconColor: ColorConfig.secondary,
+              ),
               const SizedBox(width: 10),
-              infoCard("Date", expenseModel.createdAt!.toHumanReadableFormat()),
+              infoCard(
+                "Date",
+                expenseModel.createdAt!.toHumanReadableFormat(),
+                icon: Icons.calendar_today,
+                iconColor: ColorConfig.primarySwatch,
+              ),
               const SizedBox(width: 10),
-              infoCard("Split By", expenseModel.expenseUsers.length.toString()),
+              infoCard(
+                "Split By",
+                "1 person", // Temporarily hardcoded
+                icon: Icons.group,
+                iconColor: ColorConfig.error,
+              ),
             ],
           ),
         ),
-        if (expenseModel.categoryId != null)
+        if (expenseModel.categoryId != null) ...[
+          const SizedBox(height: 16),
           CategoryInfoCard(categoryId: expenseModel.categoryId!),
+        ],
       ],
     );
   }
@@ -170,34 +251,54 @@ class CategoryInfoCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // For now, since we don't have a proper provider to get category by ID
-    // Just show the category ID, in future could fetch the actual category
-    print('Category ID in detail view: $categoryId');
-
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: GreyCardWidget(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: ColorConfig.grey,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: ColorConfig.primarySwatch25,
+            width: 1,
+          ),
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Icon(
-                Icons.category,
-                color: ColorConfig.primarySwatch,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: ColorConfig.secondary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.category,
+                  color: ColorConfig.secondary,
+                  size: 20,
+                ),
               ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Category",
-                    style: FontConfig.overline(),
-                  ),
-                  Text(
-                    categoryId,
-                    style: FontConfig.body2(),
-                  ),
-                ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Category",
+                      style: FontConfig.overline().copyWith(
+                        color: ColorConfig.primarySwatch50,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      categoryId,
+                      style: FontConfig.body1().copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: ColorConfig.midnight,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -215,20 +316,48 @@ class MemberListExpenseDetail extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Handle empty members list
     if (members.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(16, 25, 16, 25),
-        child: Center(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Icon(Icons.people_outline, size: 48, color: ColorConfig.grey),
-              const SizedBox(height: 10),
-              Text(
-                "No members in this expense",
-                style: FontConfig.body1().copyWith(color: ColorConfig.grey),
-              ),
-            ],
+      return Container(
+        margin: const EdgeInsets.fromLTRB(16, 25, 16, 25),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: ColorConfig.grey,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: ColorConfig.primarySwatch25,
+            width: 1,
           ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: ColorConfig.primarySwatch.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.group_off_outlined,
+                size: 32,
+                color: ColorConfig.primarySwatch,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "No Members Yet",
+              style: FontConfig.h6().copyWith(
+                color: ColorConfig.midnight,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "This expense hasn't been split with anyone",
+              textAlign: TextAlign.center,
+              style: FontConfig.body2().copyWith(
+                color: ColorConfig.primarySwatch50,
+              ),
+            ),
+          ],
         ),
       );
     }
