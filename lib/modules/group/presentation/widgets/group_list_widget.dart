@@ -6,8 +6,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../domain/models/group_model.dart';
 import '../../../../core/router/router_names.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../core/constants/font_config.dart';
 import '../../../../shared/widgets/image/image_widget.dart';
-import '../../../../shared/widgets/list_tile/list_tile_card.dart';
+import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/long_press_menu/long_press_menu.dart';
 import '../../domain/di/group_controller_di.dart';
 
@@ -17,12 +19,44 @@ class GroupListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (groupModels.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.group_outlined,
+              size: 64,
+              color: ColorConfig.primarySwatch.withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "No groups yet",
+              style: FontConfig.h6().copyWith(
+                color: ColorConfig.primarySwatch.withOpacity(0.5),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Create a group to start tracking expenses",
+              style: FontConfig.body2().copyWith(
+                color: ColorConfig.primarySwatch.withOpacity(0.3),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: SlidableAutoCloseBehavior(
-        child: ListView(
-          children:
-              groupModels.map<Widget>((group) => GroupListCard(group)).toList(),
+        child: ListView.builder(
+          itemCount: groupModels.length,
+          itemBuilder: (context, index) {
+            final group = groupModels[index];
+            return GroupListCard(group);
+          },
         ),
       ),
     );
@@ -36,77 +70,49 @@ class GroupListCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final GlobalKey key = GlobalKey();
+
     deleteGroup() async {
       await ref.read(groupNotifierProvider.notifier).deleteGroup(groupModel);
       if (context.mounted) {
-        showSnackBar(context, content: "Group deleted successfully!!");
+        showSnackBar(context, content: "Group deleted successfully!");
       }
     }
 
-    //  List<CupertinoContextMenuAction> menuItems = [
-    //  CupertinoContextMenuAction(
-    //    onPressed: () => context.push(
-    //      RouteName.updateGroup,
-    //      extra: groupModel,
-    //    ),
-    //    child: const Text('Edit'),
-    //  ),
-    //  CupertinoContextMenuAction(
-    //    onPressed: deleteGroup,
-    //    child: const Text('Delete'),
-    //  ),
-    //  CupertinoContextMenuAction(
-    //    onPressed: () => showSnackBar(context, content: "Coming soon!!"),
-    //    child: const Text('Invite'),
-    //  ),
-    //];
-
     List<PopupMenuEntry> menuItems = [
       PopupMenuItem(
-        child: const Text('Edit'),
+        child: Row(
+          children: [
+            Icon(Icons.edit, color: ColorConfig.primarySwatch, size: 20),
+            const SizedBox(width: 12),
+            Text('Edit', style: FontConfig.body2()),
+          ],
+        ),
         onTap: () => context.push(
           RouteName.updateGroup,
           extra: groupModel,
         ),
       ),
       PopupMenuItem(
+        child: Row(
+          children: [
+            Icon(Icons.delete, color: ColorConfig.error, size: 20),
+            const SizedBox(width: 12),
+            Text('Delete', style: FontConfig.body2()),
+          ],
+        ),
         onTap: deleteGroup,
-        child: const Text('Delete'),
       ),
       PopupMenuItem(
-        onTap: () => showSnackBar(context, content: "Coming soon!!"),
-        child: const Text('Invite'),
+        child: Row(
+          children: [
+            Icon(Icons.share, color: ColorConfig.secondary, size: 20),
+            const SizedBox(width: 12),
+            Text('Invite', style: FontConfig.body2()),
+          ],
+        ),
+        onTap: () => showSnackBar(context, content: "Coming soon!"),
       ),
     ];
-
-    //dropdownButton(GroupModel groupModel) {
-    //  List<String> items = ["Edit", "Delete"];
-    //  return DropdownButton<String>(
-    //    icon: const Icon(Icons.more_vert_outlined),
-    //    items: items.map((String item) {
-    //      return DropdownMenuItem(
-    //        value: item,
-    //        child: Text(item),
-    //      );
-    //    }).toList(),
-    //    onChanged: (val) {
-    //      if (val == items[0]) {
-    //        //Edit dropdown action
-    //        context.push(
-    //          RouteName.updateGroup,
-    //          extra: groupModel,
-    //        );
-    //      } else {
-    //        //Delete dropdown action
-    //        showSnackBar(context, content: "Successfully deleted");
-    //        ref.read(groupNotifierProvider.notifier).deleteGroup(
-    //            context: context, ref: ref, groupModel: groupModel);
-    //      }
-    //    },
-    //    underline: Container(),
-    //    isDense: true,
-    //  );
-    //}
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -116,83 +122,127 @@ class GroupListCard extends ConsumerWidget {
           key: key,
           startActionPane: ActionPane(
             extentRatio: 0.5,
-            motion: const ScrollMotion(),
-            //dismissible: DismissiblePane(
-            //  onDismissed: () => context.push(
-            //    RouteName.updateExpense,
-            //    extra: {
-            //      "expenseModel": expenseModel,
-            //    },
-            //  ),
-            //),
+            motion: const BehindMotion(),
             children: [
-              SlidableAction(
+              CustomSlidableAction(
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  bottomLeft: Radius.circular(10),
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
                 ),
                 onPressed: (context) =>
-                    showSnackBar(context, content: "Coming soon!!"),
-                backgroundColor: const Color(0xFF21B7CA),
+                    showSnackBar(context, content: "Coming soon!"),
+                backgroundColor: ColorConfig.secondary.withOpacity(0.9),
                 foregroundColor: Colors.white,
-                icon: Icons.share,
-                label: 'Invite',
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.share),
+                    const SizedBox(height: 4),
+                    Text('Invite', style: FontConfig.caption()),
+                  ],
+                ),
               ),
-              SlidableAction(
+              CustomSlidableAction(
                 onPressed: (context) => context.push(
                   RouteName.updateGroup,
                   extra: groupModel,
                 ),
-                backgroundColor: const Color(0xFF0392CF),
+                backgroundColor: ColorConfig.primarySwatch.withOpacity(0.9),
                 foregroundColor: Colors.white,
-                icon: Icons.edit,
-                label: 'Edit',
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.edit),
+                    const SizedBox(height: 4),
+                    Text('Edit', style: FontConfig.caption()),
+                  ],
+                ),
               ),
             ],
           ),
           endActionPane: ActionPane(
             extentRatio: 0.25,
-            motion: const ScrollMotion(),
-            dismissible: DismissiblePane(
-              onDismissed: deleteGroup,
-              //confirmDismiss: () async {
-              //  return await showDialog(
-              //    context: context,
-              //    builder: (context) {
-              //      return AlertDialog(
-              //        title: Text("Are you sure?"),
-              //        actions: [],
-              //      );
-              //    },
-              //  );
-              //},
-            ),
+            motion: const BehindMotion(),
+            dismissible: DismissiblePane(onDismissed: deleteGroup),
             children: [
-              SlidableAction(
+              CustomSlidableAction(
                 borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
+                  topRight: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
                 ),
                 onPressed: (context) => deleteGroup(),
-                backgroundColor: const Color(0xFFFE4A49),
+                backgroundColor: ColorConfig.error.withOpacity(0.9),
                 foregroundColor: Colors.white,
-                icon: Icons.delete,
-                label: 'Delete',
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.delete),
+                    const SizedBox(height: 4),
+                    Text('Delete', style: FontConfig.caption()),
+                  ],
+                ),
               ),
             ],
           ),
-          child: ListTileCard(
+          child: CardWidget(
             onTap: () => context.push(
               RouteName.groupDetail(groupModel.id),
             ),
-            titleString: groupModel.title,
-            subtitleString:
-                "Member: ${groupModel.groupUsers.length.toString()}",
-            leading: ImageWidget(
-              imageUrl: groupModel.image,
-              borderRadius: 10,
-              width: 50,
-              height: 50,
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: ColorConfig.primarySwatch25,
+                      width: 2,
+                    ),
+                  ),
+                  child: ImageWidget(
+                    imageUrl: groupModel.image,
+                    borderRadius: 8,
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        groupModel.title,
+                        style: FontConfig.body1().copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.group_outlined,
+                            size: 16,
+                            color: ColorConfig.primarySwatch50,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "${groupModel.groupUsers.length} Members",
+                            style: FontConfig.caption().copyWith(
+                              color: ColorConfig.primarySwatch50,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: ColorConfig.primarySwatch50,
+                  size: 16,
+                ),
+              ],
             ),
           ),
         ),
