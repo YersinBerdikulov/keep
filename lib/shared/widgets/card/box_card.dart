@@ -11,6 +11,7 @@ import '../../../core/router/router_names.dart';
 import '../image/image_widget.dart';
 import '../long_press_menu/long_press_menu.dart';
 import 'card.dart';
+import '../../../core/constants/color_config.dart';
 
 class BoxCardWidget extends ConsumerWidget {
   final BoxModel boxModel;
@@ -95,77 +96,168 @@ class BoxCardWidget extends ConsumerWidget {
       ),
       items: menuItems,
       child: CardWidget(
-        margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-        child: SizedBox(
-          width: 150,
-          height: 150,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  ImageWidget(imageUrl: boxModel.image),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: Text(
-                      boxModel.title,
-                      style: FontConfig.body1(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  //_popupButton(box)
-                ],
-              ),
-              const Spacer(flex: 3),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          "Total bill",
-                          style: FontConfig.caption(),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '\$${boxModel.total}',
-                          style: FontConfig.body2()
-                              .copyWith(fontWeight: FontWeight.w600),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Members",
-                          style: FontConfig.caption(),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          boxModel.boxUsers.length.toString(),
-                          style: FontConfig.body2()
-                              .copyWith(fontWeight: FontWeight.w600),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    )
-                  ],
+        margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        padding: EdgeInsets.zero,
+        backColor: ColorConfig.white,
+        borderColor: ColorConfig.primarySwatch.withOpacity(0.1),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with image and title
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: ColorConfig.primarySwatch.withOpacity(0.05),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
                 ),
               ),
-              const Spacer(),
-            ],
-          ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: ColorConfig.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ColorConfig.primarySwatch.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: ImageWidget(imageUrl: boxModel.image),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          boxModel.title,
+                          style: FontConfig.body1().copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: ColorConfig.midnight,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${boxModel.boxUsers.length} members',
+                          style: FontConfig.caption().copyWith(
+                            color: ColorConfig.primarySwatch50,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Stats section
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  // Total bill
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: ColorConfig.secondary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                Icons.account_balance_wallet,
+                                size: 14,
+                                color: ColorConfig.secondary,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Total Bill",
+                              style: FontConfig.caption().copyWith(
+                                color: ColorConfig.primarySwatch50,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '\$${boxModel.total.toStringAsFixed(2)}',
+                          style: FontConfig.h6().copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: ColorConfig.midnight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Divider
+                  Container(
+                    width: 1,
+                    height: 40,
+                    color: ColorConfig.primarySwatch.withOpacity(0.1),
+                  ),
+                  // Expenses count
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color(0xFF845EC2).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Icon(
+                                  Icons.receipt_long,
+                                  size: 14,
+                                  color: Color(0xFF845EC2),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Expenses",
+                                style: FontConfig.caption().copyWith(
+                                  color: ColorConfig.primarySwatch50,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${boxModel.expenseIds.length}',
+                            style: FontConfig.h6().copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: ColorConfig.midnight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

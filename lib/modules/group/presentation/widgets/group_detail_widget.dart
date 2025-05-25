@@ -22,17 +22,57 @@ class GroupDetailTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(bottom: 20),
-      alignment: Alignment.bottomLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.transparent,
+            Colors.black.withOpacity(0.6),
+          ],
+        ),
+      ),
       child: Row(
         children: [
-          Text(
-            groupName,
-            style: FontConfig.h6().copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Group',
+                  style: FontConfig.body2().copyWith(
+                    color: ColorConfig.white.withOpacity(0.8),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  groupName,
+                  style: FontConfig.h4().copyWith(
+                    color: ColorConfig.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          )
+          ),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: ColorConfig.secondary.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: ColorConfig.white.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              Icons.people_alt_outlined,
+              color: ColorConfig.white,
+              size: 24,
+            ),
+          ),
         ],
       ),
     );
@@ -71,26 +111,56 @@ class GroupDetailInfo extends StatelessWidget {
   final GroupModel groupModel;
   const GroupDetailInfo({super.key, required this.groupModel});
 
-  groupInfoCard(String title, String subtitle, IconData icon) {
+  Widget groupInfoCard(String title, String value, IconData icon, Color color) {
     return Expanded(
-      child: SizedBox(
+      child: Container(
         height: 100,
-        child: CardWidget(
-          margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+        margin: const EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+          color: ColorConfig.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: ColorConfig.primarySwatch25,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: ColorConfig.primarySwatch.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Group Icon
-              Icon(icon),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 20,
+                ),
+              ),
               const Spacer(),
               Text(
                 title,
-                style: FontConfig.caption(),
+                style: FontConfig.caption().copyWith(
+                  color: ColorConfig.primarySwatch50,
+                ),
               ),
+              const SizedBox(height: 4),
               Text(
-                subtitle,
-                style: FontConfig.body2().copyWith(
-                  fontWeight: FontWeight.w700,
+                value,
+                style: FontConfig.body1().copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: ColorConfig.midnight,
                 ),
               ),
             ],
@@ -108,18 +178,21 @@ class GroupDetailInfo extends StatelessWidget {
         children: [
           groupInfoCard(
             "Total Balance",
-            "\$${groupModel.totalBalance}",
-            Icons.monetization_on_rounded,
+            "\$${groupModel.totalBalance.toStringAsFixed(2)}",
+            Icons.account_balance_wallet,
+            ColorConfig.secondary,
           ),
           groupInfoCard(
             "Boxes",
-            groupModel.boxIds.length.toString(),
-            Icons.group,
+            "${groupModel.boxIds.length} boxes",
+            Icons.inbox_rounded,
+            const Color(0xFF845EC2),
           ),
           groupInfoCard(
             "Members",
-            groupModel.groupUsers.length.toString(),
-            Icons.account_box,
+            "${groupModel.groupUsers.length} people",
+            Icons.group_outlined,
+            const Color(0xFF00B8A9),
           ),
         ],
       ),
@@ -131,41 +204,62 @@ class GroupDetailFriendList extends ConsumerWidget {
   final List<String> userIds;
   const GroupDetailFriendList({super.key, required this.userIds});
 
-  friendCard(UserModel user) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+  Widget friendCard(UserModel user) {
+    return Container(
+      margin: const EdgeInsets.only(right: 16),
       child: Column(
         children: [
-          FriendWidget(image: user.profileImage),
-          const SizedBox(height: 5),
-          Row(
-            children: [
-              Text(
-                user.userName ?? user.email,
-                style: FontConfig.caption(),
-              )
-            ],
-          )
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                color: ColorConfig.primarySwatch25,
+                width: 2,
+              ),
+            ),
+            child: FriendWidget(
+              image: user.profileImage,
+              width: 50,
+              height: 50,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            user.userName ?? user.email,
+            style: FontConfig.caption().copyWith(
+              color: ColorConfig.midnight,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  addFriendCard() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+  Widget addFriendCard() {
+    return Container(
+      margin: const EdgeInsets.only(right: 16),
       child: Column(
         children: [
-          FriendWidget.add(),
-          const SizedBox(height: 5),
-          Row(
-            children: [
-              Text(
-                "Add",
-                style: FontConfig.caption(),
-              )
-            ],
-          )
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                color: ColorConfig.secondary.withOpacity(0.3),
+                width: 2,
+                style: BorderStyle.solid,
+              ),
+            ),
+            child: FriendWidget.add(),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Invite",
+            style: FontConfig.caption().copyWith(
+              color: ColorConfig.secondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -182,28 +276,91 @@ class GroupDetailFriendList extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(26, 16, 0, 10),
-            child: Text(
-              'Friends',
-              style: FontConfig.body1(),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Members',
+                  style: FontConfig.body1(),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorConfig.secondary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    "View All",
+                    style: FontConfig.caption().copyWith(
+                      color: ColorConfig.secondary,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          SizedBox(
-            height: 110,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              children: [
-                const SizedBox(width: 11),
-                ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) => friendCard(data[index]),
-                  scrollDirection: Axis.horizontal,
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                ),
-                addFriendCard(),
-              ],
+          if (data.isEmpty)
+            _buildEmptyMembers()
+          else
+            SizedBox(
+              height: 90,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                scrollDirection: Axis.horizontal,
+                children: [
+                  ...data.map((user) => friendCard(user)).toList(),
+                  addFriendCard(),
+                ],
+              ),
+            ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyMembers() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: ColorConfig.grey,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: ColorConfig.primarySwatch25,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: ColorConfig.primarySwatch.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.group_off_outlined,
+              size: 32,
+              color: ColorConfig.primarySwatch,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "No Members Yet",
+            style: FontConfig.h6().copyWith(
+              color: ColorConfig.midnight,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Invite your friends to join this group",
+            textAlign: TextAlign.center,
+            style: FontConfig.body2().copyWith(
+              color: ColorConfig.primarySwatch50,
             ),
           ),
         ],
@@ -217,36 +374,49 @@ class GroupDetailBoxGrid extends ConsumerWidget {
   const GroupDetailBoxGrid({super.key, required this.groupModel});
 
   Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: ColorConfig.grey,
-          borderRadius: BorderRadius.circular(15),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: ColorConfig.grey,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: ColorConfig.primarySwatch25,
+          width: 1,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.add_box_outlined,
-              size: 48,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: ColorConfig.primarySwatch.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.inbox_outlined,
+              size: 32,
               color: ColorConfig.primarySwatch,
             ),
-            const SizedBox(height: 16),
-            Text(
-              'No Boxes Yet',
-              style: FontConfig.body1(),
-              textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No Boxes Yet',
+            style: FontConfig.h6().copyWith(
+              color: ColorConfig.midnight,
+              fontWeight: FontWeight.w600,
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Create your first box to start tracking expenses',
-              style: FontConfig.body2().copyWith(color: ColorConfig.secondary),
-              textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Create your first box to start tracking expenses',
+            textAlign: TextAlign.center,
+            style: FontConfig.body2().copyWith(
+              color: ColorConfig.primarySwatch50,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -269,10 +439,29 @@ class GroupDetailBoxGrid extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(26, 0, 0, 10),
-            child: Text(
-              'Boxes',
-              style: FontConfig.body1(),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Boxes',
+                  style: FontConfig.body1(),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorConfig.secondary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    "View All",
+                    style: FontConfig.caption().copyWith(
+                      color: ColorConfig.secondary,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           if (data.isEmpty)
@@ -284,9 +473,9 @@ class GroupDetailBoxGrid extends ConsumerWidget {
                 padding: EdgeInsets.zero,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1.3,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.95,
                 ),
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

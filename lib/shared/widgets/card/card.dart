@@ -37,6 +37,9 @@ class CardWidget extends StatelessWidget {
   final Color? borderColor;
   final Color? backColor;
   final void Function()? onTap;
+  final double? elevation;
+  final BorderRadius? borderRadius;
+
   const CardWidget({
     super.key,
     required this.child,
@@ -45,23 +48,38 @@ class CardWidget extends StatelessWidget {
     this.backColor,
     this.onTap,
     this.margin = EdgeInsets.zero,
+    this.elevation,
+    this.borderRadius,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Card(
+      child: Container(
         margin: margin,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: BorderSide(
+        decoration: BoxDecoration(
+          color: backColor ?? ColorConfig.grey,
+          borderRadius: borderRadius ?? BorderRadius.circular(10),
+          border: Border.all(
             width: 1,
             color: borderColor ?? Colors.transparent,
           ),
+          boxShadow: [
+            if (elevation != null)
+              BoxShadow(
+                color: ColorConfig.primarySwatch.withOpacity(0.08),
+                blurRadius: elevation!,
+                offset: Offset(0, elevation! * 0.5),
+              )
+            else
+              BoxShadow(
+                color: ColorConfig.primarySwatch.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+          ],
         ),
-        elevation: 0,
-        color: backColor ?? ColorConfig.grey,
         child: Padding(
           padding: padding ?? const EdgeInsets.all(10),
           child: child,
