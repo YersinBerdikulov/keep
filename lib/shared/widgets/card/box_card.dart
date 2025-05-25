@@ -105,7 +105,7 @@ class BoxCardWidget extends ConsumerWidget {
           children: [
             // Header with image and title
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: ColorConfig.primarySwatch.withOpacity(0.05),
                 borderRadius: const BorderRadius.only(
@@ -116,11 +116,11 @@ class BoxCardWidget extends ConsumerWidget {
               child: Row(
                 children: [
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
                       color: ColorConfig.white,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                       boxShadow: [
                         BoxShadow(
                           color: ColorConfig.primarySwatch.withOpacity(0.1),
@@ -130,25 +130,24 @@ class BoxCardWidget extends ConsumerWidget {
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                       child: ImageWidget(imageUrl: boxModel.image),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           boxModel.title,
-                          style: FontConfig.body1().copyWith(
+                          style: FontConfig.body2().copyWith(
                             fontWeight: FontWeight.w600,
                             color: ColorConfig.midnight,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 2),
                         Text(
                           '${boxModel.boxUsers.length} members',
                           style: FontConfig.caption().copyWith(
@@ -163,7 +162,7 @@ class BoxCardWidget extends ConsumerWidget {
             ),
             // Stats section
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               child: Row(
                 children: [
                   // Total bill
@@ -174,33 +173,39 @@ class BoxCardWidget extends ConsumerWidget {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(6),
+                              padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 color: ColorConfig.secondary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(4),
                               ),
                               child: Icon(
                                 Icons.account_balance_wallet,
-                                size: 14,
+                                size: 12,
                                 color: ColorConfig.secondary,
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Total Bill",
-                              style: FontConfig.caption().copyWith(
-                                color: ColorConfig.primarySwatch50,
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                "Total Bill",
+                                style: FontConfig.caption().copyWith(
+                                  color: ColorConfig.primarySwatch50,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         Text(
                           '\$${boxModel.total.toStringAsFixed(2)}',
-                          style: FontConfig.h6().copyWith(
+                          style: FontConfig.body2().copyWith(
                             fontWeight: FontWeight.w600,
                             color: ColorConfig.midnight,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -208,50 +213,53 @@ class BoxCardWidget extends ConsumerWidget {
                   // Divider
                   Container(
                     width: 1,
-                    height: 40,
+                    height: 30,
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
                     color: ColorConfig.primarySwatch.withOpacity(0.1),
                   ),
                   // Expenses count
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color(0xFF845EC2).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: const Icon(
-                                  Icons.receipt_long,
-                                  size: 14,
-                                  color: Color(0xFF845EC2),
-                                ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF845EC2).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
                               ),
-                              const SizedBox(width: 8),
-                              Text(
+                              child: const Icon(
+                                Icons.receipt_long,
+                                size: 12,
+                                color: Color(0xFF845EC2),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
                                 "Expenses",
                                 style: FontConfig.caption().copyWith(
                                   color: ColorConfig.primarySwatch50,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${boxModel.expenseIds.length}',
-                            style: FontConfig.h6().copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: ColorConfig.midnight,
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${boxModel.expenseIds.length}',
+                          style: FontConfig.body2().copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: ColorConfig.midnight,
                           ),
-                        ],
-                      ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                   ),
                 ],

@@ -468,14 +468,14 @@ class GroupDetailBoxGrid extends ConsumerWidget {
             _buildEmptyState()
           else
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: GridView.builder(
                 padding: EdgeInsets.zero,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.95,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 0.8,
                 ),
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
