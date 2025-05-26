@@ -388,6 +388,8 @@ class GroupCardWidget extends ConsumerWidget {
                   error: (_, __) => _buildBoxCount("Error"),
                   data: (boxes) => _buildBoxCount("${boxes.length}"),
                 ),
+                const SizedBox(height: 8),
+                _buildMemberCount(group.groupUsers.length),
                 const SizedBox(height: 12),
                 _buildMemberStack(groupMember),
               ],
@@ -425,6 +427,47 @@ class GroupCardWidget extends ConsumerWidget {
         Expanded(
           child: Text(
             count,
+            style: FontConfig.body2().copyWith(
+              fontWeight: FontWeight.w600,
+              color: ColorConfig.midnight,
+              fontSize: 11,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMemberCount(int count) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            color: const Color(0xFF00B8A9).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: const Icon(
+            Icons.group_outlined,
+            size: 10,
+            color: Color(0xFF00B8A9),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          "Members",
+          style: FontConfig.caption().copyWith(
+            color: ColorConfig.primarySwatch50,
+            fontSize: 10,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            "$count",
             style: FontConfig.body2().copyWith(
               fontWeight: FontWeight.w600,
               color: ColorConfig.midnight,

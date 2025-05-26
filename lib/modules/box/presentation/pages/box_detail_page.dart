@@ -105,7 +105,6 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            FriendListBoxDetail(_boxModel!),
             const CategoryListBoxDetail(),
             ExpenseListBoxDetail(
               boxModel: _boxModel!,
