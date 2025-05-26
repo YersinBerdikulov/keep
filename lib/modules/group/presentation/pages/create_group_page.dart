@@ -6,6 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../../core/constants/color_config.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../../../shared/widgets/appbar/appbar.dart';
 import '../../domain/di/group_controller_di.dart';
@@ -43,33 +44,52 @@ class CreateGroupPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBarWidget(title: "Create Group"),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              children: [
-                CreateGroupInfoCard(
-                  image: image,
-                  groupTitle: groupTitle,
-                  groupDescription: groupDescription,
-                  formKey: _formKey,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    CreateGroupInfoCard(
+                      image: image,
+                      groupTitle: groupTitle,
+                      groupDescription: groupDescription,
+                      formKey: _formKey,
+                    ),
+                    CreateGroupAddFriend(
+                      selectedFriends: selectedFriends,
+                    ),
+                    // Add bottom padding to ensure content isn't hidden behind the button
+                    const SizedBox(height: 100),
+                  ],
                 ),
-                CreateGroupAddFriend(
-                  selectedFriends: selectedFriends,
-                ),
-              ],
+              ),
             ),
-          ),
-          CreateGroupButton(
-            formKey: _formKey,
-            image: image,
-            groupTitle: groupTitle,
-            groupDescription: groupDescription,
-            selectedFriends: selectedFriends,
-          ),
-        ],
+            // Fixed position button at the bottom
+            Container(
+              decoration: BoxDecoration(
+                color: ColorConfig.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: ColorConfig.primarySwatch.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: CreateGroupButton(
+                formKey: _formKey,
+                image: image,
+                groupTitle: groupTitle,
+                groupDescription: groupDescription,
+                selectedFriends: selectedFriends,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
