@@ -69,6 +69,10 @@ class GroupListCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (groupModel.id == null) {
+      return const SizedBox.shrink();
+    }
+
     final GlobalKey key = GlobalKey();
 
     deleteGroup() async {
@@ -186,7 +190,7 @@ class GroupListCard extends ConsumerWidget {
           ),
           child: CardWidget(
             onTap: () => context.push(
-              RouteName.groupDetail(groupModel.id),
+              RouteName.groupDetail(groupModel.id!),
             ),
             padding: const EdgeInsets.all(12),
             child: Row(

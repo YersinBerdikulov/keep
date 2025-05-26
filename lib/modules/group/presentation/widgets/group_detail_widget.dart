@@ -107,7 +107,7 @@ class GroupDetailReviewBody extends StatelessWidget {
   }
 }
 
-class GroupDetailInfo extends StatelessWidget {
+class GroupDetailInfo extends ConsumerWidget {
   final GroupModel groupModel;
   const GroupDetailInfo({super.key, required this.groupModel});
 
@@ -171,7 +171,10 @@ class GroupDetailInfo extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the box provider to get the actual number of boxes
+    final boxesInGroup = ref.watch(boxNotifierProvider(groupModel.id!));
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(11, 0, 11, 16),
       child: Row(
@@ -182,11 +185,25 @@ class GroupDetailInfo extends StatelessWidget {
             Icons.account_balance_wallet,
             ColorConfig.secondary,
           ),
-          groupInfoCard(
-            "Boxes",
-            "${groupModel.boxIds.length} boxes",
-            Icons.inbox_rounded,
-            const Color(0xFF845EC2),
+          boxesInGroup.when(
+            loading: () => groupInfoCard(
+              "Boxes",
+              "Loading...",
+              Icons.inbox_rounded,
+              const Color(0xFF845EC2),
+            ),
+            error: (_, __) => groupInfoCard(
+              "Boxes",
+              "Error",
+              Icons.inbox_rounded,
+              const Color(0xFF845EC2),
+            ),
+            data: (boxes) => groupInfoCard(
+              "Boxes",
+              "${boxes.length} boxes",
+              Icons.inbox_rounded,
+              const Color(0xFF845EC2),
+            ),
           ),
           groupInfoCard(
             "Members",

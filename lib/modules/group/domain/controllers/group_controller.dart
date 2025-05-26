@@ -88,7 +88,8 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final Map<String, dynamic> updateData = {'\$id': groupModel.id!};
+        // Start with the complete existing group data
+      Map<String, dynamic> updateData = groupModel.toJson();
 
       if (image != null && image.value != null) {
         final imageUploadRes =
@@ -108,10 +109,23 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
       if (boxIds != null) {
         updateData['boxIds'] = boxIds;
       }
-      final updateGroup = GroupModel.fromJson(updateData);
 
+      final updateGroup = GroupModel.fromJson(updateData);
       await _groupRepository.updateGroup(updateGroup);
-      state = AsyncValue.data([...state.value ?? [], updateGroup]);
+
+      // Fetch the latest group data to ensure we have the most up-to-date state
+      final updatedGroup = await getGroupDetail(groupModel.id!);
+
+      // Update the state by replacing the old group with the updated one
+      final currentGroups = state.value ?? [];
+      final updatedGroups = currentGroups.map((group) {
+        if (group.id == groupModel.id) {
+          return updatedGroup;
+        }
+        return group;
+      }).toList();
+
+      state = AsyncValue.data(updatedGroups);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

@@ -11,6 +11,8 @@ final groupNotifierProvider =
 // Provider for getting group details
 final groupDetailProvider =
     FutureProvider.family<GroupModel, String>((ref, groupId) async {
+  // Watch the group notifier to refresh when groups are updated
+  ref.watch(groupNotifierProvider);
   return ref.watch(groupNotifierProvider.notifier).getGroupDetail(groupId);
 });
 

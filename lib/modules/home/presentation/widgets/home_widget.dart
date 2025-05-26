@@ -4,6 +4,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
+import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
@@ -276,17 +278,20 @@ class HomeRecentGroup extends StatelessWidget {
                 "Groups",
                 style: FontConfig.h6(),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: ColorConfig.secondary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  "View All",
-                  style: FontConfig.caption().copyWith(
-                    color: ColorConfig.secondary,
+              InkWell(
+                onTap: () => context.push(RouteName.groupList),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorConfig.secondary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    "View All",
+                    style: FontConfig.caption().copyWith(
+                      color: ColorConfig.secondary,
+                    ),
                   ),
                 ),
               ),
@@ -301,8 +306,12 @@ class HomeRecentGroup extends StatelessWidget {
             children: [
               const SizedBox(width: 16),
               Row(
-                children:
-                    groups.map((group) => GroupCardWidget(group)).toList(),
+                children: groups.map((group) {
+                  if (group.id != null) {
+                    return GroupCardWidget(group);
+                  }
+                  return const SizedBox.shrink();
+                }).toList(),
               ),
               moreCircle(),
             ],
@@ -317,152 +326,26 @@ class GroupCardWidget extends ConsumerWidget {
   final GroupModel group;
   const GroupCardWidget(this.group, {super.key});
 
-  Widget _buildBoxCount() {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: ColorConfig.primarySwatch.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.inbox_rounded,
-                color: ColorConfig.primarySwatch,
-                size: 14,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "${group.boxIds.length} Boxes",
-                style: FontConfig.caption().copyWith(
-                  color: ColorConfig.primarySwatch,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMemberStack(AsyncValue<List<UserModel>> groupMember) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Members",
-          style: FontConfig.overline().copyWith(
-            color: ColorConfig.primarySwatch50,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Row(
-          children: [
-            Expanded(
-              child: groupMember.when(
-                loading: () => _buildMemberAvatars(
-                  group.groupUsers.asMap().entries.map((val) {
-                    int index = group.groupUsers.length - val.key - 1;
-                    return _buildAvatar(
-                      color: Colors.grey[(800 - (index * 100))],
-                      left: index == 0 ? null : index * 16.0,
-                    );
-                  }).toList(),
-                ),
-                error: (error, stackTrace) => ErrorTextWidget(error),
-                data: (data) => _buildMemberAvatars(
-                  data.asMap().entries.map((val) {
-                    int index = data.length - val.key - 1;
-                    return _buildAvatar(
-                      url: val.value.profileImage,
-                      left: index == 0 ? null : index * 16.0,
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: ColorConfig.primarySwatch.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.share,
-                color: ColorConfig.primarySwatch,
-                size: 14,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMemberAvatars(Iterable<Widget> avatars) {
-    return Stack(children: avatars.toList());
-  }
-
-  Widget _buildAvatar({Color? color, double? left, String? url}) {
-    return Positioned(
-      left: left,
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: ColorConfig.white,
-            width: 2,
-          ),
-        ),
-        child: ImageWidget(
-          color: color ?? Colors.black54.withAlpha((0.3 * 255).toInt()),
-          width: 28,
-          height: 28,
-          imageUrl: url,
-          borderEnable: true,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupMember = ref.watch(groupMembersProvider(group.groupUsers));
+    final boxesInGroup = ref.watch(boxNotifierProvider(group.id!));
+
+    // Don't render the card if the group ID is null
+    if (group.id == null) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
-      width: 250,
+      width: 150,
       margin: const EdgeInsets.only(right: 10),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            ColorConfig.primarySwatch25.withOpacity(0.5),
-            ColorConfig.primarySwatch25.withOpacity(0.3),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: ColorConfig.primarySwatch25.withOpacity(0.5),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: ColorConfig.primarySwatch.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
+      child: CardWidget(
+        margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        padding: EdgeInsets.zero,
+        backColor: ColorConfig.white,
+        borderColor: ColorConfig.primarySwatch.withOpacity(0.1),
         child: InkWell(
-          onTap: () => context.push(RouteName.groupDetail(group.id)),
+          onTap: () => context.push(RouteName.groupDetail(group.id!)),
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -500,12 +383,105 @@ class GroupCardWidget extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                _buildBoxCount(),
+                boxesInGroup.when(
+                  loading: () => _buildBoxCount("Loading..."),
+                  error: (_, __) => _buildBoxCount("Error"),
+                  data: (boxes) => _buildBoxCount("${boxes.length}"),
+                ),
                 const SizedBox(height: 12),
                 _buildMemberStack(groupMember),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBoxCount(String count) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            color: const Color(0xFF845EC2).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: const Icon(
+            Icons.inbox_rounded,
+            size: 10,
+            color: Color(0xFF845EC2),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          "Boxes",
+          style: FontConfig.caption().copyWith(
+            color: ColorConfig.primarySwatch50,
+            fontSize: 10,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            count,
+            style: FontConfig.body2().copyWith(
+              fontWeight: FontWeight.w600,
+              color: ColorConfig.midnight,
+              fontSize: 11,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMemberStack(AsyncValue<List<UserModel>> groupMember) {
+    return groupMember.when(
+      loading: () => const SizedBox(height: 28),
+      error: (_, __) => const SizedBox(height: 28),
+      data: (members) {
+        final memberAvatars = members.asMap().entries.map((entry) {
+          final index = entry.key;
+          final member = entry.value;
+          return _buildAvatar(
+            left: index * 20.0,
+            url: member.profileImage,
+          );
+        });
+
+        return SizedBox(
+          height: 28,
+          child: _buildMemberAvatars(memberAvatars),
+        );
+      },
+    );
+  }
+
+  Widget _buildMemberAvatars(Iterable<Widget> avatars) {
+    return Stack(children: avatars.toList());
+  }
+
+  Widget _buildAvatar({Color? color, double? left, String? url}) {
+    return Positioned(
+      left: left,
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: ColorConfig.white,
+            width: 2,
+          ),
+        ),
+        child: ImageWidget(
+          color: color ?? Colors.black54.withAlpha((0.3 * 255).toInt()),
+          width: 28,
+          height: 28,
+          imageUrl: url,
+          borderEnable: true,
         ),
       ),
     );
