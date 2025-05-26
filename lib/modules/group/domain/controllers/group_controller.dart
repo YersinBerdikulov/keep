@@ -16,12 +16,16 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
   late final GroupRepository _groupRepository;
   late final StorageService _storageService;
   late final DeleteAllBoxesUseCase _deleteAllBoxesUseCase;
+  bool _isInitialized = false;
 
   @override
   Future<List<GroupModel>> build() async {
-    _groupRepository = ref.watch(groupRepositoryProvider);
-    _storageService = ref.watch(storageProvider);
-    _deleteAllBoxesUseCase = ref.watch(deleteAllBoxesUseCaseProvider);
+    if (!_isInitialized) {
+      _groupRepository = ref.read(groupRepositoryProvider);
+      _storageService = ref.read(storageProvider);
+      _deleteAllBoxesUseCase = ref.read(deleteAllBoxesUseCaseProvider);
+      _isInitialized = true;
+    }
     return _fetchGroups();
   }
 
