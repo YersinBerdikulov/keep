@@ -45,58 +45,22 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       // Debug prints
       print('Adding expense with categoryId: $categoryId');
 
-      final splitUsers = ref.read(splitUserProvider);
-      num convertedCost = num.parse(expenseCost.text.replaceAll(',', ''));
-      String expenseId = ID.custom(const Uuid().v4().substring(0, 32));
-      List<String> expenseUserIds = [];
+      final expenseId = ID.custom(const Uuid().v4().substring(0, 32));
+      final convertedCost = num.parse(expenseCost.text.replaceAll(',', ''));
 
-      for (var uid in splitUsers) {
-        String expenseUserId = ID.custom(const Uuid().v4().substring(0, 32));
-        expenseUserIds.add(expenseUserId);
-        ExpenseUserModel expenseUser = ExpenseUserModel(
-          userId: uid,
-          groupId: groupModel.id!,
-          boxId: boxModel.id!,
-          expenseId: expenseId,
-          cost: convertedCost / splitUsers.length,
-        );
-        await addExpenseUser(expenseUser, customId: expenseUserId);
-      }
-
-      // Create a map for the data to be saved
-      Map<String, dynamic> expenseData = {
-        'title': expenseTitle.text,
-        'description': expenseDescription.text,
-        'boxId': boxModel.id!,
-        'groupId': groupModel.id!,
-        'creatorId': currentUser!.id!,
-        'payerId': payerUserId ?? currentUser.id!,
-        'cost': convertedCost,
-        'equal': true,
-        'expenseUsers': expenseUserIds,
-      };
-
-      // Only add categoryId if it's not null
-      if (categoryId != null) {
-        expenseData['categoryId'] = categoryId;
-        print('Added categoryId to expense data: $categoryId');
-      }
-
-      // Create the main ExpenseModel
       ExpenseModel expenseModel = ExpenseModel(
+        id: expenseId,
         title: expenseTitle.text,
-        description: expenseDescription.text,
-        categoryId: categoryId, // This might be null
-        boxId: boxModel.id!,
-        groupId: groupModel.id!,
-        creatorId: currentUser.id!,
-        payerId: payerUserId ?? currentUser.id!,
+        description:
+            expenseDescription.text.isNotEmpty ? expenseDescription.text : null,
         cost: convertedCost,
-        expenseUsers: expenseUserIds,
+        creatorId: currentUser!.id,
+        payerId: payerUserId ?? currentUser.id,
+        categoryId: categoryId,
+        groupId: groupModel.id!,
+        boxId: boxModel.id!,
+        expenseUsers: [],
       );
-
-      print('ExpenseModel created with categoryId: ${expenseModel.categoryId}');
-      print('ExpenseModel JSON: ${expenseModel.toJson()}');
 
       final res = await _expenseRepository.addExpense(expenseModel,
           customId: expenseId);

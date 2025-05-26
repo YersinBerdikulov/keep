@@ -139,8 +139,19 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
       res.fold(
         (l) => state = AsyncValue.error(l.message, l.stackTrace),
         (r) async {
-          final updatedBoxes = await getBoxesInGroup(arg);
-          state = AsyncValue.data(updatedBoxes);
+          // Fetch the updated box details
+          final updatedBox = await boxRepository.getBoxDetail(boxId);
+          if (updatedBox != null) {
+            // Update the box in the state
+            final currentBoxes = state.value ?? [];
+            final updatedBoxes = currentBoxes.map((box) {
+              if (box.id == boxId) {
+                return BoxModel.fromJson(updatedBox.data);
+              }
+              return box;
+            }).toList();
+            state = AsyncValue.data(updatedBoxes);
+          }
         },
       );
     } catch (e, st) {

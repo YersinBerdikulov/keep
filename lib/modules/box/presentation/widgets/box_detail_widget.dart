@@ -389,7 +389,6 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
   List<ExpenseModel>? _expenses;
   bool _isLoading = true;
   String? _error;
-  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -397,9 +396,15 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
     _fetchExpenses();
   }
 
+  @override
+  void dispose() {
+    // Cancel any pending operations
+    _isLoading = false;
+    super.dispose();
+  }
+
   Future<void> _fetchExpenses() async {
-    // Only load expenses once
-    if (_isInitialized) return;
+    if (!mounted) return;
 
     setState(() {
       _isLoading = true;
@@ -407,26 +412,29 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
     });
 
     try {
-      // Direct access to expense controller to bypass providers
       final expenseController = ref.read(expenseNotifierProvider.notifier);
 
       if (widget.boxModel.id != null) {
         final expenses =
             await expenseController.getExpensesInBox(widget.boxModel.id!);
 
+        if (!mounted) return;
+
         setState(() {
           _expenses = expenses;
           _isLoading = false;
-          _isInitialized = true;
         });
       } else {
+        if (!mounted) return;
+
         setState(() {
           _expenses = [];
           _isLoading = false;
-          _isInitialized = true;
         });
       }
     } catch (e) {
+      if (!mounted) return;
+
       setState(() {
         _error = e.toString();
         _isLoading = false;
@@ -436,6 +444,13 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
 
   @override
   Widget build(BuildContext context) {
+    // Watch the expense provider to trigger refresh when it changes
+    ref.listen(expenseNotifierProvider, (previous, next) {
+      if (mounted) {
+        _fetchExpenses();
+      }
+    });
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 25, 16, 25),
       child: Column(
