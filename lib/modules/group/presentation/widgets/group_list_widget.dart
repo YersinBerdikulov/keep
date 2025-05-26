@@ -238,6 +238,23 @@ class GroupListCard extends ConsumerWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.inbox_rounded,
+                            size: 16,
+                            color: ColorConfig.primarySwatch50,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "${groupModel.boxIds.length} Boxes",
+                            style: FontConfig.caption().copyWith(
+                              color: ColorConfig.primarySwatch50,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
