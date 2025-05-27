@@ -39,27 +39,6 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
     return user.toAuthUserModel();
   }
 
-  Future<void> logout(BuildContext context) async {
-    try {
-      await authRepository.logout();
-      // Clear user state
-      ref.read(currentUserProvider.notifier).state = null;
-      // Invalidate user data
-      ref.invalidate(userNotifierProvider);
-      // Navigate to auth home
-      if (context.mounted) {
-        context.go(RouteName.authHome);
-      }
-    } catch (e) {
-      debugPrint('Logout error: $e');
-      // Still clear state and redirect even if logout fails
-      ref.read(currentUserProvider.notifier).state = null;
-      ref.invalidate(userNotifierProvider);
-      if (context.mounted) {
-        context.go(RouteName.authHome);
-      }
-    }
-  }
 
   Future<AuthUserModel?> signIn({
     required String email,
