@@ -3,6 +3,7 @@ import 'package:dongi/core/constants/font_config.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
 import 'package:dongi/shared/widgets/appbar/appbar.dart';
+import 'package:dongi/shared/widgets/drawer/drawer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -15,9 +16,11 @@ class ProfilePage extends ConsumerWidget {
     final userDataAsync = ref.watch(userNotifierProvider);
 
     return Scaffold(
+      backgroundColor: ColorConfig.white,
       appBar: AppBarWidget(
         title: "Profile",
       ),
+      drawer: const DrawerWidget(),
       body: userDataAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
@@ -37,14 +40,14 @@ class ProfilePage extends ConsumerWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: ColorConfig.baseGrey,
-                          image: userData?.profileImage != null
+                          image: userData?.profileImage?.isNotEmpty == true
                               ? DecorationImage(
                                   image: NetworkImage(userData!.profileImage!),
                                   fit: BoxFit.cover,
                                 )
                               : null,
                         ),
-                        child: userData?.profileImage == null
+                        child: userData?.profileImage?.isNotEmpty != true
                             ? Icon(
                                 Icons.person,
                                 size: 60,

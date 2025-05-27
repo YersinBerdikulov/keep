@@ -1,4 +1,5 @@
 import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
+import 'package:dongi/shared/widgets/drawer/drawer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
@@ -26,6 +27,7 @@ class HomePage extends ConsumerWidget {
           // ),
           backgroundColor: ColorConfig.white,
           appBar: AppBarWidget(),
+          drawer: const DrawerWidget(),
           body: ListView(
             children: [
               const HomeExpenseSummery(),

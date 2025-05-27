@@ -2,6 +2,8 @@ import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
 import 'package:dongi/shared/utilities/helpers/snackbar_helper.dart';
 import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
+import 'package:dongi/shared/widgets/appbar/appbar.dart';
+import 'package:dongi/shared/widgets/drawer/drawer_widget.dart';
 import 'package:dongi/shared/widgets/floating_action_button/floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -40,33 +42,40 @@ class FriendsListPage extends HookConsumerWidget {
         title: "Add Friend",
         onPressed: () => context.push(RouteName.addFriend),
       ),
-      appBar: AppBar(
-        title: const Text('Friend List'),
-        bottom: TabBar(
-          indicatorColor: ColorConfig.baseGrey,
-          controller: tabController,
-          tabs: const [
-            Tab(text: 'Friends'),
-            Tab(text: 'Pending'),
-            Tab(text: 'Incoming'),
-          ],
-        ),
+      appBar: AppBarWidget(
+        title: "Friend List",
       ),
+      drawer: const DrawerWidget(),
       body: friendList.when(
         skipLoadingOnRefresh: false,
         //skipLoadingOnReload: true,
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => Center(child: Text(error.toString())),
-        data: (data) => Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: TabBarView(
-            controller: tabController,
-            children: [
-              FriendListView(data),
-              PendingListView(data),
-              IncomingListView(data),
-            ],
-          ),
+        data: (data) => Column(
+          children: [
+            TabBar(
+              indicatorColor: ColorConfig.baseGrey,
+              controller: tabController,
+              tabs: const [
+                Tab(text: 'Friends'),
+                Tab(text: 'Pending'),
+                Tab(text: 'Incoming'),
+              ],
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: TabBarView(
+                  controller: tabController,
+                  children: [
+                    FriendListView(data),
+                    PendingListView(data),
+                    IncomingListView(data),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
