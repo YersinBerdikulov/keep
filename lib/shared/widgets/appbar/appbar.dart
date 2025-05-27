@@ -1,24 +1,22 @@
-import '../../../../core/constants/color_config.dart';
-import '../../../../core/router/router_names.dart';
-import 'package:go_router/go_router.dart';
-import '../../../../modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/core/constants/color_config.dart';
+import 'package:dongi/core/router/router_names.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class AppBarWidget extends PreferredSize {
   final String? title;
-  final Widget? drawer;
   AppBarWidget({
     super.key,
     this.title,
-    this.drawer,
   }) : super(
           preferredSize: const Size.fromHeight(70),
-          child: appBarChild(title, drawer),
+          child: appBarChild(title),
         );
 }
 
-Widget appBarChild(String? title, Widget? drawer) {
+Widget appBarChild(String? title) {
   return Consumer(
     builder: (context, ref, child) {
       // Check if user is authenticated
@@ -46,12 +44,60 @@ Widget appBarChild(String? title, Widget? drawer) {
                 ),
               )
             : null,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu, color: ColorConfig.midnight),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+        actions: [
+          // Friends list button
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorConfig.baseGrey,
+              ),
+              child: Icon(
+                Icons.people_outline,
+                color: ColorConfig.midnight,
+                size: 20,
+              ),
+            ),
+            onPressed: () => context.push(RouteName.friendList),
           ),
-        ),
+          const SizedBox(width: 8),
+          // Profile button
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorConfig.baseGrey,
+              ),
+              child: Icon(
+                Icons.person_outline,
+                color: ColorConfig.midnight,
+                size: 20,
+              ),
+            ),
+            onPressed: () => context.push(RouteName.profile),
+          ),
+          const SizedBox(width: 8),
+          // Logout button
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorConfig.baseGrey,
+              ),
+              child: Icon(
+                Icons.logout_outlined,
+                color: ColorConfig.midnight,
+                size: 20,
+              ),
+            ),
+            onPressed: () =>
+                ref.read(authControllerProvider.notifier).logout(context),
+          ),
+          const SizedBox(width: 8),
+        ],
       );
     },
   );
