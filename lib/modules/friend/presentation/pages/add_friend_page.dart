@@ -8,6 +8,7 @@ import 'package:dongi/shared/widgets/text_field/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'dart:async';
 
 class AddFriendPage extends HookConsumerWidget {
   const AddFriendPage({super.key});
@@ -17,9 +18,18 @@ class AddFriendPage extends HookConsumerWidget {
     final searchController = useTextEditingController(text: '');
     final searchResults = useState<List<UserModel>>([]);
     final isLoading = useState<bool>(false);
-    final debouncer = useState<Future<void>?>(null);
+    
+    // Create a timer for debouncing
+    final searchDebouncer = useState<Timer?>(null);
 
-    /// Listening to changes in the friendNotifierProvider without rebuilding the UI
+    // Cleanup timer when widget is disposed
+    useEffect(() {
+      return () {
+        searchDebouncer.value?.cancel();
+      };
+    }, []);
+
+    // Listen to friend provider changes
     ref.listen<AsyncValue<List<UserFriendModel>>>(
       friendNotifierProvider,
       (_, state) {
@@ -32,53 +42,45 @@ class AddFriendPage extends HookConsumerWidget {
       },
     );
 
-    useEffect(() {
-      void performSearch() async {
-        if (searchController.text.length > 2) {
-          isLoading.value = true;
-          try {
-            final results = await ref
-                .read(friendNotifierProvider.notifier)
-                .searchFriends(searchController.text);
-            if (!context.mounted) return;
-            searchResults.value = results;
-          } catch (e) {
-            if (context.mounted) {
-              showSnackBar(context, content: e.toString());
-            }
-          } finally {
-            if (context.mounted) {
-              isLoading.value = false;
-            }
-          }
-        } else {
-          searchResults.value = [];
-        }
+    // Function to perform the search
+    void performSearch(String searchTerm) async {
+      isLoading.value = true;
+      try {
+        final results = await ref
+            .read(friendNotifierProvider.notifier)
+            .searchFriends(searchTerm);
+        searchResults.value = results;
+      } catch (e) {
+        showSnackBar(context, content: e.toString());
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
+    // Handle text field changes
+    String? handleSearchInput(String? value) {
+      // Cancel previous timer if it exists
+      searchDebouncer.value?.cancel();
+      
+      if (value == null || value.isEmpty) {
+        searchResults.value = [];
+        return value;
       }
 
-      void debouncedSearch() {
-        // Cancel previous debouncer if it exists
-        debouncer.value?.ignore();
+      // Set new timer
+      searchDebouncer.value = Timer(
+        const Duration(milliseconds: 500),
+        () => performSearch(value),
+      );
 
-        // Create new debouncer
-        debouncer.value = Future.delayed(const Duration(milliseconds: 300), () {
-          if (context.mounted) {
-            performSearch();
-          }
-        });
-      }
-
-      searchController.addListener(debouncedSearch);
-
-      return () {
-        searchController.removeListener(debouncedSearch);
-        debouncer.value?.ignore();
-      };
-    }, [searchController]);
+      return value;
+    }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBarWidget(
-        title: "Add Friend",
+        title: 'Add Friend',
+        showBackButton: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -86,17 +88,14 @@ class AddFriendPage extends HookConsumerWidget {
           children: [
             TextFieldWidget(
               controller: searchController,
-              hintText: "Search with UserName or Email",
+              hintText: 'Search by email or username',
+              onChanged: handleSearchInput,
             ),
-            const Divider(thickness: 1),
+            const SizedBox(height: 16),
             Expanded(
               child: isLoading.value
                   ? const Center(child: CircularProgressIndicator())
-                  : searchController.text.length <= 2
-                      ? const Center(
-                          child: Text('Enter at least 3 characters to search'),
-                        )
-                      : AddFriendList(searchResults.value),
+                  : AddFriendList(searchResults.value),
             ),
           ],
         ),

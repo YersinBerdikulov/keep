@@ -43,7 +43,10 @@ class CreateGroupPage extends HookConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBarWidget(title: "Create Group"),
+      appBar: AppBarWidget(
+        title: "Create Group",
+        showBackButton: true,
+      ),
       body: SafeArea(
         child: Column(
           children: [

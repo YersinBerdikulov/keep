@@ -33,7 +33,10 @@ class GroupListPage extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBarWidget(title: "Groups"),
+      appBar: AppBarWidget(
+        title: "Groups",
+        showBackButton: true,
+      ),
       floatingActionButton: FABWidget(
         title: "Group",
         onPressed: () => context.push(RouteName.createGroup),

@@ -6,16 +6,19 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class AppBarWidget extends PreferredSize {
   final String? title;
+  final bool showBackButton;
+  
   AppBarWidget({
     super.key,
     this.title,
+    this.showBackButton = false,
   }) : super(
           preferredSize: const Size.fromHeight(70),
-          child: appBarChild(title),
+          child: appBarChild(title, showBackButton),
         );
 }
 
-Widget appBarChild(String? title) {
+Widget appBarChild(String? title, bool showBackButton) {
   return Consumer(
     builder: (context, ref, child) {
       // Check if user is authenticated
@@ -29,7 +32,7 @@ Widget appBarChild(String? title) {
         );
       }
 
-      // If authenticated, return the full AppBar with drawer
+      // If authenticated, return the full AppBar with either drawer or back button
       return AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -42,12 +45,14 @@ Widget appBarChild(String? title) {
                 color: ColorConfig.baseGrey,
               ),
               child: Icon(
-                Icons.menu,
+                showBackButton ? Icons.arrow_back : Icons.menu,
                 color: ColorConfig.midnight,
                 size: 20,
               ),
             ),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+            onPressed: () => showBackButton 
+              ? Navigator.of(context).pop()
+              : Scaffold.of(context).openDrawer(),
           ),
         ),
         title: title != null
