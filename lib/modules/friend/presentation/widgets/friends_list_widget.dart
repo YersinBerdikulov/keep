@@ -17,22 +17,66 @@ class FriendListView extends ConsumerWidget {
 
   const FriendListView(this.userFriendModels, {super.key});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return RefreshIndicator(
-      onRefresh: () async => ref.refresh(getFriendProvider),
+  Widget _buildEmptyState() {
+    return Center(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        child: SlidableAutoCloseBehavior(
-          child: ListView(
-            children: userFriendModels
-                .where(
-                    (element) => element.status == FriendRequestStatus.accepted)
-                .map<Widget>((userFriend) => UserFriendListCard(userFriend))
-                .toList(),
-          ),
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: ColorConfig.primarySwatch.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.people_outline,
+                size: 48,
+                color: ColorConfig.primarySwatch,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Friends Yet',
+              style: FontConfig.h6().copyWith(
+                color: ColorConfig.midnight,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Add friends to start sharing expenses together',
+              textAlign: TextAlign.center,
+              style: FontConfig.body2().copyWith(
+                color: ColorConfig.primarySwatch50,
+              ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final acceptedFriends = userFriendModels
+        .where((element) => element.status == FriendRequestStatus.accepted)
+        .toList();
+
+    return RefreshIndicator(
+      onRefresh: () async => ref.refresh(getFriendProvider),
+      child: acceptedFriends.isEmpty
+          ? _buildEmptyState()
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: SlidableAutoCloseBehavior(
+                child: ListView.builder(
+                  itemCount: acceptedFriends.length,
+                  itemBuilder: (context, index) => UserFriendListCard(acceptedFriends[index]),
+                ),
+              ),
+            ),
     );
   }
 }
@@ -42,26 +86,70 @@ class PendingListView extends ConsumerWidget {
 
   const PendingListView(this.pendingFriendModels, {super.key});
 
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: ColorConfig.secondary.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.pending_outlined,
+                size: 48,
+                color: ColorConfig.secondary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Pending Requests',
+              style: FontConfig.h6().copyWith(
+                color: ColorConfig.midnight,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Friend requests you\'ve sent will appear here',
+              textAlign: TextAlign.center,
+              style: FontConfig.body2().copyWith(
+                color: ColorConfig.primarySwatch50,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
+    final pendingRequests = pendingFriendModels
+        .where((element) =>
+            element.status == FriendRequestStatus.pending &&
+            element.sendRequestUserId == currentUser!.id)
+        .toList();
 
     return RefreshIndicator(
       onRefresh: () async => ref.refresh(getFriendProvider),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        child: SlidableAutoCloseBehavior(
-          child: ListView(
-            children: pendingFriendModels
-                .where((element) =>
-                    element.status == FriendRequestStatus.pending &&
-                    element.sendRequestUserId == currentUser!.id)
-                .map<Widget>(
-                    (pendingFriend) => PendingFriendListCard(pendingFriend))
-                .toList(),
-          ),
-        ),
-      ),
+      child: pendingRequests.isEmpty
+          ? _buildEmptyState()
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: SlidableAutoCloseBehavior(
+                child: ListView.builder(
+                  itemCount: pendingRequests.length,
+                  itemBuilder: (context, index) =>
+                      PendingFriendListCard(pendingRequests[index]),
+                ),
+              ),
+            ),
     );
   }
 }
@@ -71,26 +159,70 @@ class IncomingListView extends ConsumerWidget {
 
   const IncomingListView(this.incomingFriendModels, {super.key});
 
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: ColorConfig.primarySwatch.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.mail_outline,
+                size: 48,
+                color: ColorConfig.primarySwatch,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Incoming Requests',
+              style: FontConfig.h6().copyWith(
+                color: ColorConfig.midnight,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Friend requests sent to you will appear here',
+              textAlign: TextAlign.center,
+              style: FontConfig.body2().copyWith(
+                color: ColorConfig.primarySwatch50,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
+    final incomingRequests = incomingFriendModels
+        .where((element) =>
+            element.status == FriendRequestStatus.pending &&
+            element.receiveRequestUserId == currentUser!.id)
+        .toList();
 
     return RefreshIndicator(
       onRefresh: () async => ref.refresh(getFriendProvider),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        child: SlidableAutoCloseBehavior(
-          child: ListView(
-            children: incomingFriendModels
-                .where((element) =>
-                    element.status == FriendRequestStatus.pending &&
-                    element.receiveRequestUserId == currentUser!.id)
-                .map<Widget>(
-                    (incomingFriend) => IncomingFriendListCard(incomingFriend))
-                .toList(),
-          ),
-        ),
-      ),
+      child: incomingRequests.isEmpty
+          ? _buildEmptyState()
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: SlidableAutoCloseBehavior(
+                child: ListView.builder(
+                  itemCount: incomingRequests.length,
+                  itemBuilder: (context, index) =>
+                      IncomingFriendListCard(incomingRequests[index]),
+                ),
+              ),
+            ),
     );
   }
 }
@@ -101,24 +233,34 @@ class UserFriendListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ListTileCard(
-          titleString: userFriendModel.receiveRequestUserName ??
-              userFriendModel.receiveRequestUserId,
-          leading: ImageWidget(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: ListTileCard(
+        titleString: userFriendModel.receiveRequestUserName ??
+            userFriendModel.receiveRequestUserId,
+        leading: Hero(
+          tag: 'friend_${userFriendModel.receiveRequestUserId}',
+          child: ImageWidget(
             imageUrl: userFriendModel.receiveRequestProfilePic,
-            borderRadius: 10,
+            borderRadius: 25,
             width: 50,
             height: 50,
           ),
-          trailing: Text(
-            "Friend from ${userFriendModel.createdAt!.toHumanReadableFormat()}",
-            style: FontConfig.body2(),
+        ),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: ColorConfig.secondary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            userFriendModel.createdAt!.toHumanReadableFormat(),
+            style: FontConfig.caption().copyWith(
+              color: ColorConfig.secondary,
+            ),
           ),
         ),
-        const SizedBox(height: 10),
-      ],
+      ),
     );
   }
 }
@@ -129,34 +271,45 @@ class PendingFriendListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ListTileCard(
-          titleString: userFriendModel.receiveRequestUserName ??
-              userFriendModel.receiveRequestUserId,
-          leading: ImageWidget(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: ListTileCard(
+        titleString: userFriendModel.receiveRequestUserName ??
+            userFriendModel.receiveRequestUserId,
+        leading: Hero(
+          tag: 'pending_${userFriendModel.receiveRequestUserId}',
+          child: ImageWidget(
             imageUrl: userFriendModel.receiveRequestProfilePic,
-            borderRadius: 10,
+            borderRadius: 25,
             width: 50,
             height: 50,
           ),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: ColorConfig.primarySwatch.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Sent at',
-                style: FontConfig.caption(),
+              Icon(
+                Icons.pending_outlined,
+                size: 16,
+                color: ColorConfig.primarySwatch,
               ),
+              const SizedBox(width: 4),
               Text(
-                userFriendModel.createdAt!.toHumanReadableFormat(),
-                style: FontConfig.caption(),
+                'Pending',
+                style: FontConfig.caption().copyWith(
+                  color: ColorConfig.primarySwatch,
+                ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 10),
-      ],
+      ),
     );
   }
 }
@@ -165,25 +318,40 @@ class IncomingFriendListCard extends ConsumerWidget {
   final UserFriendModel userFriendModel;
   const IncomingFriendListCard(this.userFriendModel, {super.key});
 
-  Widget actionIcon({
+  Widget _buildActionButton({
     required Color color,
     required IconData icon,
-    required onTap,
+    required String label,
+    required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        width: 30,
-        height: 30,
-        padding: const EdgeInsets.all(3),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: color,
-        ),
-        child: Icon(
-          icon,
-          color: ColorConfig.darkGrey,
-          size: 18,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: color,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: FontConfig.caption().copyWith(
+                  color: color,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -191,73 +359,59 @@ class IncomingFriendListCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      children: [
-        ListTileCard(
-          titleString: userFriendModel.sendRequestUserName ??
-              userFriendModel.sendRequestUserId,
-          leading: ImageWidget(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: ListTileCard(
+        titleString: userFriendModel.sendRequestUserName ??
+            userFriendModel.sendRequestUserId,
+        leading: Hero(
+          tag: 'incoming_${userFriendModel.sendRequestUserId}',
+          child: ImageWidget(
             imageUrl: userFriendModel.sendRequestProfilePic,
-            borderRadius: 10,
+            borderRadius: 25,
             width: 50,
             height: 50,
           ),
-          trailing: SizedBox(
-            width: 70,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                actionIcon(
-                  color: ColorConfig.error,
-                  icon: Icons.remove,
-                  onTap: () {
-                    showCustomBottomDialog(
-                      context,
-                      title: "Reject Friend Request",
-                      description:
-                          "Are you sure you want to reject friend request from ${userFriendModel.sendRequestUserName}?",
-                      onConfirm: () => ref
-                          .read(friendNotifierProvider.notifier)
-                          .rejectFriendRequest(userFriendModel),
-                    );
-                  },
-                ),
-                actionIcon(
-                  color: ColorConfig.secondary,
-                  icon: Icons.check,
-                  onTap: () {
-                    showCustomBottomDialog(
-                      context,
-                      title: "Accept Friend Request",
-                      description:
-                          "Are you sure you want to accept friend request from ${userFriendModel.sendRequestUserName}?",
-                      onConfirm: () => ref
-                          .read(friendNotifierProvider.notifier)
-                          .acceptFriendRequest(userFriendModel),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-
-          // Column(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: [
-          //     Text(
-          //       'Received at',
-          //       style: FontConfig.caption(),
-          //     ),
-          //     Text(
-          //       userFriendModel.createdAt!.toHumanReadableFormat(),
-          //       style: FontConfig.caption(),
-          //     ),
-          //   ],
-          // ),
         ),
-        const SizedBox(height: 10),
-      ],
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildActionButton(
+              color: ColorConfig.error,
+              icon: Icons.close,
+              label: 'Decline',
+              onTap: () {
+                showCustomBottomDialog(
+                  context,
+                  title: "Decline Friend Request",
+                  description:
+                      "Are you sure you want to decline the friend request from ${userFriendModel.sendRequestUserName}?",
+                  onConfirm: () => ref
+                      .read(friendNotifierProvider.notifier)
+                      .rejectFriendRequest(userFriendModel),
+                );
+              },
+            ),
+            const SizedBox(width: 8),
+            _buildActionButton(
+              color: ColorConfig.secondary,
+              icon: Icons.check,
+              label: 'Accept',
+              onTap: () {
+                showCustomBottomDialog(
+                  context,
+                  title: "Accept Friend Request",
+                  description:
+                      "Do you want to accept the friend request from ${userFriendModel.sendRequestUserName}?",
+                  onConfirm: () => ref
+                      .read(friendNotifierProvider.notifier)
+                      .acceptFriendRequest(userFriendModel),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
