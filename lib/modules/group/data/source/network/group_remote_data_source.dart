@@ -65,7 +65,7 @@ class GroupRemoteDataSource {
     final document = await _db.listDocuments(
       databaseId: AppwriteConfig.databaseId,
       collectionId: AppwriteConfig.groupCollection,
-      queries: [Query.equal('creatorId', uid)],
+      queries: [Query.contains('groupUsers', uid)],
     );
     return document.documents;
   }
@@ -95,7 +95,7 @@ class GroupRemoteDataSource {
       databaseId: AppwriteConfig.databaseId,
       collectionId: AppwriteConfig.groupCollection,
       queries: [
-        Query.equal('creatorId', uid),
+        Query.contains('groupUsers', uid),
         Query.orderDesc('\$createdAt'),
         Query.limit(limit),
       ],

@@ -1,21 +1,27 @@
 import 'dart:async';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:dongi/modules/user/data/di/user_di.dart';
 import 'package:dongi/modules/user/domain/repository/user_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class UserController extends AsyncNotifier<UserModel?> {
-  late final UserRepository _userRepository;
+  UserRepository get _userRepository => ref.read(userRepositoryProvider);
 
   @override
   FutureOr<UserModel?> build() async {
-    _userRepository = ref.read(userRepositoryProvider);
+    // Watch currentUserProvider to rebuild when auth state changes
+    ref.watch(currentUserProvider);
+
     return await _initializeCurrentUser();
   }
 
   UserModel? get currentUser => state.value;
 
   Future<UserModel?> _initializeCurrentUser() async {
+    final authUser = ref.read(currentUserProvider);
+    if (authUser == null) return null;
+
     try {
       return await _userRepository.getCurrentUserData();
     } catch (e, st) {
@@ -29,7 +35,6 @@ class UserController extends AsyncNotifier<UserModel?> {
       final user = await _userRepository.getUserDataById(uid);
       return user;
     } catch (e) {
-      // state = AsyncValue.error(e, st);
       rethrow;
     }
   }
@@ -55,7 +60,6 @@ class UserController extends AsyncNotifier<UserModel?> {
       final users = await _userRepository.getUsersListData(userIds);
       return users;
     } catch (e) {
-      // state = AsyncValue.error(e, st);
       rethrow;
     }
   }
@@ -70,7 +74,7 @@ class UserController extends AsyncNotifier<UserModel?> {
       (_) {
         // Update only if the update user is current user
         if (currentUser?.id == userModel.id) {
-          state = AsyncValue.data(userModel); // Update only if same user
+          state = AsyncValue.data(userModel);
         }
       },
     );

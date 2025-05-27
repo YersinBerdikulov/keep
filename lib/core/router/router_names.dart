@@ -21,6 +21,7 @@ class RouteName {
   static String expenseMadeBy = '/expense/madeBy';
   static String expenseSplit = '/expense/split';
   static String expenseDetail = '/expense/detail';
+  static String profile = '/profile';
 
   static String groupDetail(String? groupId) =>
       '/group/${groupId ?? ":groupId"}';
