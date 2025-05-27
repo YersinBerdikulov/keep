@@ -8,6 +8,8 @@ import '../../../../shared/widgets/appbar/appbar.dart';
 import '../../../../shared/widgets/floating_action_button/floating_action_button.dart';
 import '../../domain/di/group_controller_di.dart';
 import '../widgets/group_list_widget.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../modules/auth/domain/di/auth_controller_di.dart';
 
 class GroupListPage extends ConsumerWidget {
   const GroupListPage({super.key});
@@ -33,7 +35,8 @@ class GroupListPage extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBarWidget(title: "Groups"),
+      appBar: AppBarWidget(title: "Groups", drawer: _buildDrawer(context, ref)),
+      drawer: _buildDrawer(context, ref),
       floatingActionButton: FABWidget(
         title: "Group",
         onPressed: () => context.push(RouteName.createGroup),
@@ -83,5 +86,51 @@ class GroupListPage extends ConsumerWidget {
     //    ),
     //  ],
     //);
+  }
+
+  Widget _buildDrawer(BuildContext context, WidgetRef ref) {
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DrawerHeader(
+              child: Row(
+                children: [
+                  Icon(Icons.account_circle, size: 48, color: ColorConfig.primarySwatch),
+                  const SizedBox(width: 16),
+                  Text('Menu', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.people_outline, color: ColorConfig.midnight),
+              title: Text('Friends List'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push(RouteName.friendList);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.person_outline, color: ColorConfig.midnight),
+              title: Text('Profile'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push(RouteName.profile);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: Icon(Icons.logout_outlined, color: ColorConfig.midnight),
+              title: Text('Logout'),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(authControllerProvider.notifier).logout(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

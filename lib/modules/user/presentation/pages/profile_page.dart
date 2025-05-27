@@ -5,6 +5,8 @@ import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
 import 'package:dongi/shared/widgets/appbar/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:dongi/core/router/router_names.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -17,7 +19,9 @@ class ProfilePage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBarWidget(
         title: "Profile",
+        drawer: _buildDrawer(context, ref),
       ),
+      drawer: _buildDrawer(context, ref),
       body: userDataAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
@@ -212,5 +216,51 @@ class ProfilePage extends ConsumerWidget {
   String _formatDate(String dateStr) {
     final date = DateTime.parse(dateStr);
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Widget _buildDrawer(BuildContext context, WidgetRef ref) {
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DrawerHeader(
+              child: Row(
+                children: [
+                  Icon(Icons.account_circle, size: 48, color: ColorConfig.primarySwatch),
+                  const SizedBox(width: 16),
+                  Text('Menu', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.people_outline, color: ColorConfig.midnight),
+              title: Text('Friends List'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push(RouteName.friendList);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.person_outline, color: ColorConfig.midnight),
+              title: Text('Profile'),
+              onTap: () {
+                Navigator.pop(context);
+                // Already on profile, do nothing or pop to root
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: Icon(Icons.logout_outlined, color: ColorConfig.midnight),
+              title: Text('Logout'),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(authControllerProvider.notifier).logout(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
