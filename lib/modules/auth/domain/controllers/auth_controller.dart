@@ -91,8 +91,10 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
           return authUserModel;
         }
 
-        final saveUserResult =
-            await saveUserDataUseCase.execute(email: r.email);
+        final saveUserResult = await saveUserDataUseCase.execute(
+          email: r.email,
+          id: r.$id,
+        );
 
         return saveUserResult.fold(
           (l) {
@@ -169,8 +171,11 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
           return authUserModel;
         }
 
-        final saveUserResult =
-            await saveUserDataUseCase.execute(email: r.email);
+        // Create user document in database
+        final saveUserResult = await saveUserDataUseCase.execute(
+          email: r.email,
+          id: r.$id, // Pass the user ID from Appwrite Auth
+        );
 
         return saveUserResult.fold(
           (l) {

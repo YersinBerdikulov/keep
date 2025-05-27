@@ -21,7 +21,33 @@ class UserRemoteDataSource implements UserRepositoryImpl {
   Future<UserModel> getCurrentUserData() async {
     try {
       final user = await _account.get();
-      return UserModel.fromJson(user.toMap());
+
+      // Try to get existing user document
+      try {
+        final document = await _db.getDocument(
+          databaseId: AppwriteConfig.databaseId,
+          collectionId: AppwriteConfig.usersCollection,
+          documentId: user.$id,
+        );
+        return UserModel.fromJson(document.data);
+      } catch (e) {
+        // If document doesn't exist, create it
+        final userModel = UserModel(
+          id: user.$id,
+          email: user.email,
+          userName: user.name,
+          phoneNumber: user.phone,
+        );
+
+        final document = await _db.createDocument(
+          databaseId: AppwriteConfig.databaseId,
+          collectionId: AppwriteConfig.usersCollection,
+          documentId: user.$id,
+          data: userModel.toJson(),
+        );
+
+        return UserModel.fromJson(document.data);
+      }
     } on AppwriteException catch (e, st) {
       throw Failure(
         e.message ?? 'Failed to fetch current user data.',
@@ -35,15 +61,38 @@ class UserRemoteDataSource implements UserRepositoryImpl {
   @override
   FutureEither<UserModel?> saveUserData(UserModel userModel) async {
     try {
-      final document = await _db.createDocument(
-        databaseId: AppwriteConfig.databaseId,
-        collectionId: AppwriteConfig.usersCollection,
-        documentId: ID.unique(),
-        data: userModel.toJson(),
-      );
+      if (userModel.id == null) {
+        throw Failure('User ID is required', StackTrace.current);
+      }
 
-      final user = UserModel.fromJson(document.data);
-      return right(user);
+      // First try to get the existing document
+      try {
+        final existingDoc = await _db.getDocument(
+          databaseId: AppwriteConfig.databaseId,
+          collectionId: AppwriteConfig.usersCollection,
+          documentId: userModel.id!,
+        );
+
+        // If document exists, update it
+        final updatedDoc = await _db.updateDocument(
+          databaseId: AppwriteConfig.databaseId,
+          collectionId: AppwriteConfig.usersCollection,
+          documentId: userModel.id!,
+          data: userModel.toJson(),
+        );
+
+        return right(UserModel.fromJson(updatedDoc.data));
+      } catch (e) {
+        // If document doesn't exist, create it
+        final document = await _db.createDocument(
+          databaseId: AppwriteConfig.databaseId,
+          collectionId: AppwriteConfig.usersCollection,
+          documentId: userModel.id!,
+          data: userModel.toJson(),
+        );
+
+        return right(UserModel.fromJson(document.data));
+      }
     } on AppwriteException catch (e, st) {
       return left(
         Failure(
@@ -137,6 +186,29 @@ class UserRemoteDataSource implements UserRepositoryImpl {
   @override
   FutureEitherVoid updateUserData(UserModel userModel) async {
     try {
+      if (userModel.id == null) {
+        throw Failure('User ID is required', StackTrace.current);
+      }
+
+      // First try to get the existing document to ensure it exists
+      try {
+        await _db.getDocument(
+          databaseId: AppwriteConfig.databaseId,
+          collectionId: AppwriteConfig.usersCollection,
+          documentId: userModel.id!,
+        );
+      } catch (e) {
+        // If document doesn't exist, create it
+        await _db.createDocument(
+          databaseId: AppwriteConfig.databaseId,
+          collectionId: AppwriteConfig.usersCollection,
+          documentId: userModel.id!,
+          data: userModel.toJson(),
+        );
+        return right(null);
+      }
+
+      // If document exists, update it
       await _db.updateDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.usersCollection,

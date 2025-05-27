@@ -8,8 +8,14 @@ class SaveUserDataUseCase {
 
   SaveUserDataUseCase(this.repository);
 
-  FutureEither<UserModel?> execute({required String email}) async {
-    final user = UserModel(email: email);
+  FutureEither<UserModel?> execute({
+    required String email,
+    required String id,
+  }) async {
+    final user = UserModel(
+      id: id,
+      email: email,
+    );
     return repository.saveUserData(user);
   }
 }

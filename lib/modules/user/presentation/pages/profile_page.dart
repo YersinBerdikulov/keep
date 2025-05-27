@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:dongi/core/constants/color_config.dart';
 import 'package:dongi/core/constants/font_config.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
+import 'package:dongi/shared/utilities/helpers/image_picker_util.dart';
+import 'package:dongi/shared/utilities/helpers/snackbar_helper.dart';
 import 'package:dongi/shared/widgets/appbar/appbar.dart';
 import 'package:dongi/shared/widgets/drawer/drawer_widget.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +17,25 @@ class ProfilePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
     final userDataAsync = ref.watch(userNotifierProvider);
+
+    Future<void> handleImageUpload() async {
+      final file = await pickImage();
+      if (file != null) {
+        final userData = userDataAsync.value;
+        if (userData != null) {
+          try {
+            await ref
+                .read(userNotifierProvider.notifier)
+                .updateProfileImage(file);
+            showSnackBar(context,
+                content: "Profile image updated successfully!");
+          } catch (e) {
+            showSnackBar(context,
+                content: "Failed to update profile image: $e");
+          }
+        }
+      }
+    }
 
     return Scaffold(
       backgroundColor: ColorConfig.white,
@@ -34,26 +56,51 @@ class ProfilePage extends ConsumerWidget {
                 Center(
                   child: Column(
                     children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: ColorConfig.baseGrey,
-                          image: userData?.profileImage?.isNotEmpty == true
-                              ? DecorationImage(
-                                  image: NetworkImage(userData!.profileImage!),
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
+                      GestureDetector(
+                        onTap: handleImageUpload,
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: ColorConfig.baseGrey,
+                                image:
+                                    userData?.profileImage?.isNotEmpty == true
+                                        ? DecorationImage(
+                                            image: NetworkImage(
+                                                userData!.profileImage!),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                              ),
+                              child: userData?.profileImage?.isNotEmpty != true
+                                  ? Icon(
+                                      Icons.person,
+                                      size: 60,
+                                      color: ColorConfig.midnight,
+                                    )
+                                  : null,
+                            ),
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: ColorConfig.primarySwatch,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.camera_alt,
+                                  size: 20,
+                                  color: ColorConfig.white,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        child: userData?.profileImage?.isNotEmpty != true
-                            ? Icon(
-                                Icons.person,
-                                size: 60,
-                                color: ColorConfig.midnight,
-                              )
-                            : null,
                       ),
                       const SizedBox(height: 16),
                       Text(

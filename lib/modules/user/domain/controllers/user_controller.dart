@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:dongi/core/data/storage/storage_service.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:dongi/modules/user/data/di/user_di.dart';
@@ -7,6 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class UserController extends AsyncNotifier<UserModel?> {
   UserRepository get _userRepository => ref.read(userRepositoryProvider);
+  StorageService get _storageService => ref.read(storageServiceProvider);
 
   @override
   FutureOr<UserModel?> build() async {
@@ -78,5 +81,46 @@ class UserController extends AsyncNotifier<UserModel?> {
         }
       },
     );
+  }
+
+  Future<void> updateProfileImage(File imageFile) async {
+    try {
+      final currentUserData = state.value;
+      if (currentUserData == null) throw Exception('No user data found');
+
+      // Upload the image
+      final imageUploadRes = await _storageService.uploadImage([imageFile]);
+
+      await imageUploadRes.fold(
+        (failure) => throw Exception(failure.message),
+        (imageUrls) async {
+          if (imageUrls.isEmpty) throw Exception('Failed to upload image');
+
+          // Update user data with new image URL
+          final updatedUser = currentUserData.copyWith(
+            profileImage: imageUrls[0],
+          );
+
+          // Try to get current user document first
+          try {
+            await _userRepository.getUserDataById(currentUserData.id!);
+          } catch (e) {
+            // If user document doesn't exist, create it first
+            await _userRepository.saveUserData(currentUserData);
+          }
+
+          // Update in database
+          final result = await _userRepository.updateUserData(updatedUser);
+
+          result.fold(
+            (failure) => throw Exception(failure.message),
+            (_) => state = AsyncValue.data(updatedUser),
+          );
+        },
+      );
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
   }
 }
