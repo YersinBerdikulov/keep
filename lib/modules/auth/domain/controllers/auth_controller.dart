@@ -39,7 +39,6 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
     return user.toAuthUserModel();
   }
 
-
   Future<AuthUserModel?> signIn({
     required String email,
     required String password,
@@ -59,6 +58,8 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
         ref.read(currentUserProvider.notifier).state = authUserModel;
         // Invalidate and refresh user data
         ref.invalidate(userNotifierProvider);
+        ref.invalidate(homeNotifierProvider);
+        ref.invalidate(groupNotifierProvider);
         state = AsyncValue.data(authUserModel);
         return authUserModel;
       },
@@ -84,6 +85,8 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
           ref.read(currentUserProvider.notifier).state = authUserModel;
           // Invalidate and refresh user data
           ref.invalidate(userNotifierProvider);
+          ref.invalidate(homeNotifierProvider);
+          ref.invalidate(groupNotifierProvider);
           state = AsyncValue.data(authUserModel);
           return authUserModel;
         }
@@ -101,6 +104,8 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
             ref.read(currentUserProvider.notifier).state = authUserModel;
             // Invalidate and refresh user data
             ref.invalidate(userNotifierProvider);
+            ref.invalidate(homeNotifierProvider);
+            ref.invalidate(groupNotifierProvider);
             state = AsyncValue.data(authUserModel);
             return authUserModel;
           },
@@ -153,8 +158,13 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
         if (existingUser != null) {
           // Update auth state
           ref.read(currentUserProvider.notifier).state = authUserModel;
-          // Invalidate and refresh user data
+          // Invalidate all relevant providers to ensure fresh data
           ref.invalidate(userNotifierProvider);
+          ref.invalidate(homeNotifierProvider);
+          ref.invalidate(groupNotifierProvider);
+          ref.invalidate(boxNotifierProvider);
+          ref.invalidate(expenseNotifierProvider);
+          ref.invalidate(categoryNotifierProvider);
           state = AsyncValue.data(authUserModel);
           return authUserModel;
         }
@@ -170,8 +180,13 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
           (_) {
             // Update auth state
             ref.read(currentUserProvider.notifier).state = authUserModel;
-            // Invalidate and refresh user data
+            // Invalidate all relevant providers to ensure fresh data
             ref.invalidate(userNotifierProvider);
+            ref.invalidate(homeNotifierProvider);
+            ref.invalidate(groupNotifierProvider);
+            ref.invalidate(boxNotifierProvider);
+            ref.invalidate(expenseNotifierProvider);
+            ref.invalidate(categoryNotifierProvider);
             state = AsyncValue.data(authUserModel);
             return authUserModel;
           },
@@ -196,23 +211,10 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
 
   void logout(BuildContext context) async {
     await authRepository.logout();
-
-    // Clear all provider states
-    ref.invalidate(currentUserProvider);
-    ref.invalidate(homeNotifierProvider);
-    ref.invalidate(groupNotifierProvider);
-    ref.invalidate(boxNotifierProvider);
-    ref.invalidate(expenseNotifierProvider);
-    ref.invalidate(getBoxDetailProvider); // This will clear box cache
-    ref.invalidate(getExpensesInBoxProvider); // This will clear expense cache
-    ref.invalidate(selectedMembersProvider);
-    ref.invalidate(selectedCurrencyProvider);
-    ref.invalidate(expensePayerIdProvider);
-    ref.invalidate(expenseCategoryIdProvider);
-    ref.invalidate(splitUserProvider);
-    ref.invalidate(selectedDateProvider);
-
-    state = const AsyncValue.data(null);
+    ref.read(currentUserProvider.notifier).state = null;
+    if (context.mounted) {
+      context.go(RouteName.authHome);
+    }
   }
 
   // void forgetPassword(BuildContext context) async {
