@@ -6,6 +6,7 @@ import 'package:dongi/modules/box/domain/di/box_usecase_di.dart';
 import 'package:dongi/modules/box/domain/usecases/delete_all_boxes_usecase.dart';
 import 'package:dongi/modules/group/data/di/group_di.dart';
 import 'package:dongi/modules/group/domain/repository/group_repository.dart';
+import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../models/group_model.dart';
@@ -76,6 +77,8 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
         (document) async {
           final createdGroup = GroupModel.fromJson(document.data);
           final currentGroups = state.value ?? [];
+          // Invalidate homeNotifierProvider to refresh homepage
+          ref.invalidate(homeNotifierProvider);
           return AsyncValue.data([...currentGroups, createdGroup]);
         },
       );
@@ -130,6 +133,8 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
         return group;
       }).toList();
 
+      // Invalidate homeNotifierProvider to refresh homepage
+      ref.invalidate(homeNotifierProvider);
       state = AsyncValue.data(updatedGroups);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -146,6 +151,9 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
       }
 
       await _deleteAllBoxesUseCase.execute(groupModel.boxIds);
+
+      // Invalidate homeNotifierProvider to refresh homepage
+      ref.invalidate(homeNotifierProvider);
       state = AsyncValue.data(
         (state.value ?? [])
             .where((group) => group.id != groupModel.id)
