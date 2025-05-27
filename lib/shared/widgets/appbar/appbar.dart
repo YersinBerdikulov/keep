@@ -62,6 +62,23 @@ Widget appBarChild(String? title) {
             onPressed: () => context.push(RouteName.friendList),
           ),
           const SizedBox(width: 8),
+          // Profile button
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorConfig.baseGrey,
+              ),
+              child: Icon(
+                Icons.person_outline,
+                color: ColorConfig.midnight,
+                size: 20,
+              ),
+            ),
+            onPressed: () => context.push(RouteName.profile),
+          ),
+          const SizedBox(width: 8),
           // Logout button
           IconButton(
             icon: Container(

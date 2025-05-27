@@ -2,6 +2,7 @@ import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/core/router/router_notifier.dart';
 import 'package:dongi/modules/expense/presentation/pages/made_by_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/split_page.dart';
+import 'package:dongi/modules/user/presentation/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -99,6 +100,9 @@ final goRouterProvider = Provider<GoRouter>(
         GoRoute(
             path: RouteName.addFriend,
             builder: (context, state) => const AddFriendPage()),
+        GoRoute(
+            path: RouteName.profile,
+            builder: (context, state) => const ProfilePage()),
         GoRoute(
           path: RouteName.createBox,
           builder: (context, state) {
