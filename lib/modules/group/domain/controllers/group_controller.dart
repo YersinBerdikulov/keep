@@ -31,7 +31,9 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
 
   Future<List<GroupModel>> _fetchGroups() async {
     final user = ref.read(currentUserProvider);
-    final groupList = await _groupRepository.getGroups(user!.id!);
+    if (user == null) return [];
+
+    final groupList = await _groupRepository.getGroups(user.id!);
     return groupList.map((group) => GroupModel.fromJson(group.data)).toList();
   }
 
@@ -44,6 +46,9 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
     state = const AsyncValue.loading();
     try {
       final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      if (currentUser.id == null) throw Exception('User ID not found');
+
       List<String> imageLinks = [];
 
       if (image.value != null) {
@@ -88,7 +93,7 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-        // Start with the complete existing group data
+      // Start with the complete existing group data
       Map<String, dynamic> updateData = groupModel.toJson();
 
       if (image != null && image.value != null) {

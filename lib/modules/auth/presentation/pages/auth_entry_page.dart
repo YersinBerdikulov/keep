@@ -1,7 +1,9 @@
 import 'package:dongi/core/constants/color_config.dart';
 import 'package:dongi/core/constants/content/onboarding_contents.dart';
 import 'package:dongi/core/constants/font_config.dart';
+import 'package:dongi/core/constants/constant.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 import 'package:dongi/shared/widgets/button/primary_button_widget.dart';
 import 'package:dongi/shared/widgets/button/secondary_button_widget.dart';
 import 'package:flutter/material.dart';
@@ -129,6 +131,7 @@ class _AuthEntryPageState extends ConsumerState<AuthEntryPage> {
                           .read(authControllerProvider.notifier)
                           .authWithGoogle();
                       if (context.mounted) {
+                        ref.refresh(homeNotifierProvider);
                         context.go(RouteName.home);
                       }
                     },

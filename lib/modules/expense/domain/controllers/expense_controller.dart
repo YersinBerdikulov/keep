@@ -23,8 +23,11 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
 
   @override
   Future<List<ExpenseModel>> build() async {
-    _expenseRepository = ref.watch(expenseRepositoryProvider);
-    _updateBoxUseCase = ref.watch(updateBoxUseCaseProvider);
+    _expenseRepository = ref.read(expenseRepositoryProvider);
+    _updateBoxUseCase = ref.read(updateBoxUseCaseProvider);
+
+    // Watch the current user to rebuild when user changes
+    ref.watch(currentUserProvider);
 
     return [];
   }

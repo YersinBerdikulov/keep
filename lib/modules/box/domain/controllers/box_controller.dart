@@ -14,18 +14,20 @@ import '../../../expense/domain/di/expense_controller_di.dart';
 import '../../../group/domain/di/group_controller_di.dart';
 
 class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
-  late BoxRepository boxRepository;
-  late StorageService storageAPI;
-
+  late final BoxRepository boxRepository;
+  late final StorageService storageAPI;
   bool _isInitialized = false;
 
   @override
   Future<List<BoxModel>> build(String arg) async {
     if (!_isInitialized) {
-      boxRepository = ref.watch(boxRepositoryProvider);
-      storageAPI = ref.watch(storageProvider);
+      boxRepository = ref.read(boxRepositoryProvider);
+      storageAPI = ref.read(storageProvider);
       _isInitialized = true;
     }
+
+    // Watch the current user to rebuild when user changes
+    ref.watch(currentUserProvider);
 
     try {
       return await getBoxesInGroup(arg);
@@ -242,8 +244,11 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
 
   Future<List<BoxModel>> getBoxesInGroup(String groupId) async {
     try {
-      final boxList = await boxRepository.getBoxesInGroup(groupId);
-      return boxList.map((box) => BoxModel.fromJson(box.data)).toList();
+      final user = ref.read(currentUserProvider);
+      if (user == null || user.id == null) return [];
+
+      final boxes = await boxRepository.getBoxesInGroup(groupId);
+      return boxes.map((box) => BoxModel.fromJson(box.data)).toList();
     } catch (e) {
       print('Error in getBoxesInGroup: $e');
       return [];

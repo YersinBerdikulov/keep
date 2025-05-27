@@ -13,6 +13,7 @@ import '../../../../shared/widgets/button/button_widget.dart';
 import '../../../../shared/widgets/button/secondary_button_widget.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
 import '../../domain/di/auth_controller_di.dart';
+import '../../../home/domain/di/home_controller_di.dart';
 
 class SignInPage extends HookConsumerWidget {
   final String? email;
@@ -221,6 +222,8 @@ class SignInPage extends HookConsumerWidget {
                                     );
 
                                 if (context.mounted) {
+                                  // Refresh home data after sign in
+                                  ref.refresh(homeNotifierProvider);
                                   context.go(RouteName.setPassword);
                                 }
                               } else {

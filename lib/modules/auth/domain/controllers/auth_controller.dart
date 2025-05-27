@@ -5,7 +5,12 @@ import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/auth/domain/models/auth_user_model.dart';
 import 'package:dongi/modules/auth/domain/repository/auth_repository.dart';
 import 'package:dongi/modules/user/domain/di/user_usecase_di.dart';
-// import 'package:dongi/modules/user/domain/models/user_model.dart';
+import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
+import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
+import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
+import 'package:dongi/modules/expense/domain/di/category_controller_di.dart';
+import 'package:dongi/modules/expense/presentation/widgets/create_expense_widget.dart';
 import 'package:dongi/modules/user/domain/usecases/get_user_data_by_email_usecase.dart';
 import 'package:dongi/modules/user/domain/usecases/save_user_data_usecase.dart';
 
@@ -249,7 +254,22 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
 
   void logout(BuildContext context) async {
     await authRepository.logout();
-    ref.read(currentUserProvider.notifier).state = null;
+
+    // Clear all provider states
+    ref.invalidate(currentUserProvider);
+    ref.invalidate(homeNotifierProvider);
+    ref.invalidate(groupNotifierProvider);
+    ref.invalidate(boxNotifierProvider);
+    ref.invalidate(expenseNotifierProvider);
+    ref.invalidate(getBoxDetailProvider); // This will clear box cache
+    ref.invalidate(getExpensesInBoxProvider); // This will clear expense cache
+    ref.invalidate(selectedMembersProvider);
+    ref.invalidate(selectedCurrencyProvider);
+    ref.invalidate(expensePayerIdProvider);
+    ref.invalidate(expenseCategoryIdProvider);
+    ref.invalidate(splitUserProvider);
+    ref.invalidate(selectedDateProvider);
+
     state = const AsyncValue.data(null);
   }
 

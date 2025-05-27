@@ -7,18 +7,22 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class HomeNotifier extends AsyncNotifier<List<GroupModel>> {
   // late final HomeRepository _homeRepository;
   late final GetCurrentUserLatestGroup _currentUserLatestGroup;
+  bool _isInitialized = false;
 
   @override
   Future<List<GroupModel>> build() async {
-    // _homeRepository = ref.watch(homeAPIProvider);
-    _currentUserLatestGroup = ref.watch(getCurrentUserLatestGroupUseCase);
-
+    if (!_isInitialized) {
+      _currentUserLatestGroup = ref.read(getCurrentUserLatestGroupUseCase);
+      _isInitialized = true;
+    }
     return getLatestGroupsInHome();
   }
 
   Future<List<GroupModel>> getLatestGroupsInHome() async {
     final user = ref.read(currentUserProvider);
-    final groupList = await _currentUserLatestGroup.execute(user!.id!);
+    if (user == null) return [];
+
+    final groupList = await _currentUserLatestGroup.execute(user.id!);
     return groupList.map((group) => GroupModel.fromJson(group.data)).toList();
   }
 }
