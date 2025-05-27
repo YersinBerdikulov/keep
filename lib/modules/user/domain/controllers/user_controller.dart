@@ -6,6 +6,9 @@ import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:dongi/modules/user/data/di/user_di.dart';
 import 'package:dongi/modules/user/domain/repository/user_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
+import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 
 class UserController extends AsyncNotifier<UserModel?> {
   UserRepository get _userRepository => ref.read(userRepositoryProvider);
@@ -114,7 +117,15 @@ class UserController extends AsyncNotifier<UserModel?> {
 
           result.fold(
             (failure) => throw Exception(failure.message),
-            (_) => state = AsyncValue.data(updatedUser),
+            (_) {
+              // Update state
+              state = AsyncValue.data(updatedUser);
+
+              // Invalidate relevant providers to refresh UI
+              ref.invalidate(groupNotifierProvider);
+              ref.invalidate(homeNotifierProvider);
+              ref.invalidate(boxNotifierProvider);
+            },
           );
         },
       );
