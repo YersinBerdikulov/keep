@@ -17,16 +17,15 @@ class AddFriendPage extends HookConsumerWidget {
     final searchController = useTextEditingController(text: '');
     final searchResults = useState<List<UserModel>>([]);
     final isLoading = useState<bool>(false);
+    final debouncer = useState<Future<void>?>(null);
 
-    /// Listening to changes in the groupNotifierProvider without rebuilding the UI
+    /// Listening to changes in the friendNotifierProvider without rebuilding the UI
     ref.listen<AsyncValue<List<UserFriendModel>>>(
       friendNotifierProvider,
       (_, state) {
         state.whenOrNull(
           data: (_) {
-            // if (/* condition to refresh */) {
-            //   ref.invalidate(getGroupsProvider);
-            // }
+            // Handle successful friend request if needed
           },
           error: (error, _) => showSnackBar(context, content: error.toString()),
         );
@@ -34,29 +33,46 @@ class AddFriendPage extends HookConsumerWidget {
     );
 
     useEffect(() {
-      Future<void> searchFriends() async {
+      void performSearch() async {
         if (searchController.text.length > 2) {
-          isLoading.value = true; // Start loading
-          final results = await ref
-              .read(friendNotifierProvider.notifier)
-              .searchFriends(searchController.text);
-          searchResults.value = results;
-          isLoading.value = false; // Stop loading
+          isLoading.value = true;
+          try {
+            final results = await ref
+                .read(friendNotifierProvider.notifier)
+                .searchFriends(searchController.text);
+            if (!context.mounted) return;
+            searchResults.value = results;
+          } catch (e) {
+            if (context.mounted) {
+              showSnackBar(context, content: e.toString());
+            }
+          } finally {
+            if (context.mounted) {
+              isLoading.value = false;
+            }
+          }
         } else {
           searchResults.value = [];
         }
       }
 
-      searchFriends(); // Initial search on mount
+      void debouncedSearch() {
+        // Cancel previous debouncer if it exists
+        debouncer.value?.ignore();
 
-      searchController.addListener(() {
-        searchFriends();
-      });
+        // Create new debouncer
+        debouncer.value = Future.delayed(const Duration(milliseconds: 300), () {
+          if (context.mounted) {
+            performSearch();
+          }
+        });
+      }
+
+      searchController.addListener(debouncedSearch);
 
       return () {
-        searchController.removeListener(() {
-          searchFriends();
-        });
+        searchController.removeListener(debouncedSearch);
+        debouncer.value?.ignore();
       };
     }, [searchController]);
 
@@ -76,7 +92,11 @@ class AddFriendPage extends HookConsumerWidget {
             Expanded(
               child: isLoading.value
                   ? const Center(child: CircularProgressIndicator())
-                  : AddFriendList(searchResults.value),
+                  : searchController.text.length <= 2
+                      ? const Center(
+                          child: Text('Enter at least 3 characters to search'),
+                        )
+                      : AddFriendList(searchResults.value),
             ),
           ],
         ),
