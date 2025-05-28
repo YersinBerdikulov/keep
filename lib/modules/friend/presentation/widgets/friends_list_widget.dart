@@ -5,6 +5,7 @@ import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
 import 'package:dongi/shared/widgets/dialog/dialog_widget.dart';
 import 'package:dongi/shared/widgets/image/image_widget.dart';
+import 'package:dongi/shared/utilities/helpers/snackbar_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -60,6 +61,18 @@ class FriendListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AsyncValue<List<UserFriendModel>>>(
+      friendNotifierProvider,
+      (_, state) {
+        state.whenOrNull(
+          data: (_) {
+            ref.refresh(getFriendProvider);
+          },
+          error: (error, _) => showSnackBar(context, content: error.toString()),
+        );
+      },
+    );
+
     final acceptedFriends = userFriendModels
         .where((element) => element.status == FriendRequestStatus.accepted)
         .toList();
@@ -129,6 +142,18 @@ class PendingListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AsyncValue<List<UserFriendModel>>>(
+      friendNotifierProvider,
+      (_, state) {
+        state.whenOrNull(
+          data: (_) {
+            ref.refresh(getFriendProvider);
+          },
+          error: (error, _) => showSnackBar(context, content: error.toString()),
+        );
+      },
+    );
+
     final currentUser = ref.watch(currentUserProvider);
     final pendingRequests = pendingFriendModels
         .where((element) =>
@@ -202,6 +227,18 @@ class IncomingListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AsyncValue<List<UserFriendModel>>>(
+      friendNotifierProvider,
+      (_, state) {
+        state.whenOrNull(
+          data: (_) {
+            ref.refresh(getFriendProvider);
+          },
+          error: (error, _) => showSnackBar(context, content: error.toString()),
+        );
+      },
+    );
+
     final currentUser = ref.watch(currentUserProvider);
     final incomingRequests = incomingFriendModels
         .where((element) =>
