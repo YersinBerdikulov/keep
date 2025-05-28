@@ -227,37 +227,106 @@ class IncomingListView extends ConsumerWidget {
   }
 }
 
-class UserFriendListCard extends StatelessWidget {
+class UserFriendListCard extends ConsumerWidget {
   final UserFriendModel userFriendModel;
   const UserFriendListCard(this.userFriendModel, {super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: ListTileCard(
-        titleString: userFriendModel.receiveRequestUserName ??
-            userFriendModel.receiveRequestUserId,
-        leading: Hero(
-          tag: 'friend_${userFriendModel.receiveRequestUserId}',
-          child: ImageWidget(
-            imageUrl: userFriendModel.receiveRequestProfilePic,
-            borderRadius: 25,
-            width: 50,
-            height: 50,
-          ),
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: ColorConfig.secondary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            userFriendModel.createdAt!.toHumanReadableFormat(),
-            style: FontConfig.caption().copyWith(
-              color: ColorConfig.secondary,
+      child: Slidable(
+        endActionPane: ActionPane(
+          motion: const ScrollMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (context) {
+                showCustomBottomDialog(
+                  context,
+                  title: "Delete Friend",
+                  description: "Are you sure you want to remove this friend? This action cannot be undone.",
+                  onConfirm: () => ref
+                      .read(friendNotifierProvider.notifier)
+                      .deleteFriend(userFriendModel),
+                );
+              },
+              backgroundColor: ColorConfig.error,
+              foregroundColor: Colors.white,
+              icon: Icons.delete,
+              label: 'Delete',
             ),
+          ],
+        ),
+        child: ListTileCard(
+          titleString: userFriendModel.receiveRequestUserName ??
+              userFriendModel.receiveRequestUserId,
+          leading: Hero(
+            tag: 'friend_${userFriendModel.receiveRequestUserId}',
+            child: ImageWidget(
+              imageUrl: userFriendModel.receiveRequestProfilePic,
+              borderRadius: 25,
+              width: 50,
+              height: 50,
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: ColorConfig.secondary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  userFriendModel.createdAt!.toHumanReadableFormat(),
+                  style: FontConfig.caption().copyWith(
+                    color: ColorConfig.secondary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    showCustomBottomDialog(
+                      context,
+                      title: "Delete Friend",
+                      description: "Are you sure you want to remove this friend? This action cannot be undone.",
+                      onConfirm: () => ref
+                          .read(friendNotifierProvider.notifier)
+                          .deleteFriend(userFriendModel),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: ColorConfig.error.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.delete_outline,
+                          size: 16,
+                          color: ColorConfig.error,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Delete',
+                          style: FontConfig.caption().copyWith(
+                            color: ColorConfig.error,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -265,12 +334,12 @@ class UserFriendListCard extends StatelessWidget {
   }
 }
 
-class PendingFriendListCard extends StatelessWidget {
+class PendingFriendListCard extends ConsumerWidget {
   final UserFriendModel userFriendModel;
   const PendingFriendListCard(this.userFriendModel, {super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: ListTileCard(
@@ -285,29 +354,75 @@ class PendingFriendListCard extends StatelessWidget {
             height: 50,
           ),
         ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: ColorConfig.primarySwatch.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.pending_outlined,
-                size: 16,
-                color: ColorConfig.primarySwatch,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: ColorConfig.primarySwatch.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
               ),
-              const SizedBox(width: 4),
-              Text(
-                'Pending',
-                style: FontConfig.caption().copyWith(
-                  color: ColorConfig.primarySwatch,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.pending_outlined,
+                    size: 16,
+                    color: ColorConfig.primarySwatch,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Pending',
+                    style: FontConfig.caption().copyWith(
+                      color: ColorConfig.primarySwatch,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  showCustomBottomDialog(
+                    context,
+                    title: "Cancel Friend Request",
+                    description: "Are you sure you want to cancel this friend request? This action cannot be undone.",
+                    onConfirm: () => ref
+                        .read(friendNotifierProvider.notifier)
+                        .deleteFriend(userFriendModel),
+                  );
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorConfig.error.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.close,
+                        size: 16,
+                        color: ColorConfig.error,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Cancel',
+                        style: FontConfig.caption().copyWith(
+                          color: ColorConfig.error,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
