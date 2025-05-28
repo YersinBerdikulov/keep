@@ -15,6 +15,7 @@ class TextFieldWidget extends HookWidget {
   final String? Function(String? value)? onChanged;
   final List<TextInputFormatter> inputFormatters;
   final int? maxLength;
+  final TextInputType? keyboardType;
   const TextFieldWidget({
     required this.hintText,
     this.fillColor,
@@ -26,6 +27,7 @@ class TextFieldWidget extends HookWidget {
     this.onChanged,
     this.inputFormatters = const [],
     this.maxLength,
+    this.keyboardType,
   });
 
   @override
@@ -39,6 +41,7 @@ class TextFieldWidget extends HookWidget {
       controller: controller,
       obscureText: obscureText && !toggle.value,
       onChanged: onChanged,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
         filled: true,
         fillColor: fillColor ?? ColorConfig.white,

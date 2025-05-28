@@ -21,7 +21,8 @@ extension ExtensionsString on String {
   //}
 
   bool get isValidPhone {
-    final phoneRegExp = RegExp(r"^\+?0[0-9]{10}$");
+    // Accept formats like: +1234567890, 01234567890
+    final phoneRegExp = RegExp(r'^(\+)?[0-9]{10,12}$');
     return phoneRegExp.hasMatch(this);
   }
 }

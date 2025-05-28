@@ -110,6 +110,30 @@ class DrawerWidget extends ConsumerWidget {
                   color: ColorConfig.baseGrey,
                 ),
                 child: Icon(
+                  Icons.person_outline,
+                  color: ColorConfig.midnight,
+                  size: 20,
+                ),
+              ),
+              title: Text(
+                'Profile',
+                style: FontConfig.body2().copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onTap: () {
+                context.push(RouteName.profile);
+                Navigator.pop(context); // Close drawer
+              },
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: ColorConfig.baseGrey,
+                ),
+                child: Icon(
                   Icons.people_outline,
                   color: ColorConfig.midnight,
                   size: 20,
@@ -157,30 +181,6 @@ class DrawerWidget extends ConsumerWidget {
               ),
               onTap: () {
                 context.push(RouteName.friendList);
-                Navigator.pop(context); // Close drawer
-              },
-            ),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: ColorConfig.baseGrey,
-                ),
-                child: Icon(
-                  Icons.person_outline,
-                  color: ColorConfig.midnight,
-                  size: 20,
-                ),
-              ),
-              title: Text(
-                'Profile',
-                style: FontConfig.body2().copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              onTap: () {
-                context.push(RouteName.profile);
                 Navigator.pop(context); // Close drawer
               },
             ),
