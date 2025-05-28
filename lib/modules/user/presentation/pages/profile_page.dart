@@ -7,6 +7,8 @@ import 'package:dongi/shared/utilities/helpers/image_picker_util.dart';
 import 'package:dongi/shared/utilities/helpers/snackbar_helper.dart';
 import 'package:dongi/shared/widgets/appbar/appbar.dart';
 import 'package:dongi/shared/widgets/drawer/drawer_widget.dart';
+import 'package:dongi/shared/widgets/text_field/text_field.dart';
+import 'package:dongi/shared/utilities/extensions/validation_string.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -134,6 +136,113 @@ class ProfilePage extends ConsumerWidget {
                   'Phone',
                   userData?.phoneNumber ?? currentUser?.phone ?? 'Not provided',
                   Icons.phone_outlined,
+                  onEdit: () async {
+                    final TextEditingController phoneController = TextEditingController();
+                    phoneController.text = userData?.phoneNumber ?? currentUser?.phone ?? '';
+                    
+                    await showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        title: Text(
+                          'Update Phone Number',
+                          style: FontConfig.h6().copyWith(
+                            color: ColorConfig.midnight,
+                          ),
+                        ),
+                        content: Container(
+                          width: double.maxFinite,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Enter your phone number with country code',
+                                style: FontConfig.body2().copyWith(
+                                  color: ColorConfig.primarySwatch50,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              TextFieldWidget(
+                                controller: phoneController,
+                                hintText: '+1234567890',
+                                keyboardType: TextInputType.phone,
+                                fillColor: ColorConfig.baseGrey,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a phone number';
+                                  }
+                                  if (!value.isValidPhone) {
+                                    return 'Please enter a valid phone number';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              'Cancel',
+                              style: FontConfig.body2().copyWith(
+                                color: ColorConfig.primarySwatch50,
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final newPhone = phoneController.text;
+                              if (newPhone.isValidPhone) {
+                                try {
+                                  if (userData != null) {
+                                    final updatedUser = userData.copyWith(
+                                      phoneNumber: newPhone,
+                                    );
+                                    await ref
+                                        .read(userNotifierProvider.notifier)
+                                        .saveUser(updatedUser);
+                                    if (context.mounted) {
+                                      showSnackBar(context,
+                                          content: "Phone number updated successfully!");
+                                      Navigator.pop(context);
+                                    }
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    showSnackBar(context,
+                                        content: "Failed to update phone number: $e");
+                                    Navigator.pop(context);
+                                  }
+                                }
+                              } else {
+                                if (context.mounted) {
+                                  showSnackBar(context,
+                                      content: "Please enter a valid phone number");
+                                }
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorConfig.primarySwatch,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Update',
+                              style: FontConfig.body2().copyWith(
+                                color: ColorConfig.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                      ),
+                    );
+                  },
                 ),
                 _buildInfoTile(
                   'Member Since',
@@ -176,7 +285,7 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoTile(String title, String value, IconData icon) {
+  Widget _buildInfoTile(String title, String value, IconData icon, {VoidCallback? onEdit}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -211,6 +320,12 @@ class ProfilePage extends ConsumerWidget {
               ],
             ),
           ),
+          if (onEdit != null)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: onEdit,
+              color: ColorConfig.midnight,
+            ),
         ],
       ),
     );
