@@ -47,15 +47,21 @@ class CreateExpensePage extends HookConsumerWidget {
       },
     );
 
+    // Calculate bottom padding to account for the create button height
+    final bottomPadding = MediaQuery.of(context).padding.bottom +
+        80.0; // 80.0 is approximate button height with padding
+
     return Scaffold(
+      resizeToAvoidBottomInset:
+          true, // Ensure the screen resizes when keyboard appears
       appBar: AppBarWidget(title: "Create Expense"),
       body: Form(
         key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-          child: Column(
-            children: [
-              Expanded(
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: ListView(
                   children: [
                     CardWidget(
@@ -83,19 +89,21 @@ class CreateExpensePage extends HookConsumerWidget {
                     CreateExpenseAction(expenseCost: expenseCost),
                     const SizedBox(height: 20),
                     CreateExpenseDescription(expenseDescription),
+                    // Add padding at the bottom to prevent overlap with the create button
+                    SizedBox(height: bottomPadding),
                   ],
                 ),
               ),
-              CreateExpenseCreateButton(
-                expenseTitle: expenseTitle,
-                expenseDescription: expenseDescription,
-                expenseCost: expenseCost,
-                formKey: _formKey,
-                groupModel: groupModel,
-                boxModel: boxModel,
-              )
-            ],
-          ),
+            ),
+            CreateExpenseCreateButton(
+              expenseTitle: expenseTitle,
+              expenseDescription: expenseDescription,
+              expenseCost: expenseCost,
+              formKey: _formKey,
+              groupModel: groupModel,
+              boxModel: boxModel,
+            )
+          ],
         ),
       ),
     );
