@@ -7,11 +7,10 @@ import 'package:dongi/modules/friend/data/di/friend_di.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FriendNotifier extends AsyncNotifier<List<UserFriendModel>> {
-  late final FriendRepository _friendRepository;
+  FriendRepository get _friendRepository => ref.read(friendRepositoryProvider);
 
   @override
   Future<List<UserFriendModel>> build() async {
-    _friendRepository = ref.watch(friendRepositoryProvider);
     return getFriends();
   }
 
@@ -84,11 +83,18 @@ class FriendNotifier extends AsyncNotifier<List<UserFriendModel>> {
   }
 
   Future<List<UserFriendModel>> getFriends() async {
-    final user = ref.read(currentUserProvider);
-    final friendList = await _friendRepository.getFriends(user!.id!);
-    return friendList
-        .map((friend) => UserFriendModel.fromJson(friend.data))
-        .toList();
+    try {
+      final user = ref.read(currentUserProvider);
+      if (user == null || user.id == null) {
+        throw Exception('User not found');
+      }
+      final friendList = await _friendRepository.getFriends(user.id!);
+      return friendList
+          .map((friend) => UserFriendModel.fromJson(friend.data))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to load friends: ${e.toString()}');
+    }
   }
 
   Future<List<UserModel>> searchFriends(String query) async {

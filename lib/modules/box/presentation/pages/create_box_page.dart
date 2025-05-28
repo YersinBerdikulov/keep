@@ -46,7 +46,11 @@ class CreateBoxPage extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: ColorConfig.white,
-      appBar: AppBarWidget(title: "Create Box"),
+      appBar: AppBarWidget(
+        title: "Create Box",
+        showDrawer: false,
+        automaticallyImplyLeading: true,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [

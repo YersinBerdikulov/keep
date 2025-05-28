@@ -35,7 +35,8 @@ class GroupListPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBarWidget(
         title: "Groups",
-        showBackButton: true,
+        showDrawer: false,
+        automaticallyImplyLeading: true,
       ),
       floatingActionButton: FABWidget(
         title: "Group",

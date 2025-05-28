@@ -55,7 +55,8 @@ class UpdateGroupPage extends HookConsumerWidget {
           true, // Ensure the screen resizes when keyboard appears
       appBar: AppBarWidget(
         title: "Update Group",
-        showBackButton: true,
+        showDrawer: false,
+        automaticallyImplyLeading: true,
       ),
       body: Column(
         children: [

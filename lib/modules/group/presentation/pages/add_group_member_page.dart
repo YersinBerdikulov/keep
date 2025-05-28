@@ -66,6 +66,12 @@ class AddGroupMemberPage extends HookConsumerWidget {
     final friendList = ref.watch(friendNotifierProvider);
     final currentUserId = ref.read(currentUserProvider)!.id;
 
+    // Refresh friend list when page is loaded
+    useEffect(() {
+      ref.refresh(friendNotifierProvider);
+      return null;
+    }, []);
+
     ref.listen<AsyncValue<List<GroupModel>>>(
       groupNotifierProvider,
       (_, state) {
@@ -81,8 +87,9 @@ class AddGroupMemberPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBarWidget(
-        title: "Add Members",
-        showBackButton: true,
+        title: "Add Member",
+        showDrawer: false,
+        automaticallyImplyLeading: true,
       ),
       body: SafeArea(
         child: Column(
@@ -275,6 +282,14 @@ class AddGroupMemberPage extends HookConsumerWidget {
                                       color: ColorConfig.primarySwatch50,
                                     ),
                                     textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ButtonWidget(
+                                    onPressed: () {
+                                      ref.refresh(friendNotifierProvider);
+                                    },
+                                    title: 'Retry',
+                                    textColor: ColorConfig.secondary,
                                   ),
                                 ],
                               ),

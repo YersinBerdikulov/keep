@@ -79,8 +79,9 @@ class AddFriendPage extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBarWidget(
-        title: 'Add Friend',
-        showBackButton: true,
+        title: "Add Friend",
+        showDrawer: false,
+        automaticallyImplyLeading: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
