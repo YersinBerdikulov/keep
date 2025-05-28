@@ -12,6 +12,7 @@ class RouteName {
   static String groupList = '/group';
   static String createGroup = '/group/create';
   static String updateGroup = '/group/update';
+  static String addGroupMember = '/group/add-member';
   static String createBox = '/box/create';
   static String updateBox = '/box/update';
   static String friendList = '/friend/list';

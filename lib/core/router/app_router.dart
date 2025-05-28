@@ -3,6 +3,7 @@ import 'package:dongi/core/router/router_notifier.dart';
 import 'package:dongi/modules/expense/presentation/pages/made_by_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/split_page.dart';
 import 'package:dongi/modules/user/presentation/pages/profile_page.dart';
+import 'package:dongi/modules/group/presentation/pages/add_group_member_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -114,6 +115,12 @@ final goRouterProvider = Provider<GoRouter>(
           path: RouteName.updateGroup,
           builder: (context, state) {
             return UpdateGroupPage(groupModel: state.extra as dynamic);
+          },
+        ),
+        GoRoute(
+          path: RouteName.addGroupMember,
+          builder: (context, state) {
+            return AddGroupMemberPage(groupModel: state.extra as dynamic);
           },
         ),
         GoRoute(

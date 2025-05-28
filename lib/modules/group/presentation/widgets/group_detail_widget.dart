@@ -1,18 +1,19 @@
+import 'package:dongi/core/router/router_names.dart';
+import 'package:dongi/modules/group/domain/models/group_model.dart';
+import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
-import 'package:dongi/modules/box/domain/models/box_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
-import '../../../../shared/utilities/helpers/snackbar_helper.dart';
-import '../../domain/models/group_model.dart';
-import '../../../user/domain/models/user_model.dart';
-import '../../../../shared/widgets/card/box_card.dart';
-import '../../../../shared/widgets/card/card.dart';
-import '../../../../shared/widgets/error/error.dart';
 import '../../../../shared/widgets/friends/friend.dart';
 import '../../../../shared/widgets/loading/loading.dart';
+import '../../../../shared/widgets/error/error.dart';
+import '../../../../shared/widgets/card/box_card.dart';
+import '../../../../shared/widgets/card/card.dart';
 import '../../domain/di/group_controller_di.dart';
 
 class GroupDetailTitle extends StatelessWidget {
@@ -219,7 +220,13 @@ class GroupDetailInfo extends ConsumerWidget {
 
 class GroupDetailFriendList extends ConsumerWidget {
   final List<String> userIds;
-  const GroupDetailFriendList({super.key, required this.userIds});
+  final GroupModel groupModel;
+
+  const GroupDetailFriendList({
+    super.key,
+    required this.userIds,
+    required this.groupModel,
+  });
 
   Widget friendCard(UserModel user) {
     return Container(
@@ -253,31 +260,34 @@ class GroupDetailFriendList extends ConsumerWidget {
     );
   }
 
-  Widget addFriendCard() {
-    return Container(
-      margin: const EdgeInsets.only(right: 16),
-      child: Column(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
-              border: Border.all(
-                color: ColorConfig.secondary.withOpacity(0.3),
-                width: 2,
-                style: BorderStyle.solid,
+  Widget addFriendCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push(RouteName.addGroupMember, extra: groupModel),
+      child: Container(
+        margin: const EdgeInsets.only(right: 16),
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(
+                  color: ColorConfig.secondary.withOpacity(0.3),
+                  width: 2,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              child: FriendWidget.add(),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Invite",
+              style: FontConfig.caption().copyWith(
+                color: ColorConfig.secondary,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            child: FriendWidget.add(),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "Invite",
-            style: FontConfig.caption().copyWith(
-              color: ColorConfig.secondary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -328,7 +338,7 @@ class GroupDetailFriendList extends ConsumerWidget {
                 scrollDirection: Axis.horizontal,
                 children: [
                   ...data.map((user) => friendCard(user)).toList(),
-                  addFriendCard(),
+                  addFriendCard(context),
                 ],
               ),
             ),

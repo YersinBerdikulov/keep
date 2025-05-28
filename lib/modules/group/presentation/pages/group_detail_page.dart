@@ -57,7 +57,10 @@ class GroupDetailPage extends ConsumerWidget {
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
                 GroupDetailInfo(groupModel: data),
-                GroupDetailFriendList(userIds: data.groupUsers),
+                GroupDetailFriendList(
+                  userIds: data.groupUsers,
+                  groupModel: data,
+                ),
                 GroupDetailBoxGrid(groupModel: data),
                 const SizedBox(height: 80),
               ],
