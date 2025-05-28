@@ -71,35 +71,39 @@ class FriendsListPage extends HookConsumerWidget {
                 unselectedLabelColor: ColorConfig.primarySwatch50,
                 indicatorColor: ColorConfig.midnight,
                 indicatorWeight: 3,
+                isScrollable: true,
                 labelStyle: FontConfig.body2().copyWith(
                   fontWeight: FontWeight.w600,
                 ),
                 unselectedLabelStyle: FontConfig.body2(),
                 tabs: [
                   Tab(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.people_outline, size: 20),
-                        const SizedBox(width: 8),
-                        const Text('Friends'),
-                        if (data.where((e) => e.status == FriendRequestStatus.accepted).isNotEmpty) ...[
-                          const SizedBox(width: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: ColorConfig.midnight.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              data.where((e) => e.status == FriendRequestStatus.accepted).length.toString(),
-                              style: FontConfig.caption().copyWith(
-                                color: ColorConfig.midnight,
+                    child: Container(
+                      constraints: const BoxConstraints(minWidth: 90),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.people_outline, size: 20),
+                          const SizedBox(width: 8),
+                          const Text('Friends'),
+                          if (data.where((e) => e.status == FriendRequestStatus.accepted).isNotEmpty) ...[
+                            const SizedBox(width: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: ColorConfig.midnight.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                data.where((e) => e.status == FriendRequestStatus.accepted).length.toString(),
+                                style: FontConfig.caption().copyWith(
+                                  color: ColorConfig.midnight,
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
                   Tab(
