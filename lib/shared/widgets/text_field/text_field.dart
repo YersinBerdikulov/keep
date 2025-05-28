@@ -14,6 +14,7 @@ class TextFieldWidget extends HookWidget {
   final String? Function(String? value)? validator;
   final String? Function(String? value)? onChanged;
   final List<TextInputFormatter> inputFormatters;
+  final int? maxLength;
   const TextFieldWidget({
     required this.hintText,
     this.fillColor,
@@ -24,6 +25,7 @@ class TextFieldWidget extends HookWidget {
     this.validator,
     this.onChanged,
     this.inputFormatters = const [],
+    this.maxLength,
   });
 
   @override
@@ -33,6 +35,7 @@ class TextFieldWidget extends HookWidget {
       inputFormatters: inputFormatters,
       validator: validator,
       maxLines: maxLines,
+      maxLength: maxLength,
       controller: controller,
       obscureText: obscureText && !toggle.value,
       onChanged: onChanged,

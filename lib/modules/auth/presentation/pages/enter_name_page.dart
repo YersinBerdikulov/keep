@@ -20,8 +20,15 @@ class EnterNamePage extends HookConsumerWidget {
     final isLoading = useState(false);
 
     void onSubmit() async {
-      if (nameController.text.trim().isEmpty) {
+      final name = nameController.text.trim();
+      
+      if (name.isEmpty) {
         showSnackBar(context, content: 'Please enter your name');
+        return;
+      }
+
+      if (name.length > 10) {
+        showSnackBar(context, content: 'Name cannot be longer than 10 characters');
         return;
       }
 
@@ -43,7 +50,7 @@ class EnterNamePage extends HookConsumerWidget {
 
         // Update user data with the new name
         final updatedUser = userData.copyWith(
-          userName: nameController.text.trim(),
+          userName: name,
         );
 
         // Save the updated user data
@@ -76,14 +83,22 @@ class EnterNamePage extends HookConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                "Please enter your name to continue.",
+                "Please enter your name (max 10 characters).",
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
               const SizedBox(height: 32),
               TextFieldWidget(
                 controller: nameController,
                 hintText: 'Enter your name',
-                onChanged: (_) {},
+                onChanged: (value) {
+                  if (value != null && value.length > 10) {
+                    nameController.text = value.substring(0, 10);
+                    nameController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: nameController.text.length),
+                    );
+                  }
+                },
+                maxLength: 10,
                 fillColor: ColorConfig.white,
               ),
               const SizedBox(height: 24),

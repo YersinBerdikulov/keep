@@ -40,7 +40,7 @@ final goRouterProvider = Provider<GoRouter>(
       navigatorKey: navigatorKey,
       refreshListenable: ref.watch(goRouterNotifierProvider),
       redirect: (context, state) {
-        final user = ref.read(currentUserProvider); // Read, not watch
+        final user = ref.read(currentUserProvider);
 
         // Allow public routes without redirection
         final publicRoutes = [
@@ -63,11 +63,9 @@ final goRouterProvider = Provider<GoRouter>(
         }
 
         // Get user data to check for name
-        if (state.fullPath != RouteName.enterName) {
-          final userData = ref.read(userNotifierProvider).value;
-          if (userData == null || userData.userName == null || userData.userName!.isEmpty) {
-            return RouteName.enterName;
-          }
+        final userData = ref.read(userNotifierProvider).value;
+        if (userData != null && (userData.userName == null || userData.userName!.isEmpty) && state.fullPath != RouteName.enterName) {
+          return RouteName.enterName;
         }
 
         return null;
