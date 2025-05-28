@@ -270,6 +270,17 @@ class UserFriendListCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentUser = ref.watch(currentUserProvider);
+    final isSender = userFriendModel.sendRequestUserId == currentUser?.id;
+    
+    // Show the other user's name and profile pic
+    final friendName = isSender 
+        ? userFriendModel.receiveRequestUserName ?? userFriendModel.receiveRequestUserId
+        : userFriendModel.sendRequestUserName ?? userFriendModel.sendRequestUserId;
+    final friendProfilePic = isSender
+        ? userFriendModel.receiveRequestProfilePic
+        : userFriendModel.sendRequestProfilePic;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Slidable(
@@ -295,12 +306,11 @@ class UserFriendListCard extends ConsumerWidget {
           ],
         ),
         child: ListTileCard(
-          titleString: userFriendModel.receiveRequestUserName ??
-              userFriendModel.receiveRequestUserId,
+          titleString: friendName,
           leading: Hero(
-            tag: 'friend_${userFriendModel.receiveRequestUserId}',
+            tag: 'friend_${isSender ? userFriendModel.receiveRequestUserId : userFriendModel.sendRequestUserId}',
             child: ImageWidget(
-              imageUrl: userFriendModel.receiveRequestProfilePic,
+              imageUrl: friendProfilePic,
               borderRadius: 25,
               width: 50,
               height: 50,
