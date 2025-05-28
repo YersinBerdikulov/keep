@@ -61,6 +61,17 @@ class FriendListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final friendController = ref.read(friendNotifierProvider.notifier);
+
+    Future<void> handleRefresh() async {
+      try {
+        await friendController.getFriends();
+        await ref.refresh(getFriendProvider);
+      } catch (e) {
+        showSnackBar(context, content: 'Failed to refresh friends list');
+      }
+    }
+
     ref.listen<AsyncValue<List<UserFriendModel>>>(
       friendNotifierProvider,
       (_, state) {
@@ -78,15 +89,22 @@ class FriendListView extends ConsumerWidget {
         .toList();
 
     return RefreshIndicator(
-      onRefresh: () async => ref.refresh(getFriendProvider),
+      onRefresh: handleRefresh,
       child: acceptedFriends.isEmpty
-          ? _buildEmptyState()
+          ? Stack(
+              children: [
+                _buildEmptyState(),
+                ListView(physics: const AlwaysScrollableScrollPhysics()),
+              ],
+            )
           : Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: SlidableAutoCloseBehavior(
                 child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: acceptedFriends.length,
-                  itemBuilder: (context, index) => UserFriendListCard(acceptedFriends[index]),
+                  itemBuilder: (context, index) =>
+                      UserFriendListCard(acceptedFriends[index]),
                 ),
               ),
             ),
@@ -142,6 +160,17 @@ class PendingListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final friendController = ref.read(friendNotifierProvider.notifier);
+
+    Future<void> handleRefresh() async {
+      try {
+        await friendController.getFriends();
+        await ref.refresh(getFriendProvider);
+      } catch (e) {
+        showSnackBar(context, content: 'Failed to refresh pending requests');
+      }
+    }
+
     ref.listen<AsyncValue<List<UserFriendModel>>>(
       friendNotifierProvider,
       (_, state) {
@@ -162,13 +191,19 @@ class PendingListView extends ConsumerWidget {
         .toList();
 
     return RefreshIndicator(
-      onRefresh: () async => ref.refresh(getFriendProvider),
+      onRefresh: handleRefresh,
       child: pendingRequests.isEmpty
-          ? _buildEmptyState()
+          ? Stack(
+              children: [
+                _buildEmptyState(),
+                ListView(physics: const AlwaysScrollableScrollPhysics()),
+              ],
+            )
           : Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: SlidableAutoCloseBehavior(
                 child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: pendingRequests.length,
                   itemBuilder: (context, index) =>
                       PendingFriendListCard(pendingRequests[index]),
@@ -227,6 +262,17 @@ class IncomingListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final friendController = ref.read(friendNotifierProvider.notifier);
+
+    Future<void> handleRefresh() async {
+      try {
+        await friendController.getFriends();
+        await ref.refresh(getFriendProvider);
+      } catch (e) {
+        showSnackBar(context, content: 'Failed to refresh incoming requests');
+      }
+    }
+
     ref.listen<AsyncValue<List<UserFriendModel>>>(
       friendNotifierProvider,
       (_, state) {
@@ -247,13 +293,19 @@ class IncomingListView extends ConsumerWidget {
         .toList();
 
     return RefreshIndicator(
-      onRefresh: () async => ref.refresh(getFriendProvider),
+      onRefresh: handleRefresh,
       child: incomingRequests.isEmpty
-          ? _buildEmptyState()
+          ? Stack(
+              children: [
+                _buildEmptyState(),
+                ListView(physics: const AlwaysScrollableScrollPhysics()),
+              ],
+            )
           : Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: SlidableAutoCloseBehavior(
                 child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: incomingRequests.length,
                   itemBuilder: (context, index) =>
                       IncomingFriendListCard(incomingRequests[index]),
@@ -272,11 +324,13 @@ class UserFriendListCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
     final isSender = userFriendModel.sendRequestUserId == currentUser?.id;
-    
+
     // Show the other user's name and profile pic
-    final friendName = isSender 
-        ? userFriendModel.receiveRequestUserName ?? userFriendModel.receiveRequestUserId
-        : userFriendModel.sendRequestUserName ?? userFriendModel.sendRequestUserId;
+    final friendName = isSender
+        ? userFriendModel.receiveRequestUserName ??
+            userFriendModel.receiveRequestUserId
+        : userFriendModel.sendRequestUserName ??
+            userFriendModel.sendRequestUserId;
     final friendProfilePic = isSender
         ? userFriendModel.receiveRequestProfilePic
         : userFriendModel.sendRequestProfilePic;
@@ -292,7 +346,8 @@ class UserFriendListCard extends ConsumerWidget {
                 showCustomBottomDialog(
                   context,
                   title: "Delete Friend",
-                  description: "Are you sure you want to remove this friend? This action cannot be undone.",
+                  description:
+                      "Are you sure you want to remove this friend? This action cannot be undone.",
                   onConfirm: () => ref
                       .read(friendNotifierProvider.notifier)
                       .deleteFriend(userFriendModel),
@@ -308,7 +363,8 @@ class UserFriendListCard extends ConsumerWidget {
         child: ListTileCard(
           titleString: friendName,
           leading: Hero(
-            tag: 'friend_${isSender ? userFriendModel.receiveRequestUserId : userFriendModel.sendRequestUserId}',
+            tag:
+                'friend_${isSender ? userFriendModel.receiveRequestUserId : userFriendModel.sendRequestUserId}',
             child: ImageWidget(
               imageUrl: friendProfilePic,
               borderRadius: 25,
@@ -320,7 +376,8 @@ class UserFriendListCard extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: ColorConfig.secondary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -340,7 +397,8 @@ class UserFriendListCard extends ConsumerWidget {
                     showCustomBottomDialog(
                       context,
                       title: "Delete Friend",
-                      description: "Are you sure you want to remove this friend? This action cannot be undone.",
+                      description:
+                          "Are you sure you want to remove this friend? This action cannot be undone.",
                       onConfirm: () => ref
                           .read(friendNotifierProvider.notifier)
                           .deleteFriend(userFriendModel),
@@ -348,7 +406,8 @@ class UserFriendListCard extends ConsumerWidget {
                   },
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: ColorConfig.error.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -436,7 +495,8 @@ class PendingFriendListCard extends ConsumerWidget {
                   showCustomBottomDialog(
                     context,
                     title: "Cancel Friend Request",
-                    description: "Are you sure you want to cancel this friend request? This action cannot be undone.",
+                    description:
+                        "Are you sure you want to cancel this friend request? This action cannot be undone.",
                     onConfirm: () => ref
                         .read(friendNotifierProvider.notifier)
                         .deleteFriend(userFriendModel),
@@ -444,7 +504,8 @@ class PendingFriendListCard extends ConsumerWidget {
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: ColorConfig.error.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),

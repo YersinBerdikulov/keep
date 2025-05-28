@@ -88,10 +88,44 @@ class FriendNotifier extends AsyncNotifier<List<UserFriendModel>> {
       if (user == null || user.id == null) {
         throw Exception('User not found');
       }
+
       final friendList = await _friendRepository.getFriends(user.id!);
-      return friendList
-          .map((friend) => UserFriendModel.fromJson(friend.data))
-          .toList();
+      final List<UserFriendModel> friends = [];
+
+      for (var friend in friendList) {
+        final friendData = friend.data;
+        var friendModel = UserFriendModel.fromJson(friendData);
+
+        // If sender username is missing, fetch it
+        if (friendModel.sendRequestUserName == null) {
+          final senderUser = await ref
+              .read(getUserDataUseCaseProvider)
+              .execute(friendModel.sendRequestUserId);
+          if (senderUser != null) {
+            friendModel = friendModel.copyWith(
+              sendRequestUserName: senderUser.userName,
+              sendRequestProfilePic: senderUser.profileImage,
+            );
+          }
+        }
+
+        // If receiver username is missing, fetch it
+        if (friendModel.receiveRequestUserName == null) {
+          final receiverUser = await ref
+              .read(getUserDataUseCaseProvider)
+              .execute(friendModel.receiveRequestUserId);
+          if (receiverUser != null) {
+            friendModel = friendModel.copyWith(
+              receiveRequestUserName: receiverUser.userName,
+              receiveRequestProfilePic: receiverUser.profileImage,
+            );
+          }
+        }
+
+        friends.add(friendModel);
+      }
+
+      return friends;
     } catch (e) {
       throw Exception('Failed to load friends: ${e.toString()}');
     }
