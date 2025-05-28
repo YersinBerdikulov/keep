@@ -23,6 +23,23 @@ class RouteName {
   static String expenseSplit = '/expense/split';
   static String expenseDetail = '/expense/detail';
   static String profile = '/profile';
+  static String enterName = '/auth/enter-name';
+  static String group = '/group';
+  static String box = '/box';
+  static String expense = '/expense';
+  static String category = '/category';
+  static String search = '/search';
+  static String notification = '/notification';
+  static String settings = '/settings';
+  static String about = '/about';
+  static String help = '/help';
+  static String privacy = '/privacy';
+  static String terms = '/terms';
+  static String contact = '/contact';
+  static String feedback = '/feedback';
+  static String report = '/report';
+  static String error = '/error';
+  static String notFound = '/404';
 
   static String groupDetail(String? groupId) =>
       '/group/${groupId ?? ":groupId"}';

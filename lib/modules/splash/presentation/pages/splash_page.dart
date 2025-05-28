@@ -1,5 +1,6 @@
 import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -22,22 +23,38 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   Future<void> fetchUserData() async {
     try {
       // Make the API call to Appwrite "get account" endpoint
-      final user =
-          await ref.read(authControllerProvider.notifier).currentUser();
+      final user = await ref.read(authControllerProvider.notifier).currentUser();
 
       if (user != null) {
-        // Update the state or provider with the user data
-        ref.watch(currentUserProvider.notifier).state = user;
-        // Push to home
-        context.go(RouteName.home);
+        // Update the auth state with the user data
+        ref.read(currentUserProvider.notifier).state = user;
+
+        // Get the user data from the database
+        final userData = await ref.read(userNotifierProvider.notifier).currentUser;
+
+        if (userData == null || userData.userName == null || userData.userName!.isEmpty) {
+          // If user has no name, redirect to enter name page
+          if (mounted) {
+            context.go(RouteName.enterName);
+          }
+          return;
+        }
+
+        // If user has a name, proceed to home
+        if (mounted) {
+          context.go(RouteName.home);
+        }
       } else {
-        context.go(RouteName.authHome);
+        if (mounted) {
+          context.go(RouteName.authHome);
+        }
       }
     } catch (error) {
       // Handle the error, such as showing an error message
       debugPrint('Error fetching user data: $error');
-      //Navigator.pushReplacementNamed(context, '/error');
-      context.go(RouteName.signin);
+      if (mounted) {
+        context.go(RouteName.signin);
+      }
     }
   }
 

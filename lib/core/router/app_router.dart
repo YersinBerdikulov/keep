@@ -1,9 +1,11 @@
 import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/core/router/router_notifier.dart';
+import 'package:dongi/modules/auth/presentation/pages/enter_name_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/made_by_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/split_page.dart';
 import 'package:dongi/modules/user/presentation/pages/profile_page.dart';
 import 'package:dongi/modules/group/presentation/pages/add_group_member_page.dart';
+import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -47,13 +49,28 @@ final goRouterProvider = Provider<GoRouter>(
           RouteName.splash,
           RouteName.onboarding,
           RouteName.signupOTPInput,
+          RouteName.enterName,
         ];
 
-        if (publicRoutes.contains(state.uri.toString())) {
+        // Check if the current location matches any public route
+        if (publicRoutes.contains(state.fullPath)) {
           return null;
         }
 
-        return user == null ? RouteName.authHome : null;
+        // If user is not authenticated, redirect to auth home
+        if (user == null) {
+          return RouteName.authHome;
+        }
+
+        // Get user data to check for name
+        if (state.fullPath != RouteName.enterName) {
+          final userData = ref.read(userNotifierProvider).value;
+          if (userData == null || userData.userName == null || userData.userName!.isEmpty) {
+            return RouteName.enterName;
+          }
+        }
+
+        return null;
       },
       routes: [
         GoRoute(
@@ -86,6 +103,9 @@ final goRouterProvider = Provider<GoRouter>(
         GoRoute(
             path: RouteName.setPassword,
             builder: (context, state) => const SetPasswordPage()),
+        GoRoute(
+            path: RouteName.enterName,
+            builder: (context, state) => const EnterNamePage()),
         GoRoute(
             path: RouteName.onboarding,
             builder: (context, state) => OnboardingPage()),
