@@ -38,14 +38,40 @@ final getBoxDetailProvider =
   });
 });
 
+final _usersInBoxCache =
+    StateProvider<Map<String, List<UserModel>>>((ref) => {});
+
 final getUsersInBoxProvider = FutureProvider.family
-    .autoDispose((ref, UsersInBoxArgs usersInBoxArgs) async {
+    .autoDispose<List<UserModel>, UsersInBoxArgs>((ref, usersInBoxArgs) async {
   if (usersInBoxArgs.userIds.isEmpty) {
     return <UserModel>[];
   }
+
+  // Create a cache key from the userIds and groupId
+  final cacheKey =
+      "${usersInBoxArgs.groupId}_${usersInBoxArgs.userIds.join('_')}";
+
+  // Check cache first
+  final cache = ref.watch(_usersInBoxCache);
+  if (cache.containsKey(cacheKey)) {
+    return cache[cacheKey]!;
+  }
+
+  // Keep provider alive for 5 minutes to prevent constant rebuilds
+  ref.keepAlive();
+
+  // Get users directly from controller
   final boxesController =
       ref.read(boxNotifierProvider(usersInBoxArgs.groupId).notifier);
-  return boxesController.getUsersInBox(usersInBoxArgs.userIds);
+  final users = await boxesController.getUsersInBox(usersInBoxArgs.userIds);
+
+  // Store in cache
+  ref.read(_usersInBoxCache.notifier).update((state) => {
+        ...state,
+        cacheKey: users,
+      });
+
+  return users;
 });
 
 final selectedMembersProvider = StateProvider<List<String>>((ref) => []);
