@@ -49,6 +49,7 @@ final goRouterProvider = Provider<GoRouter>(
           RouteName.splash,
           RouteName.onboarding,
           RouteName.signupOTPInput,
+          RouteName.authHome,
           RouteName.enterName,
         ];
 
@@ -64,8 +65,21 @@ final goRouterProvider = Provider<GoRouter>(
 
         // Get user data to check for name
         final userData = ref.read(userNotifierProvider).value;
-        if (userData != null && (userData.userName == null || userData.userName!.isEmpty) && state.fullPath != RouteName.enterName) {
+        
+        // Only redirect to enterName if we have loaded user data and confirmed there's no name
+        if (userData != null && 
+            (userData.userName == null || userData.userName!.isEmpty) && 
+            state.fullPath != RouteName.enterName &&
+            state.fullPath != RouteName.home) { // Allow home page access initially
           return RouteName.enterName;
+        }
+
+        // If we're on enterName page but user has a name, redirect to home
+        if (userData != null && 
+            userData.userName != null && 
+            !userData.userName!.isEmpty && 
+            state.fullPath == RouteName.enterName) {
+          return RouteName.home;
         }
 
         return null;

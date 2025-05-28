@@ -29,19 +29,8 @@ class _SplashPageState extends ConsumerState<SplashPage> {
         // Update the auth state with the user data
         ref.read(currentUserProvider.notifier).state = user;
 
-        // Get the user data from the database
-        final userData = await ref.read(userNotifierProvider.notifier).currentUser;
-
-        if (userData == null || userData.userName == null || userData.userName!.isEmpty) {
-          // If user has no name, redirect to enter name page
-          if (mounted) {
-            context.go(RouteName.enterName);
-          }
-          return;
-        }
-
-        // If user has a name, proceed to home
         if (mounted) {
+          // Always go to home page first after authentication
           context.go(RouteName.home);
         }
       } else {
