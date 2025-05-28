@@ -2,7 +2,10 @@ import 'package:dongi/core/constants/color_config.dart';
 import 'package:dongi/core/constants/font_config.dart';
 import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
+import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
 import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
+import 'package:dongi/shared/widgets/dialog/dialog_widget.dart';
 import 'package:dongi/shared/widgets/image/image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,50 +16,67 @@ class DrawerWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentUser = ref.watch(currentUserProvider);
-    final userDataAsync = ref.watch(userNotifierProvider);
+    final currentUser = ref.watch(userNotifierProvider);
+    final friendList = ref.watch(getFriendProvider);
 
     return Drawer(
-      child: userDataAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
-        data: (userData) => Column(
+      backgroundColor: ColorConfig.white,
+      child: SafeArea(
+        child: Column(
           children: [
-            // User Profile Header
-            UserAccountsDrawerHeader(
-              decoration: BoxDecoration(
-                color: ColorConfig.primarySwatch,
-              ),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: ColorConfig.white,
-                child: userData?.profileImage?.isNotEmpty == true
-                    ? ImageWidget(
-                        imageUrl: userData!.profileImage!,
-                        borderRadius: 50,
-                        width: 80,
-                        height: 80,
-                      )
-                    : Icon(
-                        Icons.person,
-                        size: 40,
-                        color: ColorConfig.midnight,
+            // User Profile Section
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  currentUser.when(
+                    data: (user) => ImageWidget(
+                      imageUrl: user?.profileImage,
+                      borderRadius: 25,
+                      width: 50,
+                      height: 50,
+                    ),
+                    loading: () => const SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: CircularProgressIndicator(),
+                    ),
+                    error: (_, __) => const SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Icon(Icons.error),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: currentUser.when(
+                      data: (user) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user?.userName ?? user?.email ?? '',
+                            style: FontConfig.h6().copyWith(
+                              color: ColorConfig.midnight,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            user?.email ?? '',
+                            style: FontConfig.caption().copyWith(
+                              color: ColorConfig.primarySwatch50,
+                            ),
+                          ),
+                        ],
                       ),
-              ),
-              accountName: Text(
-                userData?.userName ?? currentUser?.name ?? 'No Name',
-                style: FontConfig.body1().copyWith(
-                  color: ColorConfig.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              accountEmail: Text(
-                userData?.email ?? currentUser?.email ?? 'No Email',
-                style: FontConfig.body2().copyWith(
-                  color: ColorConfig.white.withOpacity(0.8),
-                ),
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (_, __) => const Text('Error loading user data'),
+                    ),
+                  ),
+                ],
               ),
             ),
-
+            const Divider(),
             // Navigation Items
             ListTile(
               leading: Container(
@@ -95,11 +115,45 @@ class DrawerWidget extends ConsumerWidget {
                   size: 20,
                 ),
               ),
-              title: Text(
-                'Friends List',
-                style: FontConfig.body2().copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+              title: Row(
+                children: [
+                  Text(
+                    'Friends List',
+                    style: FontConfig.body2().copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  friendList.when(
+                    data: (data) {
+                      final incomingRequests = data
+                          .where((e) =>
+                              e.status == FriendRequestStatus.pending &&
+                              e.receiveRequestUserId == currentUser.value?.id)
+                          .length;
+
+                      if (incomingRequests > 0) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: ColorConfig.error.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            incomingRequests.toString(),
+                            style: FontConfig.caption().copyWith(
+                              color: ColorConfig.error,
+                            ),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                  ),
+                ],
               ),
               onTap: () {
                 context.push(RouteName.friendList);
@@ -131,7 +185,7 @@ class DrawerWidget extends ConsumerWidget {
               },
             ),
             const Spacer(),
-            const Divider(),
+            // Logout Button
             ListTile(
               leading: Container(
                 padding: const EdgeInsets.all(8),
@@ -140,7 +194,7 @@ class DrawerWidget extends ConsumerWidget {
                   color: ColorConfig.error.withOpacity(0.1),
                 ),
                 child: Icon(
-                  Icons.logout_outlined,
+                  Icons.logout,
                   color: ColorConfig.error,
                   size: 20,
                 ),
@@ -153,14 +207,18 @@ class DrawerWidget extends ConsumerWidget {
                 ),
               ),
               onTap: () {
-                ref.read(authControllerProvider.notifier).logout(context);
-                Navigator.pop(context); // Close drawer
+                showCustomBottomDialog(
+                  context,
+                  title: "Logout",
+                  description: "Are you sure you want to logout?",
+                  onConfirm: () =>
+                      ref.read(authControllerProvider.notifier).logout(context),
+                );
               },
             ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
     );
   }
-} 
+}
