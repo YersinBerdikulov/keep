@@ -1,5 +1,6 @@
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -131,7 +132,6 @@ class FriendListBoxDetail extends ConsumerStatefulWidget {
 class _FriendListBoxDetailState extends ConsumerState<FriendListBoxDetail> {
   List<UserModel>? _users;
   bool _isLoading = true;
-  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -139,9 +139,15 @@ class _FriendListBoxDetailState extends ConsumerState<FriendListBoxDetail> {
     _fetchUsers();
   }
 
-  Future<void> _fetchUsers() async {
-    if (_isInitialized) return;
+  @override
+  void didUpdateWidget(FriendListBoxDetail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.boxModel != widget.boxModel) {
+      _fetchUsers();
+    }
+  }
 
+  Future<void> _fetchUsers() async {
     setState(() {
       _isLoading = true;
     });
@@ -151,7 +157,6 @@ class _FriendListBoxDetailState extends ConsumerState<FriendListBoxDetail> {
         setState(() {
           _users = [];
           _isLoading = false;
-          _isInitialized = true;
         });
         return;
       }
@@ -166,7 +171,6 @@ class _FriendListBoxDetailState extends ConsumerState<FriendListBoxDetail> {
         setState(() {
           _users = users;
           _isLoading = false;
-          _isInitialized = true;
         });
       }
     } catch (e) {
@@ -174,47 +178,91 @@ class _FriendListBoxDetailState extends ConsumerState<FriendListBoxDetail> {
         setState(() {
           _users = [];
           _isLoading = false;
-          _isInitialized = true;
         });
       }
     }
   }
 
-  Widget friendItem(UserModel user) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 10),
+  Widget friendCard(UserModel user) {
+    return Container(
+      margin: const EdgeInsets.only(right: 16),
       child: Column(
         children: [
-          FriendWidget(image: user.profileImage),
-          const SizedBox(height: 5),
-          Text(user.userName ?? user.email, style: FontConfig.overline()),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                color: ColorConfig.primarySwatch25,
+                width: 2,
+              ),
+            ),
+            child: FriendWidget(
+              image: user.profileImage,
+              width: 50,
+              height: 50,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            user.userName ?? user.email,
+            style: FontConfig.caption().copyWith(
+              color: ColorConfig.midnight,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget addFriendCard() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-      child: Column(
-        children: [
-          FriendWidget.add(),
-          const SizedBox(height: 5),
-          Row(
-            children: [
-              Text(
-                "Add",
-                style: FontConfig.caption(),
-              )
-            ],
-          )
-        ],
+  Widget addFriendCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push(RouteName.addBoxMember, extra: widget.boxModel),
+      child: Container(
+        margin: const EdgeInsets.only(right: 16),
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(
+                  color: ColorConfig.secondary.withOpacity(0.3),
+                  width: 2,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              child: FriendWidget.add(),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Invite",
+              style: FontConfig.caption().copyWith(
+                color: ColorConfig.secondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Watch box updates to refresh users when needed
+    ref.watch(boxNotifierProvider(widget.boxModel.groupId)).whenData((boxes) {
+      final updatedBox = boxes.firstWhere(
+        (box) => box.id == widget.boxModel.id,
+        orElse: () => widget.boxModel,
+      );
+      if (updatedBox.id == widget.boxModel.id &&
+          !listEquals(updatedBox.boxUsers, widget.boxModel.boxUsers)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _fetchUsers();
+        });
+      }
+    });
+
     if (_isLoading) {
       return const LoadingWidget();
     }
@@ -223,32 +271,94 @@ class _FriendListBoxDetailState extends ConsumerState<FriendListBoxDetail> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 0, 10),
-          child: Text(
-            'Friends',
-            style: FontConfig.body1(),
-          ),
-        ),
-        SizedBox(
-          height: 90,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(width: 11),
-              if (_users != null && _users!.isNotEmpty)
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _users!.length,
-                  itemBuilder: (context, index) => friendItem(_users![index]),
+              Text(
+                'Members',
+                style: FontConfig.body1(),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: ColorConfig.secondary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              addFriendCard(),
+                child: Text(
+                  "View All",
+                  style: FontConfig.caption().copyWith(
+                    color: ColorConfig.secondary,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
-        const SizedBox(height: 25),
+        if (_users == null || _users!.isEmpty)
+          _buildEmptyMembers()
+        else
+          SizedBox(
+            height: 90,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              scrollDirection: Axis.horizontal,
+              children: [
+                ..._users!.map((user) => friendCard(user)).toList(),
+                addFriendCard(context),
+              ],
+            ),
+          ),
+        const SizedBox(height: 8),
       ],
+    );
+  }
+
+  Widget _buildEmptyMembers() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: ColorConfig.grey,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: ColorConfig.primarySwatch25,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: ColorConfig.primarySwatch.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.group_off_outlined,
+              size: 32,
+              color: ColorConfig.primarySwatch,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "No Members Yet",
+            style: FontConfig.h6().copyWith(
+              color: ColorConfig.midnight,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Invite your friends to join this box",
+            textAlign: TextAlign.center,
+            style: FontConfig.body2().copyWith(
+              color: ColorConfig.primarySwatch50,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

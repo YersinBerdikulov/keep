@@ -107,11 +107,18 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
     TextEditingController? boxTitle,
     TextEditingController? boxDescription,
     List<String>? expenseIds,
+    List<String>? boxUsers,
     num? total,
   }) async {
     state = const AsyncValue.loading();
     try {
-      Map<String, dynamic> updateData = {'\$id': boxId};
+      // First get the current box data
+      final currentBox = await boxRepository.getBoxDetail(boxId);
+      final currentBoxModel = BoxModel.fromJson(currentBox.data);
+
+      // Prepare update data with all existing fields
+      Map<String, dynamic> updateData = currentBoxModel.toJson();
+      updateData['\$id'] = boxId; // Make sure to keep the ID
 
       if (image != null && image.value != null) {
         final imageUploadRes = await storageAPI.uploadImage([image.value!]);
@@ -130,12 +137,14 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
       if (expenseIds != null) {
         updateData['expenseIds'] = expenseIds;
       }
+      if (boxUsers != null) {
+        updateData['boxUsers'] = boxUsers;
+      }
       if (total != null) {
         updateData['total'] = total;
       }
 
       final updateBoxModel = BoxModel.fromJson(updateData);
-
       final res = await boxRepository.updateBox(updateBoxModel);
 
       res.fold(

@@ -5,6 +5,7 @@ import 'package:dongi/modules/expense/presentation/pages/made_by_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/split_page.dart';
 import 'package:dongi/modules/user/presentation/pages/profile_page.dart';
 import 'package:dongi/modules/group/presentation/pages/add_group_member_page.dart';
+import 'package:dongi/modules/box/presentation/pages/add_box_member_page.dart';
 import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -65,19 +66,20 @@ final goRouterProvider = Provider<GoRouter>(
 
         // Get user data to check for name
         final userData = ref.read(userNotifierProvider).value;
-        
+
         // Only redirect to enterName if we have loaded user data and confirmed there's no name
-        if (userData != null && 
-            (userData.userName == null || userData.userName!.isEmpty) && 
+        if (userData != null &&
+            (userData.userName == null || userData.userName!.isEmpty) &&
             state.fullPath != RouteName.enterName &&
-            state.fullPath != RouteName.home) { // Allow home page access initially
+            state.fullPath != RouteName.home) {
+          // Allow home page access initially
           return RouteName.enterName;
         }
 
         // If we're on enterName page but user has a name, redirect to home
-        if (userData != null && 
-            userData.userName != null && 
-            !userData.userName!.isEmpty && 
+        if (userData != null &&
+            userData.userName != null &&
+            !userData.userName!.isEmpty &&
             state.fullPath == RouteName.enterName) {
           return RouteName.home;
         }
@@ -153,6 +155,12 @@ final goRouterProvider = Provider<GoRouter>(
           path: RouteName.addGroupMember,
           builder: (context, state) {
             return AddGroupMemberPage(groupModel: state.extra as dynamic);
+          },
+        ),
+        GoRoute(
+          path: RouteName.addBoxMember,
+          builder: (context, state) {
+            return AddBoxMemberPage(boxModel: state.extra as dynamic);
           },
         ),
         GoRoute(

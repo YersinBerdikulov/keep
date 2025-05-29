@@ -33,19 +33,14 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
   BoxModel? _boxModel;
   bool _isLoading = true;
   String? _error;
-  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    // Load data once when widget initializes
     _fetchBoxDetail();
   }
 
   Future<void> _fetchBoxDetail() async {
-    // Prevent loading multiple times
-    if (_isInitialized) return;
-
     setState(() {
       _isLoading = true;
       _error = null;
@@ -60,28 +55,52 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
 
       // Handle the repository response based on its structure
       if (boxResult != null) {
-        setState(() {
-          _boxModel = BoxModel.fromJson(boxResult.data);
-          _isLoading = false;
-          _isInitialized = true;
-        });
+        if (mounted) {
+          setState(() {
+            _boxModel = BoxModel.fromJson(boxResult.data);
+            _isLoading = false;
+          });
+        }
       } else {
+        if (mounted) {
+          setState(() {
+            _error = "Failed to load box details";
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         setState(() {
-          _error = "Failed to load box details";
+          _error = e.toString();
           _isLoading = false;
         });
       }
-    } catch (e) {
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Use local state instead of watching providers
+    // Watch the box provider to get real-time updates
+    final boxesState = ref.watch(boxNotifierProvider(widget.groupModel.id!));
+
+    // Update local state when boxes change
+    boxesState.whenData((boxes) {
+      final updatedBox = boxes.firstWhere(
+        (box) => box.id == widget.boxId,
+        orElse: () => _boxModel!,
+      );
+      if (updatedBox.id == widget.boxId && updatedBox != _boxModel) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              _boxModel = updatedBox;
+            });
+          }
+        });
+      }
+    });
+
     if (_isLoading) {
       return const LoadingWidget();
     }
@@ -90,7 +109,6 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
       return ErrorTextWidget(_error!);
     }
 
-    // Make sure box model is available
     if (_boxModel == null) {
       return const ErrorTextWidget("Box not found");
     }
@@ -106,6 +124,7 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
           physics: const NeverScrollableScrollPhysics(),
           children: [
             const CategoryListBoxDetail(),
+            FriendListBoxDetail(_boxModel!),
             ExpenseListBoxDetail(
               boxModel: _boxModel!,
               groupModel: widget.groupModel,
