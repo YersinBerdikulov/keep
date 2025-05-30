@@ -415,6 +415,13 @@ class CreateExpenseAction extends ConsumerWidget {
         num.tryParse(expenseCost.text.replaceAll(',', '')) != null &&
         num.tryParse(expenseCost.text.replaceAll(',', ''))! > 0;
 
+    // If users list is empty, show a loading state
+    if (users.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     // Get split description
     String splitInfo;
     final totalAmount = num.tryParse(expenseCost.text.replaceAll(',', '')) ?? 0;
@@ -544,7 +551,14 @@ class CreateExpenseAction extends ConsumerWidget {
       children: [
         _actionButton(
           title: "Made by",
-          subtitle: selectedPayerId != null ? "Selected" : "Not selected",
+          subtitle: selectedPayerId != null
+              ? users
+                      .firstWhere((user) => user.id == selectedPayerId,
+                          orElse: () => users.first)
+                      .userName ??
+                  users.first.email ??
+                  "Unknown"
+              : "Not selected",
           icon: Icons.person,
           iconColor: ColorConfig.secondary,
           onTap: () => context.push(RouteName.expenseMadeBy),

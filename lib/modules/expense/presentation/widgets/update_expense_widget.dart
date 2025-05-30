@@ -17,6 +17,7 @@ import '../../../../shared/widgets/card/grey_card.dart';
 import '../../../../shared/widgets/list_tile/list_tile_card.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
 import '../../domain/di/expense_controller_di.dart';
+import '../../../box/domain/di/box_controller_di.dart';
 
 class UpdateExpenseAmount extends ConsumerWidget {
   final TextEditingController expenseCost;
@@ -113,7 +114,7 @@ class UpdateExpenseAction extends ConsumerWidget {
   final TextEditingController expenseCost;
   const UpdateExpenseAction({super.key, required this.expenseCost});
 
-  _actionButton({
+  Widget _actionButton({
     required String title,
     required String subtitle,
     required IconData icon,
@@ -138,13 +139,23 @@ class UpdateExpenseAction extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final users = ref.watch(userInBoxStoreProvider);
+    final selectedPayerId = ref.watch(expensePayerIdProvider);
+
     return CardWidget(
       padding: const EdgeInsets.all(10),
       child: Column(
         children: [
           _actionButton(
             title: "made by",
-            subtitle: "Person name",
+            subtitle: selectedPayerId != null
+                ? users
+                        .firstWhere((user) => user.id == selectedPayerId,
+                            orElse: () => users.first)
+                        .userName ??
+                    users.first.email ??
+                    "Unknown"
+                : "Not selected",
             icon: Icons.account_box,
             onTap: () => context.push(RouteName.expenseMadeBy),
           ),

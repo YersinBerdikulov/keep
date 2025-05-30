@@ -36,27 +36,38 @@ class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
     super.initState();
     // Reset all split-related states
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Load box members first
-      final boxController =
-          ref.read(boxNotifierProvider(widget.groupModel.id!).notifier);
-      final users = await boxController.getUsersInBox(widget.boxModel.boxUsers);
-      ref.read(userInBoxStoreProvider.notifier).state = users;
-
-      // Reset split states
-      ref.read(selectedSplitOptionProvider.notifier).state = -1;
-      ref.read(advancedSplitMethodProvider.notifier).state = null;
-      ref.read(customSplitAmountsProvider.notifier).state = {};
-      ref.read(customSplitPercentagesProvider.notifier).state = {};
-      ref.read(splitUserProvider.notifier).state = [];
-
-      // Initialize shares with 1 for each user
-      if (users.isNotEmpty) {
-        final initialShares = Map<String, int>.fromEntries(users
-            .where((user) => user.id != null)
-            .map((user) => MapEntry(user.id!, 1)));
-        ref.read(userSharesProvider.notifier).state = initialShares;
-      } else {
+      try {
+        // Reset all providers first to prevent "No element" error
+        ref.read(userInBoxStoreProvider.notifier).state = [];
+        ref.read(selectedSplitOptionProvider.notifier).state = -1;
+        ref.read(advancedSplitMethodProvider.notifier).state = null;
+        ref.read(customSplitAmountsProvider.notifier).state = {};
+        ref.read(customSplitPercentagesProvider.notifier).state = {};
+        ref.read(splitUserProvider.notifier).state = [];
         ref.read(userSharesProvider.notifier).state = {};
+        ref.read(expensePayerIdProvider.notifier).state = null;
+
+        // Load box members
+        final boxController =
+            ref.read(boxNotifierProvider(widget.groupModel.id!).notifier);
+        final users =
+            await boxController.getUsersInBox(widget.boxModel.boxUsers);
+
+        // Only update providers if the widget is still mounted
+        if (mounted) {
+          ref.read(userInBoxStoreProvider.notifier).state = users;
+
+          // Initialize shares with 1 for each user
+          if (users.isNotEmpty) {
+            final initialShares = Map<String, int>.fromEntries(users
+                .where((user) => user.id != null)
+                .map((user) => MapEntry(user.id!, 1)));
+            ref.read(userSharesProvider.notifier).state = initialShares;
+          }
+        }
+      } catch (e) {
+        print('Error initializing expense page: $e');
+        // Handle error appropriately
       }
     });
   }
