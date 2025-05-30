@@ -11,6 +11,7 @@ import '../../../../shared/widgets/appbar/appbar.dart';
 import '../../../../shared/widgets/card/card.dart';
 import '../../domain/di/expense_controller_di.dart';
 import '../widgets/create_expense_widget.dart';
+import '../../../box/domain/di/box_controller_di.dart';
 
 class CreateExpensePage extends HookConsumerWidget {
   final BoxModel boxModel;
@@ -28,6 +29,17 @@ class CreateExpensePage extends HookConsumerWidget {
     final expenseTitle = useTextEditingController();
     final expenseDescription = useTextEditingController();
     final expenseCost = useTextEditingController();
+
+    // Load box members when the page is created
+    useEffect(() {
+      Future.microtask(() async {
+        final boxController =
+            ref.read(boxNotifierProvider(groupModel.id!).notifier);
+        final users = await boxController.getUsersInBox(boxModel.boxUsers);
+        ref.read(userInBoxStoreProvider.notifier).state = users;
+      });
+      return null;
+    }, []);
 
     ref.listen<AsyncValue<List<ExpenseModel>>>(
       expenseNotifierProvider,

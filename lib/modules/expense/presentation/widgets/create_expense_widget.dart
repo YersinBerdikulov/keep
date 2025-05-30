@@ -21,6 +21,8 @@ import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/card/grey_card.dart';
 import '../../../../shared/widgets/list_tile/list_tile_card.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
+import '../../../box/domain/di/box_controller_di.dart';
+import '../pages/split_page.dart';
 
 final selectedDateProvider = StateProvider<DateTime?>((ref) => DateTime.now());
 
@@ -288,52 +290,73 @@ class CreateExpenseAction extends ConsumerWidget {
   final TextEditingController expenseCost;
   const CreateExpenseAction({super.key, required this.expenseCost});
 
-  _actionButton({
+  String _getSplitDescription(List<dynamic> users, int? selectedSplitOption) {
+    // Only handle 2-person case, return early for other cases
+    if (users.length != 2) return "Not split yet";
+
+    final firstUserName = users[0].userName ?? users[0].email ?? "Unknown";
+    final secondUserName = users[1].userName ?? users[1].email ?? "Unknown";
+
+    switch (selectedSplitOption) {
+      case 0:
+        return "Paid by $firstUserName, split equally";
+      case 1:
+        return "$secondUserName owes $firstUserName the full total";
+      case 2:
+        return "Paid by $secondUserName, split equally";
+      case 3:
+        return "$firstUserName owes $secondUserName the full total";
+      default:
+        return "Not split yet";
+    }
+  }
+
+  Widget _actionButton({
     required String title,
     required String subtitle,
     required IconData icon,
-    required Color iconColor,
-    required Function()? onTap,
+    Color? iconColor,
+    required VoidCallback? onTap,
+    required bool isEnabled,
   }) {
     return CardWidget(
-      onTap: onTap,
-      backColor: ColorConfig.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      onTap: isEnabled ? onTap : null,
+      backColor:
+          isEnabled ? ColorConfig.white : ColorConfig.white.withOpacity(0.7),
+      padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: iconColor, size: 20),
+          Icon(
+            icon,
+            color: isEnabled
+                ? (iconColor ?? ColorConfig.primarySwatch)
+                : (iconColor ?? ColorConfig.primarySwatch).withOpacity(0.5),
+            size: 24,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: FontConfig.caption().copyWith(
-                    color: ColorConfig.primarySwatch50,
+                  style: FontConfig.body2().copyWith(
+                    color: isEnabled
+                        ? ColorConfig.midnight
+                        : ColorConfig.midnight.withOpacity(0.5),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: FontConfig.body2().copyWith(
-                    fontWeight: FontWeight.w600,
+                  style: FontConfig.caption().copyWith(
+                    color: isEnabled
+                        ? ColorConfig.primarySwatch50
+                        : ColorConfig.primarySwatch50.withOpacity(0.5),
                   ),
                 ),
               ],
             ),
-          ),
-          Icon(
-            Icons.arrow_forward_ios,
-            color: ColorConfig.primarySwatch50,
-            size: 16,
           ),
         ],
       ),
@@ -342,22 +365,55 @@ class CreateExpenseAction extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final users = ref.watch(userInBoxStoreProvider);
+    final selectedPayerId = ref.watch(expensePayerIdProvider);
+    final selectedSplitOption = ref.watch(selectedSplitOptionProvider);
+
+    // Check if amount is entered
+    final hasAmount = expenseCost.text.isNotEmpty &&
+        num.tryParse(expenseCost.text.replaceAll(',', '')) != null &&
+        num.tryParse(expenseCost.text.replaceAll(',', ''))! > 0;
+
+    // Get split description based on the selected option
+    final splitInfo = _getSplitDescription(users, selectedSplitOption);
+
+    // For 2-person case, only show Split between button
+    if (users.length == 2) {
+      return _actionButton(
+        title: "Split between",
+        subtitle: splitInfo,
+        icon: Icons.group,
+        iconColor: ColorConfig.primarySwatch,
+        onTap: () => context.push(
+          RouteName.expenseSplit,
+          extra: {"expenseCost": expenseCost},
+        ),
+        isEnabled: hasAmount,
+      );
+    }
+
+    // For 3+ people case (to be implemented later)
     return Column(
       children: [
         _actionButton(
           title: "Made by",
-          subtitle: "You",
+          subtitle: selectedPayerId != null ? "Selected" : "Not selected",
           icon: Icons.person,
           iconColor: ColorConfig.secondary,
-          onTap: () => showSnackBar(context, content: "Coming soon!"),
+          onTap: () => context.push(RouteName.expenseMadeBy),
+          isEnabled: hasAmount,
         ),
         const SizedBox(height: 10),
         _actionButton(
           title: "Split between",
-          subtitle: "Equal split · 4 people",
+          subtitle: "Not implemented for 3+ people yet",
           icon: Icons.group,
           iconColor: ColorConfig.primarySwatch,
-          onTap: () => showSnackBar(context, content: "Coming soon!"),
+          onTap: () => context.push(
+            RouteName.expenseSplit,
+            extra: {"expenseCost": expenseCost},
+          ),
+          isEnabled: hasAmount,
         ),
       ],
     );
