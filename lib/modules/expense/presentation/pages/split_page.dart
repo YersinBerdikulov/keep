@@ -4,14 +4,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/widgets/appbar/appbar.dart';
 import '../../../../shared/widgets/button/button_widget.dart';
 import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/image/image_widget.dart';
 import '../../domain/di/expense_controller_di.dart';
-
-// Provider to track selected split option
-final selectedSplitOptionProvider = StateProvider<int>((ref) => -1);
+import '../pages/advanced_split_page.dart'; // Import for SplitMethod enum
 
 class SplitPage extends ConsumerWidget {
   final TextEditingController expenseCost;
@@ -141,6 +140,11 @@ class SplitPage extends ConsumerWidget {
                   description: "$secondUserName owes $halfAmount",
                   isSelected: selectedOption == 0,
                   onTap: () {
+                    // Reset advanced split state
+                    ref.read(advancedSplitMethodProvider.notifier).state = null;
+                    ref.read(splitMethodProvider.notifier).state =
+                        SplitMethod.equal;
+                    // Set basic split option
                     ref.read(selectedSplitOptionProvider.notifier).state = 0;
                     ref.read(splitUserProvider.notifier).state =
                         users.map((e) => e.id!).toList();
@@ -155,6 +159,11 @@ class SplitPage extends ConsumerWidget {
                       "$secondUserName owes ${cost.toStringAsFixed(2)} to $firstUserName",
                   isSelected: selectedOption == 1,
                   onTap: () {
+                    // Reset advanced split state
+                    ref.read(advancedSplitMethodProvider.notifier).state = null;
+                    ref.read(splitMethodProvider.notifier).state =
+                        SplitMethod.equal;
+                    // Set basic split option
                     ref.read(selectedSplitOptionProvider.notifier).state = 1;
                     ref.read(splitUserProvider.notifier).state =
                         users.length > 1 ? [users[1].id!] : [];
@@ -168,6 +177,11 @@ class SplitPage extends ConsumerWidget {
                   description: "$firstUserName owes $halfAmount",
                   isSelected: selectedOption == 2,
                   onTap: () {
+                    // Reset advanced split state
+                    ref.read(advancedSplitMethodProvider.notifier).state = null;
+                    ref.read(splitMethodProvider.notifier).state =
+                        SplitMethod.equal;
+                    // Set basic split option
                     ref.read(selectedSplitOptionProvider.notifier).state = 2;
                     ref.read(splitUserProvider.notifier).state =
                         users.map((e) => e.id!).toList();
@@ -182,6 +196,11 @@ class SplitPage extends ConsumerWidget {
                       "$firstUserName owes ${cost.toStringAsFixed(2)} to $secondUserName",
                   isSelected: selectedOption == 3,
                   onTap: () {
+                    // Reset advanced split state
+                    ref.read(advancedSplitMethodProvider.notifier).state = null;
+                    ref.read(splitMethodProvider.notifier).state =
+                        SplitMethod.equal;
+                    // Set basic split option
                     ref.read(selectedSplitOptionProvider.notifier).state = 3;
                     ref.read(splitUserProvider.notifier).state =
                         users.isNotEmpty ? [users[0].id!] : [];
@@ -206,10 +225,27 @@ class SplitPage extends ConsumerWidget {
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                child: ButtonWidget(
-                  onPressed: selectedOption >= 0 ? () => context.pop() : null,
-                  title: "Confirm Split",
-                  textColor: ColorConfig.secondary,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ButtonWidget(
+                      onPressed: () => context.push(
+                        RouteName.expenseAdvancedSplit,
+                        extra: {"expenseCost": expenseCost},
+                      ),
+                      title: "Advanced Split Options",
+                      textColor: ColorConfig.primarySwatch,
+                      backgroundColor: ColorConfig.white,
+                      borderColor: ColorConfig.primarySwatch,
+                    ),
+                    const SizedBox(height: 12),
+                    ButtonWidget(
+                      onPressed:
+                          selectedOption >= 0 ? () => context.pop() : null,
+                      title: "Confirm Split",
+                      textColor: ColorConfig.secondary,
+                    ),
+                  ],
                 ),
               ),
             ),

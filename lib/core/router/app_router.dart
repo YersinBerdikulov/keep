@@ -1,6 +1,7 @@
 import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/core/router/router_notifier.dart';
 import 'package:dongi/modules/auth/presentation/pages/enter_name_page.dart';
+import 'package:dongi/modules/expense/presentation/pages/advanced_split_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/made_by_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/split_page.dart';
 import 'package:dongi/modules/user/presentation/pages/profile_page.dart';
@@ -203,6 +204,12 @@ final goRouterProvider = Provider<GoRouter>(
             builder: (context, state) {
               Map extra = state.extra as Map<String, dynamic>;
               return SplitPage(expenseCost: extra["expenseCost"]);
+            }),
+        GoRoute(
+            path: RouteName.expenseAdvancedSplit,
+            builder: (context, state) {
+              Map extra = state.extra as Map<String, dynamic>;
+              return AdvancedSplitPage(expenseCost: extra["expenseCost"]);
             }),
         GoRoute(
             path: RouteName.expenseDetail,

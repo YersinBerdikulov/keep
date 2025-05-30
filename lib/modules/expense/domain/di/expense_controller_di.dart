@@ -2,6 +2,7 @@ import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:dongi/modules/expense/domain/controllers/expense_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import '../../../expense/presentation/pages/advanced_split_page.dart';
 
 import '../models/expense_model.dart';
 
@@ -43,9 +44,37 @@ final getExpensesDetailProvider =
   return expenseController.getExpenseDetail(expenseId);
 });
 
+final selectedSplitOptionProvider = StateProvider<int>((ref) => -1);
+
 final expensePayerIdProvider = StateProvider<String?>((ref) {
   final user = ref.read(currentUserProvider);
   return user?.id;
+});
+
+// Provider for advanced split method
+final advancedSplitMethodProvider = StateProvider<String?>((ref) => null);
+
+// Provider for selected split method
+final splitMethodProvider =
+    StateProvider<SplitMethod>((ref) => SplitMethod.equal);
+
+// Provider for custom split amounts
+final customSplitAmountsProvider =
+    StateProvider<Map<String, double>>((ref) => {});
+
+// Provider for custom split percentages
+final customSplitPercentagesProvider =
+    StateProvider<Map<String, double>>((ref) => {});
+
+// Provider for user shares
+final userSharesProvider = StateProvider<Map<String, int>>((ref) {
+  // Get users from the box store
+  final users = ref.read(userInBoxStoreProvider);
+  // Initialize with 1 share for each user if there are users, otherwise return empty map
+  if (users.isEmpty) return {};
+  return Map<String, int>.fromEntries(
+    users.where((user) => user.id != null).map((user) => MapEntry(user.id!, 1)),
+  );
 });
 
 final expenseCategoryIdProvider = StateProvider<String?>((ref) => null);
@@ -57,3 +86,17 @@ final splitUserProvider =
   // Initialize SplitUserNotifier with a list of user IDs.
   return SplitUserNotifier(allUsers.map((e) => e.id!).toList());
 });
+
+// Provider for selected currency in expense
+final expenseCurrencyProvider = StateProvider<String>((ref) => 'KZT');
+
+// List of available currencies for expense
+final expenseAvailableCurrenciesProvider = Provider<List<String>>((ref) => [
+      'KZT',
+      'USD',
+      'EUR',
+      'GBP',
+      'RUB',
+      'CNY',
+      'JPY',
+    ]);

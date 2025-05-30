@@ -23,6 +23,7 @@ import '../../../../shared/widgets/list_tile/list_tile_card.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
 import '../../../box/domain/di/box_controller_di.dart';
 import '../pages/split_page.dart';
+import '../pages/advanced_split_page.dart';
 
 final selectedDateProvider = StateProvider<DateTime?>((ref) => DateTime.now());
 
@@ -35,8 +36,54 @@ class CreateExpenseAmount extends ConsumerWidget {
     required this.boxModel,
   });
 
+  void _showCurrencyPicker(BuildContext context, WidgetRef ref) {
+    final availableCurrencies = ref.read(expenseAvailableCurrenciesProvider);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.4,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Select Currency',
+                  style: FontConfig.h6(),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: availableCurrencies.length,
+                  itemBuilder: (context, index) {
+                    final currency = availableCurrencies[index];
+                    return ListTile(
+                      title: Text(currency),
+                      onTap: () {
+                        ref.read(expenseCurrencyProvider.notifier).state =
+                            currency;
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedCurrency = ref.watch(expenseCurrencyProvider);
+
     return Row(
       children: [
         Expanded(
@@ -66,11 +113,25 @@ class CreateExpenseAmount extends ConsumerWidget {
           ),
         ),
         const SizedBox(width: 10),
-        GreyCardWidget(
-          width: 50,
-          height: 50,
-          child: Center(
-            child: Text(boxModel.currency),
+        GestureDetector(
+          onTap: () => _showCurrencyPicker(context, ref),
+          child: GreyCardWidget(
+            width: 60,
+            height: 50,
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(selectedCurrency),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_drop_down,
+                    size: 18,
+                    color: ColorConfig.midnight,
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ],
@@ -290,27 +351,6 @@ class CreateExpenseAction extends ConsumerWidget {
   final TextEditingController expenseCost;
   const CreateExpenseAction({super.key, required this.expenseCost});
 
-  String _getSplitDescription(List<dynamic> users, int? selectedSplitOption) {
-    // Only handle 2-person case, return early for other cases
-    if (users.length != 2) return "Not split yet";
-
-    final firstUserName = users[0].userName ?? users[0].email ?? "Unknown";
-    final secondUserName = users[1].userName ?? users[1].email ?? "Unknown";
-
-    switch (selectedSplitOption) {
-      case 0:
-        return "Paid by $firstUserName, split equally";
-      case 1:
-        return "$secondUserName owes $firstUserName the full total";
-      case 2:
-        return "Paid by $secondUserName, split equally";
-      case 3:
-        return "$firstUserName owes $secondUserName the full total";
-      default:
-        return "Not split yet";
-    }
-  }
-
   Widget _actionButton({
     required String title,
     required String subtitle,
@@ -368,14 +408,122 @@ class CreateExpenseAction extends ConsumerWidget {
     final users = ref.watch(userInBoxStoreProvider);
     final selectedPayerId = ref.watch(expensePayerIdProvider);
     final selectedSplitOption = ref.watch(selectedSplitOptionProvider);
+    final advancedMethod = ref.watch(advancedSplitMethodProvider);
 
     // Check if amount is entered
     final hasAmount = expenseCost.text.isNotEmpty &&
         num.tryParse(expenseCost.text.replaceAll(',', '')) != null &&
         num.tryParse(expenseCost.text.replaceAll(',', ''))! > 0;
 
-    // Get split description based on the selected option
-    final splitInfo = _getSplitDescription(users, selectedSplitOption);
+    // Get split description
+    String splitInfo;
+    final totalAmount = num.tryParse(expenseCost.text.replaceAll(',', '')) ?? 0;
+
+    // First check for advanced split method as it applies to both 2-user and multi-user cases
+    if (advancedMethod != null && advancedMethod.isNotEmpty) {
+      final splitMethod = ref.watch(splitMethodProvider);
+      switch (splitMethod) {
+        case SplitMethod.equal:
+          final selectedUsers = ref.watch(splitUserProvider);
+          if (selectedUsers.isEmpty) {
+            splitInfo =
+                "${(totalAmount / users.length).toStringAsFixed(2)} each";
+          } else if (selectedUsers.length == 1) {
+            // When only one user is selected, show their name and the full amount
+            final selectedUser =
+                users.firstWhere((user) => user.id == selectedUsers[0]);
+            final name = selectedUser.userName?.split(' ')[0] ??
+                selectedUser.email?.split('@')[0] ??
+                "Unknown";
+            splitInfo = "$name: ${totalAmount.toStringAsFixed(2)}";
+          } else {
+            // When multiple users are selected, show the split amount per person
+            splitInfo =
+                "${(totalAmount / selectedUsers.length).toStringAsFixed(2)} each";
+          }
+          break;
+        case SplitMethod.amount:
+          final customAmounts = ref.watch(customSplitAmountsProvider);
+          if (customAmounts.isEmpty) {
+            splitInfo = "Custom amounts";
+          } else {
+            final userAmounts = users.map((user) {
+              final amount = customAmounts[user.id] ?? 0;
+              final name = user.userName?.split(' ')[0] ??
+                  user.email?.split('@')[0] ??
+                  "Unknown";
+              return "$name: ${amount.toStringAsFixed(2)}";
+            }).join(', ');
+            splitInfo = userAmounts;
+          }
+          break;
+        case SplitMethod.percentage:
+          final customPercentages = ref.watch(customSplitPercentagesProvider);
+          if (customPercentages.isEmpty) {
+            splitInfo = "Custom percentages";
+          } else {
+            final userPercentages = users.map((user) {
+              final percentage = customPercentages[user.id] ?? 0;
+              final amount = totalAmount * (percentage / 100);
+              final name = user.userName?.split(' ')[0] ??
+                  user.email?.split('@')[0] ??
+                  "Unknown";
+              return "$name: $percentage% (${amount.toStringAsFixed(2)})";
+            }).join(', ');
+            splitInfo = userPercentages;
+          }
+          break;
+        case SplitMethod.shares:
+          final userShares = ref.watch(userSharesProvider);
+          final totalShares =
+              userShares.values.fold(0, (sum, shares) => sum + shares);
+          if (userShares.isEmpty || totalShares == 0) {
+            splitInfo = "By shares";
+          } else {
+            final userShareInfo = users.map((user) {
+              final shares = userShares[user.id] ?? 1;
+              final amount = totalAmount * shares / totalShares;
+              final name = user.userName?.split(' ')[0] ??
+                  user.email?.split('@')[0] ??
+                  "Unknown";
+              return "$name: $shares shares (${amount.toStringAsFixed(2)})";
+            }).join(', ');
+            splitInfo = userShareInfo;
+          }
+          break;
+      }
+    }
+    // Then check for basic split options for 2-user case
+    else if (users.length == 2) {
+      final firstUserName = users[0].userName?.split(' ')[0] ??
+          users[0].email?.split('@')[0] ??
+          "Unknown";
+      final secondUserName = users[1].userName?.split(' ')[0] ??
+          users[1].email?.split('@')[0] ??
+          "Unknown";
+      final halfAmount = (totalAmount / 2).toStringAsFixed(2);
+
+      switch (selectedSplitOption) {
+        case 0:
+          splitInfo = "$firstUserName paid, $secondUserName owes $halfAmount";
+          break;
+        case 1:
+          splitInfo = "$secondUserName owes $totalAmount to $firstUserName";
+          break;
+        case 2:
+          splitInfo = "$secondUserName paid, $firstUserName owes $halfAmount";
+          break;
+        case 3:
+          splitInfo = "$firstUserName owes $totalAmount to $secondUserName";
+          break;
+        default:
+          splitInfo = "Not split yet";
+      }
+    }
+    // Default case when no split method is selected
+    else {
+      splitInfo = "Not split yet";
+    }
 
     // For 2-person case, only show Split between button
     if (users.length == 2) {
@@ -392,7 +540,7 @@ class CreateExpenseAction extends ConsumerWidget {
       );
     }
 
-    // For 3+ people case (to be implemented later)
+    // For 3+ people case
     return Column(
       children: [
         _actionButton(
@@ -406,7 +554,7 @@ class CreateExpenseAction extends ConsumerWidget {
         const SizedBox(height: 10),
         _actionButton(
           title: "Split between",
-          subtitle: "Not implemented for 3+ people yet",
+          subtitle: splitInfo,
           icon: Icons.group,
           iconColor: ColorConfig.primarySwatch,
           onTap: () => context.push(
@@ -458,6 +606,8 @@ class CreateExpenseCreateButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedCurrency = ref.watch(expenseCurrencyProvider);
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -473,7 +623,7 @@ class CreateExpenseCreateButton extends ConsumerWidget {
                     expenseDescription: expenseDescription,
                     expenseCost: expenseCost,
                     groupModel: groupModel,
-                    boxModel: boxModel,
+                    boxModel: boxModel.copyWith(currency: selectedCurrency),
                   );
 
               // Reset the category selection

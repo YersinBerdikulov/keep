@@ -286,24 +286,26 @@ class SplitUserNotifier extends StateNotifier<List<String>> {
     }
   }
 
-  /// Toggles between selecting all users or deselecting all.
-  void toggleAll(List<String> allUserIds) {
-    if (state.length == allUserIds.length) {
-      // Deselect all users.
-      state = [];
-    } else {
-      // Select all users.
-      state = [...allUserIds];
+  /// Adds a user to the selection
+  void add(String userId) {
+    if (!state.contains(userId)) {
+      state = [...state, userId];
     }
   }
 
-  /// Clears all selected users.
-  void clear() {
-    state = [];
+  /// Removes a user from the selection
+  void remove(String userId) {
+    if (state.contains(userId)) {
+      state = state.where((val) => val != userId).toList();
+    }
   }
 
-  /// Resets the state with a new set of user IDs.
-  void reset(List<String> newUserIds) {
-    state = [...newUserIds];
+  /// Toggles all users
+  void toggleAll(List<String> userIds) {
+    if (state.length == userIds.length) {
+      state = [];
+    } else {
+      state = List.from(userIds);
+    }
   }
 }

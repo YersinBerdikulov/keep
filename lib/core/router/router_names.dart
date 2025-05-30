@@ -22,6 +22,7 @@ class RouteName {
   static String updateExpense = '/expense/update';
   static String expenseMadeBy = '/expense/madeBy';
   static String expenseSplit = '/expense/split';
+  static String expenseAdvancedSplit = '/expense/split/advanced';
   static String expenseDetail = '/expense/detail';
   static String profile = '/profile';
   static String enterName = '/auth/enter-name';

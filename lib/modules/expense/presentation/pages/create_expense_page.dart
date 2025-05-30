@@ -1,45 +1,79 @@
 import 'package:dongi/modules/expense/domain/models/expense_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
+import '../../../../core/constants/color_config.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
-import '../../../box/domain/models/box_model.dart';
-import '../../../group/domain/models/group_model.dart';
 import '../../../../shared/widgets/appbar/appbar.dart';
 import '../../../../shared/widgets/card/card.dart';
+import '../../../box/domain/models/box_model.dart';
+import '../../../group/domain/models/group_model.dart';
+import '../../../box/domain/di/box_controller_di.dart';
 import '../../domain/di/expense_controller_di.dart';
 import '../widgets/create_expense_widget.dart';
-import '../../../box/domain/di/box_controller_di.dart';
 
-class CreateExpensePage extends HookConsumerWidget {
-  final BoxModel boxModel;
+class CreateExpensePage extends ConsumerStatefulWidget {
   final GroupModel groupModel;
-  CreateExpensePage({
+  final BoxModel boxModel;
+  const CreateExpensePage({
     super.key,
-    required this.boxModel,
     required this.groupModel,
+    required this.boxModel,
   });
 
-  final _formKey = GlobalKey<FormState>();
+  @override
+  ConsumerState<CreateExpensePage> createState() => _CreateExpensePageState();
+}
+
+class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
+  final TextEditingController expenseTitle = TextEditingController();
+  final TextEditingController expenseDescription = TextEditingController();
+  final TextEditingController expenseCost = TextEditingController();
+  final formKey = GlobalKey<FormState>();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final expenseTitle = useTextEditingController();
-    final expenseDescription = useTextEditingController();
-    final expenseCost = useTextEditingController();
+  void initState() {
+    super.initState();
+    // Reset all split-related states
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Load box members first
+      final boxController =
+          ref.read(boxNotifierProvider(widget.groupModel.id!).notifier);
+      final users = await boxController.getUsersInBox(widget.boxModel.boxUsers);
+      ref.read(userInBoxStoreProvider.notifier).state = users;
 
-    // Load box members when the page is created
-    useEffect(() {
-      Future.microtask(() async {
-        final boxController =
-            ref.read(boxNotifierProvider(groupModel.id!).notifier);
-        final users = await boxController.getUsersInBox(boxModel.boxUsers);
-        ref.read(userInBoxStoreProvider.notifier).state = users;
-      });
-      return null;
-    }, []);
+      // Reset split states
+      ref.read(selectedSplitOptionProvider.notifier).state = -1;
+      ref.read(advancedSplitMethodProvider.notifier).state = null;
+      ref.read(customSplitAmountsProvider.notifier).state = {};
+      ref.read(customSplitPercentagesProvider.notifier).state = {};
+      ref.read(splitUserProvider.notifier).state = [];
+
+      // Initialize shares with 1 for each user
+      if (users.isNotEmpty) {
+        final initialShares = Map<String, int>.fromEntries(users
+            .where((user) => user.id != null)
+            .map((user) => MapEntry(user.id!, 1)));
+        ref.read(userSharesProvider.notifier).state = initialShares;
+      } else {
+        ref.read(userSharesProvider.notifier).state = {};
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    expenseTitle.dispose();
+    expenseDescription.dispose();
+    expenseCost.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Calculate bottom padding to account for the create button height
+    final bottomPadding = MediaQuery.of(context).padding.bottom +
+        80.0; // 80.0 is approximate button height with padding
 
     ref.listen<AsyncValue<List<ExpenseModel>>>(
       expenseNotifierProvider,
@@ -59,61 +93,55 @@ class CreateExpensePage extends HookConsumerWidget {
       },
     );
 
-    // Calculate bottom padding to account for the create button height
-    final bottomPadding = MediaQuery.of(context).padding.bottom +
-        80.0; // 80.0 is approximate button height with padding
-
     return Scaffold(
       resizeToAvoidBottomInset:
           true, // Ensure the screen resizes when keyboard appears
       appBar: AppBarWidget(title: "Create Expense"),
       body: Form(
-        key: _formKey,
+        key: formKey,
         child: Column(
           children: [
             Expanded(
-              child: Padding(
+              child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                child: ListView(
-                  children: [
-                    CardWidget(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          CreateExpenseAmount(
-                            expenseCost: expenseCost,
-                            boxModel: boxModel,
-                          ),
-                          const SizedBox(height: 10),
-                          CreateExpenseTitle(expenseTitle: expenseTitle),
-                          const SizedBox(height: 10),
-                          const Row(
-                            children: [
-                              CreateExpenseCategory(),
-                              SizedBox(width: 10),
-                              CreateExpenseDate()
-                            ],
-                          )
-                        ],
-                      ),
+                children: [
+                  CardWidget(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        CreateExpenseAmount(
+                          expenseCost: expenseCost,
+                          boxModel: widget.boxModel,
+                        ),
+                        const SizedBox(height: 10),
+                        CreateExpenseTitle(expenseTitle: expenseTitle),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            const CreateExpenseCategory(),
+                            const SizedBox(width: 10),
+                            const CreateExpenseDate(),
+                          ],
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    CreateExpenseAction(expenseCost: expenseCost),
-                    const SizedBox(height: 20),
-                    CreateExpenseDescription(expenseDescription),
-                    // Add padding at the bottom to prevent overlap with the create button
-                    SizedBox(height: bottomPadding),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 20),
+                  CreateExpenseAction(expenseCost: expenseCost),
+                  const SizedBox(height: 20),
+                  CreateExpenseDescription(expenseDescription),
+                  // Add padding at the bottom to prevent overlap with the create button
+                  SizedBox(height: bottomPadding),
+                ],
               ),
             ),
             CreateExpenseCreateButton(
               expenseTitle: expenseTitle,
               expenseDescription: expenseDescription,
               expenseCost: expenseCost,
-              formKey: _formKey,
-              groupModel: groupModel,
-              boxModel: boxModel,
+              formKey: formKey,
+              groupModel: widget.groupModel,
+              boxModel: widget.boxModel,
             )
           ],
         ),
