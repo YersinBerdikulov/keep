@@ -534,9 +534,12 @@ class AdvancedSplitPage extends ConsumerWidget {
                   // Update the advanced split method provider
                   ref.read(advancedSplitMethodProvider.notifier).state =
                       _getMethodName(selectedMethod);
-                  // Navigate back twice to return to create expense screen
+                  // Navigate back to create expense screen
                   context.pop();
-                  context.pop();
+                  // If we came from basic split screen (2 people case), pop that too
+                  if (ref.read(userInBoxStoreProvider).length == 2) {
+                    context.pop();
+                  }
                 }
               : null,
           title: "Confirm Split",

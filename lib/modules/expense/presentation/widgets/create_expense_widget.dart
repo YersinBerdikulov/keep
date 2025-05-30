@@ -428,18 +428,17 @@ class CreateExpenseAction extends ConsumerWidget {
           if (selectedUsers.isEmpty) {
             splitInfo =
                 "${(totalAmount / users.length).toStringAsFixed(2)} each";
-          } else if (selectedUsers.length == 1) {
-            // When only one user is selected, show their name and the full amount
-            final selectedUser =
-                users.firstWhere((user) => user.id == selectedUsers[0]);
-            final name = selectedUser.userName?.split(' ')[0] ??
-                selectedUser.email?.split('@')[0] ??
-                "Unknown";
-            splitInfo = "$name: ${totalAmount.toStringAsFixed(2)}";
           } else {
-            // When multiple users are selected, show the split amount per person
-            splitInfo =
-                "${(totalAmount / selectedUsers.length).toStringAsFixed(2)} each";
+            // Show individual amounts for each selected user
+            final selectedUserNames = users
+                .where((user) => selectedUsers.contains(user.id))
+                .map((user) {
+              final name = user.userName?.split(' ')[0] ??
+                  user.email?.split('@')[0] ??
+                  "Unknown";
+              return "$name: ${(totalAmount / selectedUsers.length).toStringAsFixed(2)}";
+            }).join(', ');
+            splitInfo = selectedUserNames;
           }
           break;
         case SplitMethod.amount:
@@ -557,10 +556,21 @@ class CreateExpenseAction extends ConsumerWidget {
           subtitle: splitInfo,
           icon: Icons.group,
           iconColor: ColorConfig.primarySwatch,
-          onTap: () => context.push(
-            RouteName.expenseSplit,
-            extra: {"expenseCost": expenseCost},
-          ),
+          onTap: () {
+            if (users.length > 2) {
+              // For 3+ users, go directly to advanced split
+              context.push(
+                RouteName.expenseAdvancedSplit,
+                extra: {"expenseCost": expenseCost},
+              );
+            } else {
+              // For 2 users, show basic split options
+              context.push(
+                RouteName.expenseSplit,
+                extra: {"expenseCost": expenseCost},
+              );
+            }
+          },
           isEnabled: hasAmount,
         ),
       ],
