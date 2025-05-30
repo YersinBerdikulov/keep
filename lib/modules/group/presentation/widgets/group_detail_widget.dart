@@ -318,10 +318,16 @@ class GroupDetailFriendList extends ConsumerWidget {
                     color: ColorConfig.secondary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
-                    "View All",
-                    style: FontConfig.caption().copyWith(
-                      color: ColorConfig.secondary,
+                  child: GestureDetector(
+                    onTap: () => context.push(
+                      RouteName.manageGroupMembers,
+                      extra: groupModel,
+                    ),
+                    child: Text(
+                      "Manage",
+                      style: FontConfig.caption().copyWith(
+                        color: ColorConfig.secondary,
+                      ),
                     ),
                   ),
                 ),

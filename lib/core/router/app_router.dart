@@ -6,6 +6,7 @@ import 'package:dongi/modules/expense/presentation/pages/made_by_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/split_page.dart';
 import 'package:dongi/modules/user/presentation/pages/profile_page.dart';
 import 'package:dongi/modules/group/presentation/pages/add_group_member_page.dart';
+import 'package:dongi/modules/group/presentation/pages/manage_group_members_page.dart';
 import 'package:dongi/modules/box/presentation/pages/add_box_member_page.dart';
 import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
 import 'package:flutter/material.dart';
@@ -156,6 +157,12 @@ final goRouterProvider = Provider<GoRouter>(
           path: RouteName.addGroupMember,
           builder: (context, state) {
             return AddGroupMemberPage(groupModel: state.extra as dynamic);
+          },
+        ),
+        GoRoute(
+          path: RouteName.manageGroupMembers,
+          builder: (context, state) {
+            return ManageGroupMembersPage(groupModel: state.extra as dynamic);
           },
         ),
         GoRoute(

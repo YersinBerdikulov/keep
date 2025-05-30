@@ -214,4 +214,42 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
       state = AsyncValue.error(e, st);
     }
   }
+
+  Future<void> deleteMember({
+    required GroupModel groupModel,
+    required String memberIdToDelete,
+  }) async {
+    state = const AsyncLoading();
+    try {
+      // Check if the member is the creator
+      if (memberIdToDelete == groupModel.creatorId) {
+        throw Exception('Cannot remove the group creator');
+      }
+
+      // Remove the member from the group
+      final updatedGroupModel = groupModel.copyWith(
+        groupUsers: groupModel.groupUsers.where((id) => id != memberIdToDelete).toList(),
+      );
+
+      final result = await _groupRepository.updateGroup(updatedGroupModel);
+      state = await result.fold(
+        (l) => AsyncValue.error(l.message, StackTrace.current),
+        (document) async {
+          final updatedGroup = GroupModel.fromJson(document.data);
+          final currentGroups = state.value ?? [];
+          final updatedGroups = currentGroups.map((group) {
+            if (group.id == updatedGroup.id) {
+              return updatedGroup;
+            }
+            return group;
+          }).toList();
+          // Invalidate homeNotifierProvider to refresh homepage
+          ref.invalidate(homeNotifierProvider);
+          return AsyncValue.data(updatedGroups);
+        },
+      );
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 }

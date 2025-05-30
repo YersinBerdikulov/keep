@@ -112,6 +112,19 @@ class GroupListCard extends ConsumerWidget {
       PopupMenuItem(
         child: Row(
           children: [
+            Icon(Icons.people, color: ColorConfig.secondary, size: 20),
+            const SizedBox(width: 12),
+            Text('Manage Members', style: FontConfig.body2()),
+          ],
+        ),
+        onTap: () => context.push(
+          RouteName.manageGroupMembers,
+          extra: groupModel,
+        ),
+      ),
+      PopupMenuItem(
+        child: Row(
+          children: [
             Icon(Icons.delete, color: ColorConfig.error, size: 20),
             const SizedBox(width: 12),
             Text('Delete', style: FontConfig.body2()),
