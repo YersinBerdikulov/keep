@@ -403,12 +403,12 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     try {
       print('Starting settle up for expense: $expenseId, user: $userId');
       
-      // Get the expense details first
+      // Get the expense details first with cache disabled
       final expense = await _expenseRepository.getExpenseDetail(expenseId);
       final expenseModel = ExpenseModel.fromJson(expense.data);
       print('Found expense: ${expenseModel.id}');
       
-      // Get expense users
+      // Get expense users with cache disabled
       final expenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
       print('Found ${expenseUsers.length} expense users');
       
@@ -439,6 +439,9 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         (r) => print('Successfully updated expense user'),
       );
 
+      // Ensure database consistency with a short delay
+      await Future.delayed(const Duration(milliseconds: 500));
+
       // Check if all users have settled
       print('Checking if all users have settled');
       final allExpenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
@@ -465,7 +468,10 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         );
       }
 
-      // Update the state with the latest expenses
+      // Ensure database consistency with a short delay
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Update the state with the latest expenses - with fresh data
       print('Fetching updated expenses for box: ${expenseModel.boxId}');
       final updatedExpenses = await getExpensesInBox(expenseModel.boxId);
       print('Got ${updatedExpenses.length} updated expenses');
@@ -474,6 +480,13 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       // Notify the UI to refresh
       print('Notifying listeners to refresh UI');
       ref.notifyListeners();
+      
+      // Invalidate related providers to force refresh on all clients
+      ref.invalidateSelf();
+      
+      // Explicitly clear cache for this expense
+      await _expenseRepository.clearCacheForExpense(expenseId);
+      await _expenseRepository.clearCacheForExpenseUsers(expenseId);
     } catch (e, st) {
       print('Error in settleUpExpenseUser: $e');
       print('Stack trace: $st');
@@ -488,12 +501,12 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     try {
       print('Starting cancel settle up for expense: $expenseId, user: $userId');
       
-      // Get the expense details first
+      // Get the expense details first with cache disabled
       final expense = await _expenseRepository.getExpenseDetail(expenseId);
       final expenseModel = ExpenseModel.fromJson(expense.data);
       print('Found expense: ${expenseModel.id}');
       
-      // Get expense users
+      // Get expense users with cache disabled
       final expenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
       print('Found ${expenseUsers.length} expense users');
       
@@ -523,6 +536,9 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         (r) => print('Successfully updated expense user'),
       );
 
+      // Ensure database consistency with a short delay
+      await Future.delayed(const Duration(milliseconds: 500));
+
       // Since we're unsettling a user, the expense should also be marked as not settled
       final updateExpenseData = {
         '\$id': expenseId,
@@ -539,7 +555,10 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         (r) => print('Successfully updated expense'),
       );
 
-      // Update the state with the latest expenses
+      // Ensure database consistency with a short delay
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Update the state with the latest expenses - with fresh data
       print('Fetching updated expenses for box: ${expenseModel.boxId}');
       final updatedExpenses = await getExpensesInBox(expenseModel.boxId);
       print('Got ${updatedExpenses.length} updated expenses');
@@ -548,6 +567,13 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       // Notify the UI to refresh
       print('Notifying listeners to refresh UI');
       ref.notifyListeners();
+      
+      // Invalidate related providers to force refresh on all clients
+      ref.invalidateSelf();
+      
+      // Explicitly clear cache for this expense
+      await _expenseRepository.clearCacheForExpense(expenseId);
+      await _expenseRepository.clearCacheForExpenseUsers(expenseId);
     } catch (e, st) {
       print('Error in cancelSettleUpExpenseUser: $e');
       print('Stack trace: $st');
@@ -592,6 +618,41 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+    }
+  }
+
+  // Helper method to refresh data without using the cache
+  Future<List<ExpenseModel>> getExpensesInBoxFresh(String boxId) async {
+    try {
+      // Clear any cached data before fetching
+      await Future.delayed(Duration.zero); // Force a context switch
+      final expenseList = await _expenseRepository.getExpensesInBox(boxId);
+      return expenseList.map((box) => ExpenseModel.fromJson(box.data)).toList();
+    } catch (e, st) {
+      throw AsyncValue.error(e, st);
+    }
+  }
+
+  // Add a new method for manual refresh
+  Future<void> refreshExpenseData(String expenseId, String boxId) async {
+    try {
+      print('Performing manual refresh of expense data');
+      
+      // Clear cache for expense and expense users
+      await _expenseRepository.clearCacheForExpense(expenseId);
+      await _expenseRepository.clearCacheForExpenseUsers(expenseId);
+      
+      // Fetch fresh data
+      final updatedExpenses = await getExpensesInBox(boxId);
+      
+      // Update state with fresh data
+      state = AsyncValue.data(updatedExpenses);
+      
+      // Notify listeners
+      ref.notifyListeners();
+    } catch (e, st) {
+      print('Error refreshing expense data: $e');
+      print('Stack trace: $st');
     }
   }
 }

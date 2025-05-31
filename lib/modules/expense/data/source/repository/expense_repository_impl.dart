@@ -77,4 +77,14 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   FutureEither<bool> updateExpenseUser(Map updateExpenseUserData) {
     return _remoteDataSource.updateExpenseUser(updateExpenseUserData);
   }
+
+  @override
+  Future<void> clearCacheForExpense(String expenseId) {
+    return _remoteDataSource.clearCacheForExpense(expenseId);
+  }
+
+  @override
+  Future<void> clearCacheForExpenseUsers(String expenseId) {
+    return _remoteDataSource.clearCacheForExpenseUsers(expenseId);
+  }
 }

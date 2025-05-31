@@ -19,4 +19,8 @@ abstract class ExpenseRepository {
       {required String customId});
   FutureEither<bool> deleteExpenseUser(String id);
   FutureEither<bool> updateExpenseUser(Map updateExpenseUserData);
+  
+  // Add cache clearing methods
+  Future<void> clearCacheForExpense(String expenseId);
+  Future<void> clearCacheForExpenseUsers(String expenseId);
 }

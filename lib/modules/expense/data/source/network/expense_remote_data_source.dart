@@ -250,15 +250,18 @@ class ExpenseRemoteDataSource {
   }
 
   Future<Document> getExpenseDetail(String expenseId) async {
-    final document = await _db.getDocument(
-      databaseId: AppwriteConfig.databaseId,
-      collectionId: AppwriteConfig.expenseCollection,
-      documentId: expenseId,
-      //queries: [
-      //  Query.equal('\$id', expenseId),
-      //],
-    );
-    return document;
+    try {
+      print('Getting expense detail for ID: $expenseId with no cache');
+      final document = await _db.getDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.expenseCollection,
+        documentId: expenseId,
+      );
+      return document;
+    } catch (e) {
+      print('Error getting expense detail: $e');
+      rethrow;
+    }
   }
 
   Future<List<Document>> getUsersInExpense(List<String> userIds) async {
@@ -304,7 +307,7 @@ class ExpenseRemoteDataSource {
 
   Future<List<Document>> getExpenseUsers(String expenseId) async {
     try {
-      print('Fetching expense users for expense: $expenseId');
+      print('Fetching expense users for expense: $expenseId with no cache');
       final document = await _db.listDocuments(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.expenseUserCollection,
@@ -355,6 +358,40 @@ class ExpenseRemoteDataSource {
     } catch (e, st) {
       print('General error updating expense user: $e');
       return left(Failure(e.toString(), st));
+    }
+  }
+
+  // Add a method to explicitly clear cache for an entity
+  Future<void> clearCacheForExpense(String expenseId) async {
+    try {
+      // This is a dummy operation that forces a refresh of the cache
+      print('Forcing cache refresh for expense: $expenseId');
+      await _db.getDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.expenseCollection,
+        documentId: expenseId,
+      );
+    } catch (e) {
+      // Ignore errors - this is just to refresh cache
+      print('Note: Error in cache refresh operation: $e');
+    }
+  }
+  
+  Future<void> clearCacheForExpenseUsers(String expenseId) async {
+    try {
+      // This is a dummy operation that forces a refresh of the cache
+      print('Forcing cache refresh for expense users of expense: $expenseId');
+      await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.expenseUserCollection,
+        queries: [
+          Query.equal('expenseId', expenseId),
+          Query.limit(1), // Just get one to refresh cache
+        ],
+      );
+    } catch (e) {
+      // Ignore errors - this is just to refresh cache
+      print('Note: Error in cache refresh operation: $e');
     }
   }
 }

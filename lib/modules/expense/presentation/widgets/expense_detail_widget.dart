@@ -514,6 +514,66 @@ class _SplitDetailsCardState extends ConsumerState<SplitDetailsCard> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
+                          
+                          // Add refresh button row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () async {
+                                  // Show loading indicator
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Refreshing data...'),
+                                      duration: Duration(seconds: 1),
+                                    ),
+                                  );
+                                  
+                                  try {
+                                    // Call the refresh method
+                                    final expenseController = ref.read(expenseNotifierProvider.notifier);
+                                    await expenseController.refreshExpenseData(
+                                      expenseDetails.id!,
+                                      expenseDetails.boxId!,
+                                    );
+                                    
+                                    // Invalidate providers to force UI refresh
+                                    ref.invalidate(expenseDetailsProvider(expenseDetails.id!));
+                                    ref.invalidate(getExpenseUsersForExpenseProvider(expenseDetails.id!));
+                                    
+                                    // Refresh local state
+                                    await _refreshExpenseData();
+                                    
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Data refreshed successfully'),
+                                          backgroundColor: Colors.green,
+                                          duration: Duration(seconds: 1),
+                                        ),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    print('Error refreshing data: $e');
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Error refreshing data: $e'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                                icon: const Icon(Icons.refresh, size: 16),
+                                label: const Text('Refresh'),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: ColorConfig.primarySwatch,
+                                ),
+                              ),
+                            ],
+                          ),
+                          
                           const SizedBox(height: 16),
                           ...users.map((user) {
                             if (user.id == null) {
