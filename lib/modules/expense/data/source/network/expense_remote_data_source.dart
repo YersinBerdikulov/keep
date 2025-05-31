@@ -201,15 +201,21 @@ class ExpenseRemoteDataSource {
   Future<List<Document>> getUsersInExpense(List<String> userIds) async {
     try {
       if (userIds.isEmpty) return [];
+      print('Fetching users with IDs: $userIds');
+
+      // Fetch all users in one query using Query.any for multiple IDs
       final document = await _db.listDocuments(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.usersCollection,
         queries: [
-          Query.equal('\$id', userIds),
+          Query.any('\$id', userIds),
         ],
       );
+
+      print('Found users: ${document.documents.map((d) => d.$id).toList()}');
       return document.documents;
     } catch (e) {
+      print('Error fetching users: $e');
       return [];
     }
   }

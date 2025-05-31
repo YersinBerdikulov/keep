@@ -1,6 +1,8 @@
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:dongi/modules/expense/domain/controllers/expense_controller.dart';
+import 'package:dongi/modules/user/domain/models/user_model.dart';
+import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../expense/presentation/pages/advanced_split_page.dart';
 
@@ -42,6 +44,19 @@ final getExpensesDetailProvider =
     FutureProvider.family.autoDispose((ref, String expenseId) {
   final expenseController = ref.watch(expenseNotifierProvider.notifier);
   return expenseController.getExpenseDetail(expenseId);
+});
+
+// New provider for fetching expense users
+final getExpenseUsersProvider = FutureProvider.family<List<UserModel>, List<String>>((ref, userIds) async {
+  if (userIds.isEmpty) return [];
+  
+  final userController = ref.watch(userNotifierProvider.notifier);
+  final users = await Future.wait(
+    userIds.map((uid) => userController.getUserData(uid).catchError((e) => null)),
+  );
+  
+  // Filter out null values (users that weren't found) and return the list
+  return users.whereType<UserModel>().toList();
 });
 
 final selectedSplitOptionProvider = StateProvider<int>((ref) => -1);

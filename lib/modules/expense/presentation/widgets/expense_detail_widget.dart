@@ -1,11 +1,15 @@
 import 'package:dongi/shared/utilities/extensions/date_extension.dart';
 import 'package:dongi/modules/expense/domain/models/expense_model.dart';
 import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
+import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
 import 'package:dongi/shared/widgets/card/grey_card.dart';
 import 'package:dongi/shared/widgets/list_tile/list_tile.dart';
 import 'package:dongi/shared/widgets/list_tile/list_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
+import 'package:dongi/modules/box/domain/controllers/box_controller.dart';
+import 'package:dongi/modules/user/domain/models/user_model.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
@@ -23,80 +27,45 @@ class UserInfoExpenseDetail extends ConsumerWidget {
 
     return creator.when(
       loading: () => const LoadingWidget(),
-      error: (error, stackTrace) => ListTileWidget(
-        contentPadding: const EdgeInsets.fromLTRB(0, 2, 10, 2),
-        headerString: "Created By",
-        titleString: "Unknown User",
-        titleStringStyle: FontConfig.body1().copyWith(
-          color: ColorConfig.pureWhite,
-        ),
-        headerStringStyle: FontConfig.overline().copyWith(
-          color: ColorConfig.pureWhite.withAlpha((0.5 * 255).toInt()),
-        ),
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: ColorConfig.grey.withOpacity(0.5),
-            shape: BoxShape.circle,
+      error: (error, _) => ErrorTextWidget(error),
+      data: (user) => Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: ColorConfig.primarySwatch.withOpacity(0.1),
+            backgroundImage: user?.profileImage != null
+                ? NetworkImage(user!.profileImage!)
+                : null,
+            child: user?.profileImage == null
+                ? Text(
+                    user?.userName?.isNotEmpty == true
+                        ? user!.userName![0].toUpperCase()
+                        : '?',
+                    style: FontConfig.body1().copyWith(
+                      color: ColorConfig.primarySwatch,
+                    ),
+                  )
+                : null,
           ),
-          child: Icon(
-            Icons.person_outline,
-            color: ColorConfig.pureWhite,
-            size: 24,
-          ),
-        ),
-      ),
-      data: (data) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            ListTileWidget(
-              contentPadding: const EdgeInsets.fromLTRB(0, 2, 10, 2),
-              headerString: "Created By",
-              titleString: data?.userName ?? data?.email ?? "Unknown User",
-              titleStringStyle: FontConfig.body1().copyWith(
-                color: ColorConfig.pureWhite,
-              ),
-              headerStringStyle: FontConfig.overline().copyWith(
-                color: ColorConfig.pureWhite.withAlpha((0.5 * 255).toInt()),
-              ),
-              leading: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: data == null
-                      ? ColorConfig.grey.withOpacity(0.5)
-                      : ColorConfig.primarySwatch.withOpacity(0.8),
-                  shape: BoxShape.circle,
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Created By',
+                style: FontConfig.caption().copyWith(
+                  color: ColorConfig.primarySwatch50,
                 ),
-                child: data?.profileImage == null
-                    ? Icon(
-                        Icons.person_outline,
-                        color: ColorConfig.pureWhite,
-                        size: 24,
-                      )
-                    : ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.network(
-                          data!.profileImage!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            Icons.person_outline,
-                            color: ColorConfig.pureWhite,
-                            size: 24,
-                          ),
-                        ),
-                      ),
               ),
-              trailing: Icon(
-                Icons.info_outline,
-                color: ColorConfig.secondary,
+              Text(
+                user?.userName ?? user?.email ?? 'Unknown',
+                style: FontConfig.body1().copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -131,8 +100,27 @@ class InfoExpenseDetail extends ConsumerWidget {
 
   const InfoExpenseDetail({super.key, required this.expenseModel});
 
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return 'Unknown date';
+    try {
+      final date = DateTime.parse(dateStr);
+      final month = _getMonthName(date.month).toLowerCase();
+      return '${date.day} $month ${date.year}';
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
+
+  String _getMonthName(int month) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[month - 1];
+  }
+
   Widget infoCard(String title, String content,
-      {required IconData icon, Color? iconColor}) {
+      {required IconData icon, Color? iconColor, bool isDate = false}) {
     return Expanded(
       child: Container(
         height: 100,
@@ -149,45 +137,44 @@ class InfoExpenseDetail extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color:
-                      (iconColor ?? ColorConfig.primarySwatch).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  color: iconColor ?? ColorConfig.primarySwatch,
-                  size: 20,
-                ),
+              Row(
+                children: [
+                  Icon(
+                    icon,
+                    color: iconColor ?? ColorConfig.secondary,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    title,
+                    style: FontConfig.caption().copyWith(
+                      color: ColorConfig.secondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-              const Spacer(),
-              Text(
-                title,
-                style: FontConfig.overline().copyWith(
-                  color: ColorConfig.primarySwatch50,
+              const SizedBox(height: 8),
+              Expanded(
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      content,
+                      style: FontConfig.h6().copyWith(
+                        color: ColorConfig.midnight,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                content,
-                style: FontConfig.body1().copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: ColorConfig.midnight,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  String _formatCurrency(num amount) {
-    return '\$${amount.toStringAsFixed(2)}';
   }
 
   @override
@@ -207,14 +194,15 @@ class InfoExpenseDetail extends ConsumerWidget {
               const SizedBox(width: 10),
               infoCard(
                 "Date",
-                expenseModel.createdAt!.toHumanReadableFormat(),
+                _formatDate(expenseModel.createdAt),
                 icon: Icons.calendar_today,
                 iconColor: ColorConfig.primarySwatch,
+                isDate: true,
               ),
               const SizedBox(width: 10),
               infoCard(
                 "Split By",
-                "1 person", // Temporarily hardcoded
+                "${expenseModel.expenseUsers.length} people",
                 icon: Icons.group,
                 iconColor: ColorConfig.error,
               ),
@@ -226,6 +214,151 @@ class InfoExpenseDetail extends ConsumerWidget {
           CategoryInfoCard(categoryId: expenseModel.categoryId!),
         ],
       ],
+    );
+  }
+
+  String _formatCurrency(num amount) {
+    return '\$${amount.toStringAsFixed(2)}';
+  }
+}
+
+class SplitDetailsCard extends ConsumerWidget {
+  final ExpenseModel expenseModel;
+
+  const SplitDetailsCard({super.key, required this.expenseModel});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    print('Building SplitDetailsCard for expense: ${expenseModel.id}');
+    print('Expense users: ${expenseModel.expenseUsers}');
+    
+    // Use the new provider to fetch expense users
+    final splitUsersAsync = ref.watch(getExpenseUsersProvider(expenseModel.expenseUsers));
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: ColorConfig.grey,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: ColorConfig.primarySwatch25,
+            width: 1,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.people,
+                    color: ColorConfig.secondary,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Split Details',
+                    style: FontConfig.caption().copyWith(
+                      color: ColorConfig.secondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              splitUsersAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) {
+                  print('Error loading split users: $error');
+                  print('Stack trace: $stack');
+                  return Center(
+                    child: Text('Error: $error'),
+                  );
+                },
+                data: (users) {
+                  print('Loaded users: ${users.map((u) => u.id).toList()}');
+                  if (users.isEmpty) {
+                    return const Center(
+                      child: Text('No users found'),
+                    );
+                  }
+
+                  final perPersonAmount = expenseModel.cost / users.length;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Split equally between ${users.length} people',
+                        style: FontConfig.body2().copyWith(
+                          color: ColorConfig.midnight,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ...users.map((user) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: ColorConfig.primarySwatch25,
+                                  width: 1,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: user.profileImage != null
+                                    ? Image.network(
+                                        user.profileImage!,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Icon(
+                                        Icons.person,
+                                        size: 20,
+                                        color: ColorConfig.secondary,
+                                      ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user.userName ?? user.email ?? 'Unknown',
+                                    style: FontConfig.body2().copyWith(
+                                      color: ColorConfig.midnight,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$${perPersonAmount.toStringAsFixed(2)}',
+                                    style: FontConfig.caption().copyWith(
+                                      color: ColorConfig.primarySwatch50,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )).toList(),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

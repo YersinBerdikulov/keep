@@ -16,6 +16,7 @@ import 'package:uuid/uuid.dart';
 import '../../../box/domain/models/box_model.dart';
 import '../models/expense_model.dart';
 import '../../../group/domain/models/group_model.dart';
+import '../../../box/domain/di/box_controller_di.dart';
 
 class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   late final ExpenseRepository _expenseRepository;
@@ -46,10 +47,50 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       final categoryId = ref.read(expenseCategoryIdProvider);
 
       // Debug prints
-      print('Adding expense with categoryId: $categoryId');
+      print('Starting expense creation...');
+      print('Current user: ${currentUser?.id}');
+      print('Payer user ID: $payerUserId');
+      print('Category ID: $categoryId');
 
       final expenseId = ID.custom(const Uuid().v4().substring(0, 32));
       final convertedCost = num.parse(expenseCost.text.replaceAll(',', ''));
+      var splitUsersList = ref.read(splitUserProvider);
+
+      // Debug prints
+      print('Initial split users list: $splitUsersList');
+
+      if (splitUsersList.isEmpty) {
+        // If no split users are selected, default to all users in the box
+        final boxUsers = ref.read(userInBoxStoreProvider);
+        print('No split users selected, using box users: ${boxUsers.map((u) => u.id).toList()}');
+        splitUsersList = boxUsers.map((user) => user.id!).toList();
+      }
+
+      print('Final split users list: $splitUsersList');
+
+      // Create expense user records for each split user
+      List<String> expenseUserIds = [];
+      for (var uid in splitUsersList) {
+        String expenseUserId = ID.custom(const Uuid().v4().substring(0, 32));
+        expenseUserIds.add(expenseUserId);
+
+        // Create a new ExpenseUserModel
+        ExpenseUserModel expenseUser = ExpenseUserModel(
+          userId: uid,
+          groupId: groupModel.id!,
+          boxId: boxModel.id!,
+          expenseId: expenseId,
+          cost: convertedCost / splitUsersList.length, // Distribute the cost equally
+        );
+
+        print('Creating expense user: ${expenseUser.toString()}');
+
+        // Add the expense user
+        await addExpenseUser(expenseUser, customId: expenseUserId);
+        print('Expense user created with ID: $expenseUserId');
+      }
+
+      print('Created expense user IDs: $expenseUserIds');
 
       ExpenseModel expenseModel = ExpenseModel(
         id: expenseId,
@@ -62,11 +103,16 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         categoryId: categoryId,
         groupId: groupModel.id!,
         boxId: boxModel.id!,
-        expenseUsers: [],
+        expenseUsers: expenseUserIds,
       );
+
+      print('Creating expense model: ${expenseModel.toString()}');
 
       final res = await _expenseRepository.addExpense(expenseModel,
           customId: expenseId);
+      
+      print('Expense creation result: $res');
+
       res.fold(
         (l) => throw Exception(l.message),
         (r) {
@@ -85,6 +131,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       state = AsyncValue.data(updatedExpenses);
     } catch (e, st) {
       print('Error adding expense: $e');
+      print('Stack trace: $st');
       state = AsyncValue.error(e, st);
     }
   }
@@ -226,16 +273,26 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     required String customId,
   }) async {
     try {
+      print('Adding expense user with ID: $customId');
+      print('Expense user details: ${expenseUser.toString()}');
+      
       final res = await _expenseRepository.addExpenseUser(
         expenseUser,
         customId: customId,
       );
 
       res.fold(
-        (l) => throw Exception(l.message),
-        (_) => {}, // No state update; handled elsewhere
+        (l) {
+          print('Error adding expense user: ${l.message}');
+          throw Exception(l.message);
+        },
+        (_) {
+          print('Successfully added expense user with ID: $customId');
+        },
       );
     } catch (e, st) {
+      print('Exception adding expense user: $e');
+      print('Stack trace: $st');
       state = AsyncValue.error(e, st);
     }
   }

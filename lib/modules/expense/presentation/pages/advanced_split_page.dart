@@ -97,11 +97,13 @@ class AdvancedSplitPage extends ConsumerWidget {
   Widget _buildEqualSplit(
       WidgetRef ref, List<dynamic> users, double totalAmount) {
     final selectedUsers = ref.watch(splitUserProvider);
+    print('Advanced split - Selected users: $selectedUsers');
 
     // Calculate amounts based on selection
     Map<String, double> userAmounts = {};
     if (selectedUsers.isEmpty) {
       // If no one is selected, show the equal split amount but don't assign it
+      print('No users selected, showing default split for all users');
       for (var user in users) {
         if (user.id != null) {
           userAmounts[user.id] = totalAmount / users.length;
@@ -110,6 +112,7 @@ class AdvancedSplitPage extends ConsumerWidget {
     } else {
       // Selected users split the FULL amount equally
       double amountPerSelected = totalAmount / selectedUsers.length;
+      print('Splitting amount $totalAmount between ${selectedUsers.length} users: $amountPerSelected each');
 
       for (var user in users) {
         if (user.id != null) {
@@ -121,6 +124,7 @@ class AdvancedSplitPage extends ConsumerWidget {
         }
       }
     }
+    print('Final user amounts: $userAmounts');
 
     return Column(
       children: [

@@ -49,7 +49,8 @@ class ExpenseDetailPage extends ConsumerWidget {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 InfoExpenseDetail(expenseModel: data),
-                MemberListExpenseDetail(members: data.expenseUsers),
+                SplitDetailsCard(expenseModel: data),
+                const SizedBox(height: 20),
               ],
             ),
           );

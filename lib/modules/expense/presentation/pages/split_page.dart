@@ -146,6 +146,7 @@ class SplitPage extends ConsumerWidget {
                         SplitMethod.equal;
                     // Set basic split option
                     ref.read(selectedSplitOptionProvider.notifier).state = 0;
+                    print('Setting split users for equal split: ${users.map((e) => e.id!).toList()}');
                     ref.read(splitUserProvider.notifier).state =
                         users.map((e) => e.id!).toList();
                   },

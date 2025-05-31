@@ -37,6 +37,7 @@ class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
     // Reset all split-related states
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
+        print('Initializing expense page...');
         // Reset all providers first to prevent "No element" error
         ref.read(userInBoxStoreProvider.notifier).state = [];
         ref.read(selectedSplitOptionProvider.notifier).state = -1;
@@ -52,9 +53,12 @@ class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
             ref.read(boxNotifierProvider(widget.groupModel.id!).notifier);
         final users =
             await boxController.getUsersInBox(widget.boxModel.boxUsers);
+        
+        print('Loaded box users: ${users.map((u) => u.id).toList()}');
 
         // Only update providers if the widget is still mounted
         if (mounted) {
+          print('Setting userInBoxStoreProvider with users');
           ref.read(userInBoxStoreProvider.notifier).state = users;
 
           // Initialize shares with 1 for each user
@@ -62,6 +66,7 @@ class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
             final initialShares = Map<String, int>.fromEntries(users
                 .where((user) => user.id != null)
                 .map((user) => MapEntry(user.id!, 1)));
+            print('Setting initial shares: $initialShares');
             ref.read(userSharesProvider.notifier).state = initialShares;
           }
         }
