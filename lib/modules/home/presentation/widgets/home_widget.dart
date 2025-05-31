@@ -268,6 +268,7 @@ class HomeRecentGroup extends StatelessWidget {
     }
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
@@ -298,8 +299,9 @@ class HomeRecentGroup extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(
+        Container(
           height: 170,
+          constraints: const BoxConstraints(maxHeight: 170),
           child: ListView(
             padding: EdgeInsets.zero,
             scrollDirection: Axis.horizontal,
@@ -338,6 +340,7 @@ class GroupCardWidget extends ConsumerWidget {
 
     return Container(
       width: 150,
+      height: 160, // Fixed height
       margin: const EdgeInsets.only(right: 10),
       child: CardWidget(
         margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -356,47 +359,58 @@ class GroupCardWidget extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min, // Take minimum required space
+              mainAxisAlignment: MainAxisAlignment.start, // Start from the top
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: ColorConfig.primarySwatch25,
-                          width: 2,
+                // Group title and image row - fixed height
+                SizedBox(
+                  height: 36, // Fixed height for title row
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: ColorConfig.primarySwatch25,
+                            width: 2,
+                          ),
+                        ),
+                        child: ImageWidget(
+                          width: 36,
+                          height: 36,
+                          imageUrl: group.image,
+                          borderRadius: 6,
                         ),
                       ),
-                      child: ImageWidget(
-                        width: 36,
-                        height: 36,
-                        imageUrl: group.image,
-                        borderRadius: 6,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        group.title,
-                        style: FontConfig.body2().copyWith(
-                          color: ColorConfig.midnight,
-                          fontWeight: FontWeight.w600,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          group.title,
+                          style: FontConfig.body2().copyWith(
+                            color: ColorConfig.midnight,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 12),
+                const Spacer(flex: 1),
+                // Boxes count
                 boxesInGroup.when(
                   loading: () => _buildBoxCount("Loading..."),
                   error: (_, __) => _buildBoxCount("Error"),
                   data: (boxes) => _buildBoxCount("${boxes.length}"),
                 ),
                 const SizedBox(height: 8),
+                // Member count
                 _buildMemberCount(group.groupUsers.length),
-                const SizedBox(height: 12),
+                const Spacer(flex: 1),
+                // Member stack
                 _buildMemberStack(groupMember),
               ],
             ),

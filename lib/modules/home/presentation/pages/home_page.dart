@@ -34,9 +34,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void checkUserName() async {
     final userData = await ref.read(userNotifierProvider.future);
     if (mounted &&
-       
         userData != null &&
-       
         (userData.userName == null || userData.userName!.isEmpty)) {
       context.go(RouteName.enterName);
     }
@@ -101,32 +99,40 @@ class _HomePageState extends ConsumerState<HomePage> {
             ],
           ),
           drawer: const DrawerWidget(),
-          body: RefreshIndicator(
-            onRefresh: () async {
-              // Refresh all the data
-              await Future.wait([
-                ref.refresh(homeNotifierProvider.future),
-                ref.refresh(groupNotifierProvider.future),
-                ref.refresh(boxNotifierProvider('').future),
-              ]);
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              return RefreshIndicator(
+                onRefresh: () async {
+                  // Refresh all the data
+                  await Future.wait([
+                    ref.refresh(homeNotifierProvider.future),
+                    ref.refresh(groupNotifierProvider.future),
+                    ref.refresh(boxNotifierProvider('').future),
+                  ]);
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const HomeExpenseSummery(),
+                        const SizedBox(height: 24),
+                        HomeRecentGroup(data),
+                        const SizedBox(height: 24),
+                        HomeWeeklyAnalytic(),
+                        const SizedBox(height: 24),
+                        const HomeRecentTransaction(),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
+                  ),
+                ),
+              );
             },
-            child: RefreshIndicator(
-            onRefresh: () async {
-              refreshData();
-            },
-            child: ListView(
-                children: [
-                  const HomeExpenseSummery(),
-                  const SizedBox(height: 30),
-                  HomeRecentGroup(data),
-                  const SizedBox(height: 30),
-                  HomeWeeklyAnalytic(),
-                  const SizedBox(height: 30),
-                  const HomeRecentTransaction(),
-                  const SizedBox(height: 30),
-                ],
-            ),
-            ),
           ),
         );
       },
