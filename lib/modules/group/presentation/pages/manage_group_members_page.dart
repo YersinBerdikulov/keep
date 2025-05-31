@@ -85,22 +85,20 @@ class ManageGroupMembersPage extends HookConsumerWidget {
           if (result.isNotEmpty) {
             members.value = result;
             
-            // Load member roles if current user is creator
-            if (isCreator) {
-              Map<String, String> roles = {};
-              for (var user in result) {
-                if (user.id != null) {
-                  try {
-                    final role = await ref.read(groupNotifierProvider.notifier)
-                        .getUserRole(user.id!, groupModel.id!);
-                    roles[user.id!] = role;
-                  } catch (e) {
-                    roles[user.id!] = "member";
-                  }
+            // Load member roles for all users
+            Map<String, String> roles = {};
+            for (var user in result) {
+              if (user.id != null) {
+                try {
+                  final role = await ref.read(groupNotifierProvider.notifier)
+                      .getUserRole(user.id!, groupModel.id!);
+                  roles[user.id!] = role;
+                } catch (e) {
+                  roles[user.id!] = "member";
                 }
               }
-              memberRoles.value = roles;
             }
+            memberRoles.value = roles;
           } else {
             members.value = [];
           }
@@ -125,11 +123,10 @@ class ManageGroupMembersPage extends HookConsumerWidget {
           newRole: newRole,
         );
         
-        // Update local state
-        memberRoles.value = {
-          ...memberRoles.value,
-          memberId: newRole,
-        };
+        // Update local state correctly
+        final updatedRoles = Map<String, String>.from(memberRoles.value);
+        updatedRoles[memberId] = newRole;
+        memberRoles.value = updatedRoles;
         
         showSnackBar(
           context, 
@@ -165,6 +162,15 @@ class ManageGroupMembersPage extends HookConsumerWidget {
         title: "Manage Members",
         showDrawer: false,
         automaticallyImplyLeading: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              isLoading.value = true;
+              ref.invalidate(groupDetailProvider(groupModel.id!));
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: Container(
