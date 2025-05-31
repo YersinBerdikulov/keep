@@ -2,6 +2,7 @@ import 'package:appwrite/models.dart';
 import 'package:dongi/shared/types/failure.dart';
 import 'package:dongi/modules/group/data/source/network/group_remote_data_source.dart';
 import 'package:dongi/modules/group/domain/models/group_model.dart';
+import 'package:dongi/modules/group/domain/models/group_user_model.dart';
 import 'package:dongi/modules/group/domain/repository/group_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -47,5 +48,25 @@ class GroupRepositoryImpl implements GroupRepository {
     int limit = 3,
   }) {
     return _remoteDataSource.getCurrentUserLatestGroup(uid, limit);
+  }
+
+  @override
+  Future<List<Document>> getGroupUsers(String groupId) {
+    return _remoteDataSource.getGroupUsers(groupId);
+  }
+
+  @override
+  Future<Either<Failure, Document>> addGroupUser(GroupUserModel groupUserModel) {
+    return _remoteDataSource.addGroupUser(groupUserModel);
+  }
+
+  @override
+  Future<Either<Failure, Document>> updateGroupUser(GroupUserModel groupUserModel) {
+    return _remoteDataSource.updateGroupUser(groupUserModel);
+  }
+
+  @override
+  Future<Either<Failure, bool>> deleteGroupUser(String id) {
+    return _remoteDataSource.deleteGroupUser(id);
   }
 }

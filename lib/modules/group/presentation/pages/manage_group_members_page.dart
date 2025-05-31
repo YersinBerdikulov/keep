@@ -1,17 +1,18 @@
-import 'package:dongi/modules/group/domain/models/group_model.dart';
+import 'package:dongi/core/constants/color_config.dart';
+import 'package:dongi/core/constants/font_config.dart';
+import 'package:dongi/core/constants/size_config.dart';
+import 'package:dongi/core/widgets/app_bar.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
-import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
-import 'package:dongi/shared/utilities/helpers/snackbar_helper.dart';
-import 'package:dongi/shared/widgets/appbar/appbar.dart';
+import 'package:dongi/modules/group/domain/models/group_model.dart';
+import 'package:dongi/modules/user/domain/models/user_model.dart';
+import 'package:dongi/shared/widgets/permission_widgets.dart';
+import 'package:dongi/shared/widgets/snackbar_widget.dart';
 import 'package:dongi/shared/widgets/loading/loading_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import '../../../../core/constants/color_config.dart';
-import '../../../../core/constants/font_config.dart';
-import '../../../../core/constants/size_config.dart';
 
 class ManageGroupMembersPage extends HookConsumerWidget {
   final GroupModel groupModel;
@@ -60,7 +61,41 @@ class ManageGroupMembersPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUserId = ref.read(currentUserProvider)!.id;
-    final groupMembers = ref.watch(groupMembersProvider(groupModel.groupUsers));
+    
+    // Use hooks to manage state
+    final isLoading = useState(true);
+    final error = useState<String?>(null);
+    final members = useState<List<UserModel>>([]);
+    
+    // Load members when needed
+    useEffect(() {
+      Future<void> loadMembers() async {
+        try {
+          if (groupModel.groupUsers.isEmpty) {
+            members.value = [];
+            isLoading.value = false;
+            return;
+          }
+          
+          final result = await ref.read(groupNotifierProvider.notifier)
+              .getUsersInGroup(groupModel.groupUsers);
+          
+          if (result.isNotEmpty) {
+            members.value = result;
+          } else {
+            members.value = [];
+          }
+        } catch (e) {
+          error.value = e.toString();
+        } finally {
+          isLoading.value = false;
+        }
+      }
+      
+      loadMembers();
+      
+      return null;
+    }, [groupModel.groupUsers]);
 
     ref.listen<AsyncValue<List<GroupModel>>>(
       groupNotifierProvider,
@@ -68,7 +103,8 @@ class ManageGroupMembersPage extends HookConsumerWidget {
         state.whenOrNull(
           data: (_) {
             showSnackBar(context, content: "Member removed successfully!");
-            ref.invalidate(usersInGroupProvider(groupModel.groupUsers));
+            // Refresh the members after removal
+            isLoading.value = true;
             ref.invalidate(groupDetailProvider(groupModel.id!));
             context.pop();
           },
@@ -103,117 +139,117 @@ class ManageGroupMembersPage extends HookConsumerWidget {
                     color: ColorConfig.grey,
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child: groupMembers.when(
-                    data: (members) {
-                      if (members.isEmpty) {
-                        return _buildEmptyState();
-                      }
-
-                      return ListView.builder(
-                        padding: const EdgeInsets.all(15),
-                        itemCount: members.length,
-                        itemBuilder: (context, index) {
-                          final member = members[index];
-                          final isCreator = member.id == groupModel.creatorId;
-                          final isCurrentUser = member.id == currentUserId;
-
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            decoration: BoxDecoration(
-                              color: ColorConfig.white,
-                              borderRadius: BorderRadius.circular(12),
+                  child: isLoading.value 
+                    ? const LoadingWidget()
+                    : error.value != null
+                        ? Center(
+                            child: Text(
+                              error.value!,
+                              style: FontConfig.body2().copyWith(
+                                color: ColorConfig.error,
+                              ),
                             ),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: ColorConfig.primarySwatch.withOpacity(0.1),
-                                backgroundImage: member.profileImage != null
-                                    ? NetworkImage(member.profileImage!)
-                                    : null,
-                                child: member.profileImage == null
-                                    ? Text(
-                                        member.userName?[0].toUpperCase() ?? '',
-                                        style: FontConfig.body1().copyWith(
-                                          color: ColorConfig.primarySwatch,
+                          )
+                        : members.value.isEmpty
+                            ? _buildEmptyState()
+                            : ListView.builder(
+                                padding: const EdgeInsets.all(15),
+                                itemCount: members.value.length,
+                                itemBuilder: (context, index) {
+                                  final member = members.value[index];
+                                  final isCreator = member.id == groupModel.creatorId;
+                                  final isCurrentUser = member.id == currentUserId;
+
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    decoration: BoxDecoration(
+                                      color: ColorConfig.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: ColorConfig.primarySwatch.withOpacity(0.1),
+                                        backgroundImage: member.profileImage != null
+                                            ? NetworkImage(member.profileImage!)
+                                            : null,
+                                        child: member.profileImage == null
+                                            ? Text(
+                                                member.userName?[0].toUpperCase() ?? '',
+                                                style: FontConfig.body1().copyWith(
+                                                  color: ColorConfig.primarySwatch,
+                                                ),
+                                              )
+                                            : null,
+                                      ),
+                                      title: Text(
+                                        member.userName ?? 'Unknown User',
+                                        style: FontConfig.body2().copyWith(
+                                          fontWeight: FontWeight.w600,
                                         ),
-                                      )
-                                    : null,
-                              ),
-                              title: Text(
-                                member.userName ?? 'Unknown User',
-                                style: FontConfig.body2().copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              subtitle: Text(
-                                isCreator ? 'Creator' : 'Member',
-                                style: FontConfig.caption().copyWith(
-                                  color: ColorConfig.primarySwatch50,
-                                ),
-                              ),
-                              trailing: !isCreator && !isCurrentUser
-                                  ? IconButton(
-                                      icon: const Icon(Icons.remove_circle_outline),
-                                      color: ColorConfig.error,
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            title: Text(
-                                              'Remove Member',
-                                              style: FontConfig.h6(),
-                                            ),
-                                            content: Text(
-                                              'Are you sure you want to remove ${member.userName ?? 'this member'} from the group?',
-                                              style: FontConfig.body2(),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () => context.pop(),
-                                                child: Text(
-                                                  'Cancel',
-                                                  style: FontConfig.body2().copyWith(
-                                                    color: ColorConfig.primarySwatch50,
-                                                  ),
-                                                ),
-                                              ),
-                                              TextButton(
+                                      ),
+                                      subtitle: Text(
+                                        isCreator ? 'Creator' : 'Member',
+                                        style: FontConfig.caption().copyWith(
+                                          color: ColorConfig.primarySwatch50,
+                                        ),
+                                      ),
+                                      trailing: !isCreator && !isCurrentUser
+                                          ? CreatorOrAdminWidget(
+                                              groupId: groupModel.id!,
+                                              creatorId: groupModel.creatorId,
+                                              child: IconButton(
+                                                icon: const Icon(Icons.remove_circle_outline),
+                                                color: ColorConfig.error,
                                                 onPressed: () {
-                                                  context.pop();
-                                                  ref
-                                                      .read(groupNotifierProvider.notifier)
-                                                      .deleteMember(
-                                                        groupModel: groupModel,
-                                                        memberIdToDelete: member.id!,
-                                                      );
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) => AlertDialog(
+                                                      title: Text(
+                                                        'Remove Member',
+                                                        style: FontConfig.h6(),
+                                                      ),
+                                                      content: Text(
+                                                        'Are you sure you want to remove ${member.userName ?? 'this member'} from the group?',
+                                                        style: FontConfig.body2(),
+                                                      ),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () => context.pop(),
+                                                          child: Text(
+                                                            'Cancel',
+                                                            style: FontConfig.body2().copyWith(
+                                                              color: ColorConfig.primarySwatch50,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            context.pop();
+                                                            ref
+                                                                .read(groupNotifierProvider.notifier)
+                                                                .deleteMember(
+                                                                  groupModel: groupModel,
+                                                                  memberIdToDelete: member.id!,
+                                                                );
+                                                          },
+                                                          child: Text(
+                                                            'Remove',
+                                                            style: FontConfig.body2().copyWith(
+                                                              color: ColorConfig.error,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
                                                 },
-                                                child: Text(
-                                                  'Remove',
-                                                  style: FontConfig.body2().copyWith(
-                                                    color: ColorConfig.error,
-                                                  ),
-                                                ),
                                               ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    )
-                                  : null,
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    loading: () => const LoadingWidget(),
-                    error: (error, _) => Center(
-                      child: Text(
-                        error.toString(),
-                        style: FontConfig.body2().copyWith(
-                          color: ColorConfig.error,
-                        ),
-                      ),
-                    ),
-                  ),
+                                            )
+                                          : null,
+                                    ),
+                                  );
+                                },
+                              ),
                 ),
               ),
             ],

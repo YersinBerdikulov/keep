@@ -13,6 +13,7 @@ class GroupUserModel with _$GroupUserModel {
     required String userId,
     required String groupId,
     @Default("pending") String status,
+    @Default("member") String role,
   }) = _GroupUserModel;
 
   factory GroupUserModel.fromJson(Map<String, dynamic> json) =>
