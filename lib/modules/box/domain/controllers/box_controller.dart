@@ -115,6 +115,18 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
       // First get the current box data
       final currentBox = await boxRepository.getBoxDetail(boxId);
       final currentBoxModel = BoxModel.fromJson(currentBox.data);
+      
+      // Check if current user has permission to update
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      
+      final isCreator = currentBoxModel.creatorId == currentUser.id;
+      final canEdit = await ref.read(groupNotifierProvider.notifier)
+          .canUserDeleteItem(currentUser.id!, currentBoxModel.groupId, currentBoxModel.creatorId);
+      
+      if (!isCreator && !canEdit) {
+        throw Exception('Only the box creator or group admin can update this box');
+      }
 
       // Prepare update data with all existing fields
       Map<String, dynamic> updateData = currentBoxModel.toJson();
@@ -176,6 +188,17 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
   }) async {
     state = const AsyncValue.loading();
     try {
+      // Check if current user has permission to delete
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      
+      final canDelete = await ref.read(groupNotifierProvider.notifier)
+          .canUserDeleteItem(currentUser.id!, boxModel.groupId, boxModel.creatorId);
+      
+      if (!canDelete) {
+        throw Exception('Only the box creator or group admin can delete this box');
+      }
+      
       // Remove the box from the server
       final res = await boxRepository.deleteBox(boxModel.id!);
 
@@ -211,6 +234,7 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
   Future<void> deleteAllBox(List<String> boxIds) async {
     state = const AsyncValue.loading();
     try {
+      // Current user should be checked at the group level
       // Remove all boxes from the server
       final res = await boxRepository.deleteAllBox(boxIds);
 

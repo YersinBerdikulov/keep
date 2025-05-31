@@ -5,6 +5,7 @@ import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/box/domain/di/box_usecase_di.dart';
 import 'package:dongi/modules/box/domain/usecases/delete_all_boxes_usecase.dart';
 import 'package:dongi/modules/group/data/di/group_di.dart';
+import 'package:dongi/modules/group/domain/models/group_user_model.dart';
 import 'package:dongi/modules/group/domain/repository/group_repository.dart';
 import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +77,25 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
         (l) => AsyncValue.error(l.message, StackTrace.current),
         (document) async {
           final createdGroup = GroupModel.fromJson(document.data);
+          
+          // Create group user records - creator as admin, others as members
+          await _groupRepository.addGroupUser(GroupUserModel(
+            userId: currentUser.id!,
+            groupId: createdGroup.id!,
+            status: "accepted",
+            role: "admin",
+          ));
+
+          // Add other members as regular members
+          for (final friendId in selectedFriends.value) {
+            await _groupRepository.addGroupUser(GroupUserModel(
+              userId: friendId,
+              groupId: createdGroup.id!,
+              status: "pending",
+              role: "member",
+            ));
+          }
+          
           final currentGroups = state.value ?? [];
           // Invalidate homeNotifierProvider to refresh homepage
           ref.invalidate(homeNotifierProvider);
@@ -96,6 +116,17 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
   }) async {
     state = const AsyncValue.loading();
     try {
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      
+      // Check if user is creator or admin
+      final isCreator = groupModel.creatorId == currentUser.id;
+      final isAdmin = await _isUserAdmin(currentUser.id!, groupModel.id!);
+      
+      if (!isCreator && !isAdmin) {
+        throw Exception('Only the group creator or admin can update the group');
+      }
+      
       // Start with the complete existing group data
       Map<String, dynamic> updateData = groupModel.toJson();
 
@@ -144,6 +175,23 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
   Future<void> deleteGroup(GroupModel groupModel) async {
     state = const AsyncValue.loading();
     try {
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      
+      // Check if user is creator or admin
+      final isCreator = groupModel.creatorId == currentUser.id;
+      final isAdmin = await _isUserAdmin(currentUser.id!, groupModel.id!);
+      
+      if (!isCreator && !isAdmin) {
+        throw Exception('Only the group creator or admin can delete the group');
+      }
+      
+      // Delete all group users first
+      final groupUsers = await _groupRepository.getGroupUsers(groupModel.id!);
+      for (final user in groupUsers) {
+        await _groupRepository.deleteGroupUser(user.$id);
+      }
+      
       await _groupRepository.deleteGroup(groupModel.id!);
 
       if (groupModel.image != null && groupModel.image!.isNotEmpty) {
@@ -198,6 +246,17 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
         (l) => AsyncValue.error(l.message, StackTrace.current),
         (document) async {
           final updatedGroup = GroupModel.fromJson(document.data);
+          
+          // Create group user records for new members
+          for (final memberId in newMemberIds) {
+            await _groupRepository.addGroupUser(GroupUserModel(
+              userId: memberId,
+              groupId: updatedGroup.id!,
+              status: "pending",
+              role: "member",
+            ));
+          }
+          
           final currentGroups = state.value ?? [];
           final updatedGroups = currentGroups.map((group) {
             if (group.id == updatedGroup.id) {
@@ -221,9 +280,32 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
   }) async {
     state = const AsyncLoading();
     try {
-      // Check if the member is the creator
-      if (memberIdToDelete == groupModel.creatorId) {
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      
+      // Check if user is creator, admin, or deleting themselves
+      final isCreator = groupModel.creatorId == currentUser.id;
+      final isAdmin = await _isUserAdmin(currentUser.id!, groupModel.id!);
+      final isDeletingSelf = currentUser.id == memberIdToDelete;
+      
+      // Check if member to delete is the creator
+      if (memberIdToDelete == groupModel.creatorId && !isDeletingSelf) {
         throw Exception('Cannot remove the group creator');
+      }
+      
+      // Only allow if user is creator, admin, or deleting themselves
+      if (!isCreator && !isAdmin && !isDeletingSelf) {
+        throw Exception('Only the group creator, admin, or the user themselves can remove a member');
+      }
+      
+      // Find and delete the group user record
+      final groupUsers = await _groupRepository.getGroupUsers(groupModel.id!);
+      for (final user in groupUsers) {
+        final userData = GroupUserModel.fromJson(user.data);
+        if (userData.userId == memberIdToDelete) {
+          await _groupRepository.deleteGroupUser(user.$id);
+          break;
+        }
       }
 
       // Remove the member from the group
@@ -251,5 +333,132 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
+  }
+  
+  Future<void> promoteToAdmin({
+    required GroupModel groupModel,
+    required String memberIdToPromote,
+  }) async {
+    state = const AsyncLoading();
+    try {
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      
+      // Check if current user is creator or admin
+      final isCreator = groupModel.creatorId == currentUser.id;
+      final isAdmin = await _isUserAdmin(currentUser.id!, groupModel.id!);
+      
+      if (!isCreator && !isAdmin) {
+        throw Exception('Only the group creator or admin can promote members');
+      }
+      
+      // Find and update the group user record
+      final groupUsers = await _groupRepository.getGroupUsers(groupModel.id!);
+      for (final user in groupUsers) {
+        final userData = GroupUserModel.fromJson(user.data);
+        if (userData.userId == memberIdToPromote) {
+          final updatedUser = userData.copyWith(role: "admin");
+          await _groupRepository.updateGroupUser(updatedUser);
+          break;
+        }
+      }
+      
+      // No need to update the group model itself
+      // Refresh the state to reflect changes
+      final updatedGroups = await _fetchGroups();
+      state = AsyncValue.data(updatedGroups);
+      
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+  
+  Future<void> demoteToMember({
+    required GroupModel groupModel,
+    required String memberIdToDemote,
+  }) async {
+    state = const AsyncLoading();
+    try {
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      
+      // Check if current user is creator
+      final isCreator = groupModel.creatorId == currentUser.id;
+      
+      // Only allow creator to demote admins
+      if (!isCreator) {
+        throw Exception('Only the group creator can demote admins');
+      }
+      
+      // Check if trying to demote creator (which is not allowed)
+      if (memberIdToDemote == groupModel.creatorId) {
+        throw Exception('Cannot demote the group creator');
+      }
+      
+      // Find and update the group user record
+      final groupUsers = await _groupRepository.getGroupUsers(groupModel.id!);
+      for (final user in groupUsers) {
+        final userData = GroupUserModel.fromJson(user.data);
+        if (userData.userId == memberIdToDemote) {
+          final updatedUser = userData.copyWith(role: "member");
+          await _groupRepository.updateGroupUser(updatedUser);
+          break;
+        }
+      }
+      
+      // No need to update the group model itself
+      // Refresh the state to reflect changes
+      final updatedGroups = await _fetchGroups();
+      state = AsyncValue.data(updatedGroups);
+      
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+  
+  Future<bool> _isUserAdmin(String userId, String groupId) async {
+    try {
+      final groupUsers = await _groupRepository.getGroupUsers(groupId);
+      for (final user in groupUsers) {
+        final userData = GroupUserModel.fromJson(user.data);
+        if (userData.userId == userId && userData.role == "admin") {
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+  
+  Future<String> getUserRole(String userId, String groupId) async {
+    try {
+      final groupUsers = await _groupRepository.getGroupUsers(groupId);
+      for (final user in groupUsers) {
+        final userData = GroupUserModel.fromJson(user.data);
+        if (userData.userId == userId) {
+          return userData.role;
+        }
+      }
+      return "member"; // Default role if not found
+    } catch (e) {
+      return "member"; // Default role on error
+    }
+  }
+  
+  Future<bool> canUserDeleteItem(String userId, String groupId, String creatorId) async {
+    // User can delete if they are the creator of the item
+    if (userId == creatorId) {
+      return true;
+    }
+    
+    // User can delete if they are the group creator
+    final group = await getGroupDetail(groupId);
+    if (userId == group.creatorId) {
+      return true;
+    }
+    
+    // User can delete if they are an admin
+    return await _isUserAdmin(userId, groupId);
   }
 }

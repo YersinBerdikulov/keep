@@ -29,6 +29,7 @@ mixin _$GroupUserModel {
   String get userId => throw _privateConstructorUsedError;
   String get groupId => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
+  String get role => throw _privateConstructorUsedError;
 
   /// Serializes this GroupUserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -52,7 +53,8 @@ abstract class $GroupUserModelCopyWith<$Res> {
       @JsonKey(name: '\$updatedAt') String? updatedAt,
       String userId,
       String groupId,
-      String status});
+      String status,
+      String role});
 }
 
 /// @nodoc
@@ -76,6 +78,7 @@ class _$GroupUserModelCopyWithImpl<$Res, $Val extends GroupUserModel>
     Object? userId = null,
     Object? groupId = null,
     Object? status = null,
+    Object? role = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -102,6 +105,10 @@ class _$GroupUserModelCopyWithImpl<$Res, $Val extends GroupUserModel>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String,
+      role: null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -120,7 +127,8 @@ abstract class _$$GroupUserModelImplCopyWith<$Res>
       @JsonKey(name: '\$updatedAt') String? updatedAt,
       String userId,
       String groupId,
-      String status});
+      String status,
+      String role});
 }
 
 /// @nodoc
@@ -142,6 +150,7 @@ class __$$GroupUserModelImplCopyWithImpl<$Res>
     Object? userId = null,
     Object? groupId = null,
     Object? status = null,
+    Object? role = null,
   }) {
     return _then(_$GroupUserModelImpl(
       id: freezed == id
@@ -168,6 +177,10 @@ class __$$GroupUserModelImplCopyWithImpl<$Res>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String,
+      role: null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -181,7 +194,8 @@ class _$GroupUserModelImpl implements _GroupUserModel {
       @JsonKey(name: '\$updatedAt') this.updatedAt,
       required this.userId,
       required this.groupId,
-      this.status = "pending"});
+      this.status = "pending",
+      this.role = "member"});
 
   factory _$GroupUserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$GroupUserModelImplFromJson(json);
@@ -202,10 +216,13 @@ class _$GroupUserModelImpl implements _GroupUserModel {
   @override
   @JsonKey()
   final String status;
+  @override
+  @JsonKey()
+  final String role;
 
   @override
   String toString() {
-    return 'GroupUserModel(id: $id, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, groupId: $groupId, status: $status)';
+    return 'GroupUserModel(id: $id, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, groupId: $groupId, status: $status, role: $role)';
   }
 
   @override
@@ -220,13 +237,14 @@ class _$GroupUserModelImpl implements _GroupUserModel {
                 other.updatedAt == updatedAt) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.groupId, groupId) || other.groupId == groupId) &&
-            (identical(other.status, status) || other.status == status));
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.role, role) || other.role == role));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, createdAt, updatedAt, userId, groupId, status);
+      runtimeType, id, createdAt, updatedAt, userId, groupId, status, role);
 
   /// Create a copy of GroupUserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -252,7 +270,8 @@ abstract class _GroupUserModel implements GroupUserModel {
       @JsonKey(name: '\$updatedAt') final String? updatedAt,
       required final String userId,
       required final String groupId,
-      final String status}) = _$GroupUserModelImpl;
+      final String status,
+      final String role}) = _$GroupUserModelImpl;
 
   factory _GroupUserModel.fromJson(Map<String, dynamic> json) =
       _$GroupUserModelImpl.fromJson;
@@ -272,6 +291,8 @@ abstract class _GroupUserModel implements GroupUserModel {
   String get groupId;
   @override
   String get status;
+  @override
+  String get role;
 
   /// Create a copy of GroupUserModel
   /// with the given fields replaced by the non-null parameter values.

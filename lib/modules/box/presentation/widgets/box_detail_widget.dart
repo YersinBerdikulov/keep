@@ -22,6 +22,9 @@ import '../../../../shared/widgets/long_press_menu/long_press_menu.dart';
 import '../../../../shared/utilities/extensions/date_extension.dart';
 import '../../../expense/domain/di/expense_controller_di.dart';
 import '../../domain/controllers/box_controller.dart';
+import '../../../../shared/widgets/permission_widgets.dart';
+import '../../../auth/domain/di/auth_controller_di.dart';
+import '../../../group/domain/di/group_controller_di.dart';
 
 class TotalExpenseBoxDetail extends ConsumerWidget {
   final num total;
@@ -719,11 +722,18 @@ class _ExpenseCardItemState extends ConsumerState<ExpenseCardItem> {
           },
         ),
       ),
-      PopupMenuItem(
-        onTap: _deleteExpense,
-        child: const Text('Delete'),
-      ),
     ];
+
+    // Conditionally add delete option
+    if (ref.read(currentUserProvider)?.id == widget.expenseModel.creatorId || 
+        ref.watch(isCurrentUserAdminProvider(widget.groupModel.id!))) {
+      menuItems.add(
+        PopupMenuItem(
+          onTap: _deleteExpense,
+          child: const Text('Delete'),
+        )
+      );
+    }
 
     return Column(
       children: [
@@ -765,16 +775,20 @@ class _ExpenseCardItemState extends ConsumerState<ExpenseCardItem> {
                     onDismissed: _deleteExpense,
                   ),
                   children: [
-                    SlidableAction(
-                      borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(10),
-                        bottomRight: Radius.circular(10),
+                    DeleteButtonWrapper(
+                      groupId: widget.groupModel.id!,
+                      creatorId: widget.expenseModel.creatorId,
+                      child: SlidableAction(
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
+                        ),
+                        onPressed: (context) => _deleteExpense(),
+                        backgroundColor: const Color(0xFFFE4A49),
+                        foregroundColor: Colors.white,
+                        icon: Icons.delete,
+                        label: 'Delete',
                       ),
-                      onPressed: (context) => _deleteExpense(),
-                      backgroundColor: const Color(0xFFFE4A49),
-                      foregroundColor: Colors.white,
-                      icon: Icons.delete,
-                      label: 'Delete',
                     ),
                   ],
                 ),

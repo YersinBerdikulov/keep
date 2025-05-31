@@ -14,6 +14,7 @@ _$GroupUserModelImpl _$$GroupUserModelImplFromJson(Map<String, dynamic> json) =>
       userId: json['userId'] as String,
       groupId: json['groupId'] as String,
       status: json['status'] as String? ?? "pending",
+      role: json['role'] as String? ?? "member",
     );
 
 Map<String, dynamic> _$$GroupUserModelImplToJson(
@@ -25,4 +26,5 @@ Map<String, dynamic> _$$GroupUserModelImplToJson(
       'userId': instance.userId,
       'groupId': instance.groupId,
       'status': instance.status,
+      'role': instance.role,
     };

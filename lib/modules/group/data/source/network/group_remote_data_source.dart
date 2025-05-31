@@ -3,6 +3,7 @@ import 'package:appwrite/models.dart';
 import 'package:dongi/core/constants/appwrite_config.dart';
 import 'package:dongi/shared/types/failure.dart';
 import 'package:dongi/modules/group/domain/models/group_model.dart';
+import 'package:dongi/modules/group/domain/models/group_user_model.dart';
 import 'package:fpdart/fpdart.dart';
 
 class GroupRemoteDataSource {
@@ -101,5 +102,62 @@ class GroupRemoteDataSource {
       ],
     );
     return document.documents;
+  }
+  
+  Future<List<Document>> getGroupUsers(String groupId) async {
+    try {
+      final document = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.groupUserCollection,
+        queries: [
+          Query.equal('groupId', groupId),
+        ],
+      );
+      return document.documents;
+    } catch (e) {
+      print('Error fetching group users: $e');
+      return [];
+    }
+  }
+  
+  Future<Either<Failure, Document>> addGroupUser(GroupUserModel groupUserModel) async {
+    try {
+      final document = await _db.createDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.groupUserCollection,
+        documentId: ID.unique(),
+        data: groupUserModel.toJson(),
+      );
+      return right(document);
+    } on AppwriteException catch (e, st) {
+      return left(Failure(e.message ?? 'Unexpected error occurred', st));
+    }
+  }
+  
+  Future<Either<Failure, Document>> updateGroupUser(GroupUserModel groupUserModel) async {
+    try {
+      final document = await _db.updateDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.groupUserCollection,
+        documentId: groupUserModel.id!,
+        data: groupUserModel.toJson(),
+      );
+      return right(document);
+    } on AppwriteException catch (e, st) {
+      return left(Failure(e.message ?? 'Unexpected error occurred', st));
+    }
+  }
+  
+  Future<Either<Failure, bool>> deleteGroupUser(String id) async {
+    try {
+      await _db.deleteDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.groupUserCollection,
+        documentId: id,
+      );
+      return right(true);
+    } on AppwriteException catch (e, st) {
+      return left(Failure(e.message ?? 'Unexpected error occurred', st));
+    }
   }
 }

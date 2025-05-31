@@ -9,6 +9,7 @@ import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
 import 'package:dongi/modules/expense/domain/models/expense_user_model.dart';
 import 'package:dongi/modules/expense/data/di/expense_di.dart';
 import 'package:dongi/modules/expense/domain/repository/expense_repository.dart';
+import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -174,8 +175,19 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      Map<String, dynamic> updateData = {'\$id': expenseModel.id};
+      // Check if current user has permission to update
       final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      
+      final isCreator = expenseModel.creatorId == currentUser.id;
+      final canEdit = await ref.read(groupNotifierProvider.notifier)
+          .canUserDeleteItem(currentUser.id!, groupModel.id!, expenseModel.creatorId);
+      
+      if (!isCreator && !canEdit) {
+        throw Exception('Only the expense creator or group admin can update this expense');
+      }
+      
+      Map<String, dynamic> updateData = {'\$id': expenseModel.id};
       final splitUsers = ref.read(splitUserProvider);
       final payerUserId = ref.read(expensePayerIdProvider);
 
@@ -266,6 +278,18 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   }) async {
     state = const AsyncValue.loading();
     try {
+      // Check if current user has permission to delete
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      
+      final isCreator = expenseModel.creatorId == currentUser.id;
+      final canDelete = await ref.read(groupNotifierProvider.notifier)
+          .canUserDeleteItem(currentUser.id!, expenseModel.groupId, expenseModel.creatorId);
+      
+      if (!isCreator && !canDelete) {
+        throw Exception('Only the expense creator or group admin can delete this expense');
+      }
+      
       print('Deleting expense: ${expenseModel.id}');
       
       // First get all expense users
