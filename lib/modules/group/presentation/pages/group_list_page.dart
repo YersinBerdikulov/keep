@@ -8,13 +8,34 @@ import '../../../../shared/widgets/appbar/appbar.dart';
 import '../../../../shared/widgets/floating_action_button/floating_action_button.dart';
 import '../../domain/di/group_controller_di.dart';
 import '../widgets/group_list_widget.dart';
+import '../../../../core/constants/color_config.dart';
+import '../../../../modules/home/domain/di/home_controller_di.dart';
 
-class GroupListPage extends ConsumerWidget {
+class GroupListPage extends ConsumerStatefulWidget {
   const GroupListPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    //final controller = useState<PanelController>(PanelController());
+  ConsumerState<GroupListPage> createState() => _GroupListPageState();
+}
+
+class _GroupListPageState extends ConsumerState<GroupListPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Refresh data when page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      refreshData();
+    });
+  }
+
+  void refreshData() {
+    // Invalidate and refresh providers
+    ref.invalidate(groupNotifierProvider);
+    ref.invalidate(homeNotifierProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final groupList = ref.watch(groupNotifierProvider);
 
     /// Listening to changes in the groupNotifierProvider without rebuilding the UI
@@ -23,9 +44,7 @@ class GroupListPage extends ConsumerWidget {
       (_, state) {
         state.whenOrNull(
           data: (_) {
-            // if (/* condition to refresh */) {
-            //   ref.invalidate(getGroupsProvider);
-            // }
+            // Data loaded successfully
           },
           error: (error, _) => showSnackBar(context, content: error.toString()),
         );
@@ -33,59 +52,70 @@ class GroupListPage extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBarWidget(
-        title: "Groups",
-        showDrawer: false,
-        automaticallyImplyLeading: true,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorConfig.baseGrey,
+              ),
+              child: Icon(
+                Icons.arrow_back,
+                color: ColorConfig.midnight,
+                size: 20,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+        title: Text(
+          "Groups",
+          style: TextStyle(
+            color: ColorConfig.midnight,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorConfig.baseGrey,
+              ),
+              child: Icon(
+                Icons.refresh,
+                color: ColorConfig.midnight,
+                size: 20,
+              ),
+            ),
+            onPressed: refreshData,
+            tooltip: 'Refresh data',
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       floatingActionButton: FABWidget(
         title: "Group",
         onPressed: () => context.push(RouteName.createGroup),
-        //onPressed: () => controller.value.open(),
       ),
       body: groupList.when(
         skipLoadingOnRefresh: false,
-        //skipLoadingOnReload: true,
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => Center(child: Text(error.toString())),
         data: (data) => RefreshIndicator(
           child: GroupListView(data),
-          onRefresh: () async => ref.refresh(groupNotifierProvider),
+          onRefresh: () async {
+            refreshData();
+          },
         ),
       ),
     );
-    //return Stack(
-    //  children: [
-    //    Scaffold(
-    //      appBar: AppBarWidget(title: "Groups"),
-    //      floatingActionButton: FABWidget(
-    //        title: "Group",
-    //        onPressed: () => controller.value.open(),
-    //      ),
-    //      body: groupList.when(
-    //        skipLoadingOnRefresh: false,
-    //        //skipLoadingOnReload: true,
-    //        loading: () => const Center(child: CircularProgressIndicator()),
-    //        error: (error, stackTrace) => Center(child: Text(error.toString())),
-    //        data: (data) => RefreshIndicator(
-    //          onRefresh: () async => ref.refresh(getGroupsProvider),
-    //          child: GroupListView(data),
-    //        ),
-    //      ),
-    //    ),
-    //    SlidingUpPanel(
-    //      backdropEnabled: true,
-    //      controller: controller.value,
-    //      panelSnapping: false,
-    //      minHeight: 0,
-    //      maxHeight: 700,
-    //      borderRadius: const BorderRadius.only(
-    //        topLeft: Radius.circular(16),
-    //        topRight: Radius.circular(16),
-    //      ),
-    //      panel: CreateGroupPage(),
-    //    ),
-    //  ],
-    //);
   }
 }
