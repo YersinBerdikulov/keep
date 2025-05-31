@@ -345,7 +345,13 @@ class GroupCardWidget extends ConsumerWidget {
         backColor: ColorConfig.white,
         borderColor: ColorConfig.primarySwatch.withOpacity(0.1),
         child: InkWell(
-          onTap: () => context.push(RouteName.groupDetail(group.id!)),
+          onTap: () {
+            // Invalidate the cache to ensure we get fresh data
+            ref.invalidate(groupDetailProvider(group.id!));
+            ref.invalidate(boxNotifierProvider(group.id!));
+            // Navigate to the group detail page
+            context.push(RouteName.groupDetail(group.id!));
+          },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(12),

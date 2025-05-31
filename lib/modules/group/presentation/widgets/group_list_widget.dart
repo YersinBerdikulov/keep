@@ -132,9 +132,9 @@ class GroupListCard extends ConsumerWidget {
     // Add delete option only if user has permission
     if (currentUser != null && groupModel.id != null) {
       // Check if user is creator or admin to show delete option
-      final canDelete = currentUser.id == groupModel.creatorId || 
-                         ref.watch(isCurrentUserAdminProvider(groupModel.id!));
-      
+      final canDelete = currentUser.id == groupModel.creatorId ||
+          ref.watch(isCurrentUserAdminProvider(groupModel.id!));
+
       if (canDelete) {
         menuItems.add(
           PopupMenuItem(
@@ -197,7 +197,8 @@ class GroupListCard extends ConsumerWidget {
               ),
             ],
           ),
-          endActionPane: currentUser != null && groupModel.id != null &&
+          endActionPane: currentUser != null &&
+                  groupModel.id != null &&
                   (currentUser.id == groupModel.creatorId ||
                       ref.watch(isCurrentUserAdminProvider(groupModel.id!)))
               ? ActionPane(
@@ -231,9 +232,14 @@ class GroupListCard extends ConsumerWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: ListTile(
-              onTap: () => context.push(
-                RouteName.groupDetail(groupModel.id),
-              ),
+              onTap: () {
+                // Invalidate the cache to ensure we get fresh data
+                ref.invalidate(groupDetailProvider(groupModel.id!));
+                // Navigate to the group detail page
+                context.push(
+                  RouteName.groupDetail(groupModel.id),
+                );
+              },
               contentPadding: const EdgeInsets.all(12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
