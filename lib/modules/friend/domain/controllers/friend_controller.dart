@@ -57,11 +57,7 @@ class FriendNotifier extends AsyncNotifier<List<UserFriendModel>> {
   Future<void> rejectFriendRequest(UserFriendModel userFriendModel) async {
     state = const AsyncLoading();
     try {
-      final updatedFriendModel = userFriendModel.copyWith(
-        status: FriendRequestStatus.rejected,
-      );
-
-      final res = await _friendRepository.updateFriend(updatedFriendModel);
+      final res = await _friendRepository.deleteFriend(userFriendModel.id!);
 
       state = res.fold(
         (l) => AsyncError(l.message, StackTrace.current),

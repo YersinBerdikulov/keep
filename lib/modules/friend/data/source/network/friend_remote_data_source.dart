@@ -20,6 +20,7 @@ class FriendRemoteDataSource {
         queries: [
           Query.equal('sendRequestUserId', friendModel.sendRequestUserId),
           Query.equal('receiveRequestUserId', friendModel.receiveRequestUserId),
+          Query.notEqual('status', 'rejected'),
         ],
       ).then((response) => response.documents);
 
