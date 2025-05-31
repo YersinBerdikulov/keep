@@ -24,6 +24,8 @@ _$ExpenseModelImpl _$$ExpenseModelImplFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      isSettled: json['isSettled'] as bool? ?? false,
+      settledAt: json['settledAt'] as String?,
     );
 
 Map<String, dynamic> _$$ExpenseModelImplToJson(_$ExpenseModelImpl instance) =>
@@ -41,4 +43,6 @@ Map<String, dynamic> _$$ExpenseModelImplToJson(_$ExpenseModelImpl instance) =>
       'cost': instance.cost,
       'equal': instance.equal,
       'expenseUsers': instance.expenseUsers,
+      'isSettled': instance.isSettled,
+      'settledAt': instance.settledAt,
     };

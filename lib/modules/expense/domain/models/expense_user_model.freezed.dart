@@ -23,15 +23,30 @@ mixin _$ExpenseUserModel {
   @JsonKey(name: '\$id')
   String? get id => throw _privateConstructorUsedError;
   @JsonKey(name: '\$createdAt')
-  String? get createdAt => throw _privateConstructorUsedError;
+  String? get systemCreatedAt => throw _privateConstructorUsedError;
   @JsonKey(name: '\$updatedAt')
-  String? get updatedAt => throw _privateConstructorUsedError;
+  String? get systemUpdatedAt => throw _privateConstructorUsedError;
   String get userId => throw _privateConstructorUsedError;
   String get groupId => throw _privateConstructorUsedError;
   String get boxId => throw _privateConstructorUsedError;
   String get expenseId => throw _privateConstructorUsedError;
-  num get cost => throw _privateConstructorUsedError;
+  double get cost => throw _privateConstructorUsedError;
   bool get isPaid => throw _privateConstructorUsedError;
+  String get createdAt => throw _privateConstructorUsedError;
+  String? get updatedAt => throw _privateConstructorUsedError;
+  String? get dueDate => throw _privateConstructorUsedError;
+  String get splitType => throw _privateConstructorUsedError;
+  String get currency => throw _privateConstructorUsedError;
+  List<String> get recipients => throw _privateConstructorUsedError;
+  String get status => throw _privateConstructorUsedError;
+  String? get recurringId => throw _privateConstructorUsedError;
+  String? get notes => throw _privateConstructorUsedError;
+  double get shares => throw _privateConstructorUsedError;
+  double get sharePercentage => throw _privateConstructorUsedError;
+  double get shareAmount => throw _privateConstructorUsedError;
+  bool get isSettled => throw _privateConstructorUsedError;
+  String? get settledAt => throw _privateConstructorUsedError;
+  String? get settlementId => throw _privateConstructorUsedError;
 
   /// Serializes this ExpenseUserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -51,14 +66,29 @@ abstract class $ExpenseUserModelCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: '\$id') String? id,
-      @JsonKey(name: '\$createdAt') String? createdAt,
-      @JsonKey(name: '\$updatedAt') String? updatedAt,
+      @JsonKey(name: '\$createdAt') String? systemCreatedAt,
+      @JsonKey(name: '\$updatedAt') String? systemUpdatedAt,
       String userId,
       String groupId,
       String boxId,
       String expenseId,
-      num cost,
-      bool isPaid});
+      double cost,
+      bool isPaid,
+      String createdAt,
+      String? updatedAt,
+      String? dueDate,
+      String splitType,
+      String currency,
+      List<String> recipients,
+      String status,
+      String? recurringId,
+      String? notes,
+      double shares,
+      double sharePercentage,
+      double shareAmount,
+      bool isSettled,
+      String? settledAt,
+      String? settlementId});
 }
 
 /// @nodoc
@@ -77,27 +107,42 @@ class _$ExpenseUserModelCopyWithImpl<$Res, $Val extends ExpenseUserModel>
   @override
   $Res call({
     Object? id = freezed,
-    Object? createdAt = freezed,
-    Object? updatedAt = freezed,
+    Object? systemCreatedAt = freezed,
+    Object? systemUpdatedAt = freezed,
     Object? userId = null,
     Object? groupId = null,
     Object? boxId = null,
     Object? expenseId = null,
     Object? cost = null,
     Object? isPaid = null,
+    Object? createdAt = null,
+    Object? updatedAt = freezed,
+    Object? dueDate = freezed,
+    Object? splitType = null,
+    Object? currency = null,
+    Object? recipients = null,
+    Object? status = null,
+    Object? recurringId = freezed,
+    Object? notes = freezed,
+    Object? shares = null,
+    Object? sharePercentage = null,
+    Object? shareAmount = null,
+    Object? isSettled = null,
+    Object? settledAt = freezed,
+    Object? settlementId = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: freezed == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
+      systemCreatedAt: freezed == systemCreatedAt
+          ? _value.systemCreatedAt
+          : systemCreatedAt // ignore: cast_nullable_to_non_nullable
               as String?,
-      updatedAt: freezed == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
+      systemUpdatedAt: freezed == systemUpdatedAt
+          ? _value.systemUpdatedAt
+          : systemUpdatedAt // ignore: cast_nullable_to_non_nullable
               as String?,
       userId: null == userId
           ? _value.userId
@@ -118,11 +163,71 @@ class _$ExpenseUserModelCopyWithImpl<$Res, $Val extends ExpenseUserModel>
       cost: null == cost
           ? _value.cost
           : cost // ignore: cast_nullable_to_non_nullable
-              as num,
+              as double,
       isPaid: null == isPaid
           ? _value.isPaid
           : isPaid // ignore: cast_nullable_to_non_nullable
               as bool,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      dueDate: freezed == dueDate
+          ? _value.dueDate
+          : dueDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      splitType: null == splitType
+          ? _value.splitType
+          : splitType // ignore: cast_nullable_to_non_nullable
+              as String,
+      currency: null == currency
+          ? _value.currency
+          : currency // ignore: cast_nullable_to_non_nullable
+              as String,
+      recipients: null == recipients
+          ? _value.recipients
+          : recipients // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      recurringId: freezed == recurringId
+          ? _value.recurringId
+          : recurringId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      shares: null == shares
+          ? _value.shares
+          : shares // ignore: cast_nullable_to_non_nullable
+              as double,
+      sharePercentage: null == sharePercentage
+          ? _value.sharePercentage
+          : sharePercentage // ignore: cast_nullable_to_non_nullable
+              as double,
+      shareAmount: null == shareAmount
+          ? _value.shareAmount
+          : shareAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      isSettled: null == isSettled
+          ? _value.isSettled
+          : isSettled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      settledAt: freezed == settledAt
+          ? _value.settledAt
+          : settledAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      settlementId: freezed == settlementId
+          ? _value.settlementId
+          : settlementId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -137,14 +242,29 @@ abstract class _$$ExpenseUserModelImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: '\$id') String? id,
-      @JsonKey(name: '\$createdAt') String? createdAt,
-      @JsonKey(name: '\$updatedAt') String? updatedAt,
+      @JsonKey(name: '\$createdAt') String? systemCreatedAt,
+      @JsonKey(name: '\$updatedAt') String? systemUpdatedAt,
       String userId,
       String groupId,
       String boxId,
       String expenseId,
-      num cost,
-      bool isPaid});
+      double cost,
+      bool isPaid,
+      String createdAt,
+      String? updatedAt,
+      String? dueDate,
+      String splitType,
+      String currency,
+      List<String> recipients,
+      String status,
+      String? recurringId,
+      String? notes,
+      double shares,
+      double sharePercentage,
+      double shareAmount,
+      bool isSettled,
+      String? settledAt,
+      String? settlementId});
 }
 
 /// @nodoc
@@ -161,27 +281,42 @@ class __$$ExpenseUserModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
-    Object? createdAt = freezed,
-    Object? updatedAt = freezed,
+    Object? systemCreatedAt = freezed,
+    Object? systemUpdatedAt = freezed,
     Object? userId = null,
     Object? groupId = null,
     Object? boxId = null,
     Object? expenseId = null,
     Object? cost = null,
     Object? isPaid = null,
+    Object? createdAt = null,
+    Object? updatedAt = freezed,
+    Object? dueDate = freezed,
+    Object? splitType = null,
+    Object? currency = null,
+    Object? recipients = null,
+    Object? status = null,
+    Object? recurringId = freezed,
+    Object? notes = freezed,
+    Object? shares = null,
+    Object? sharePercentage = null,
+    Object? shareAmount = null,
+    Object? isSettled = null,
+    Object? settledAt = freezed,
+    Object? settlementId = freezed,
   }) {
     return _then(_$ExpenseUserModelImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: freezed == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
+      systemCreatedAt: freezed == systemCreatedAt
+          ? _value.systemCreatedAt
+          : systemCreatedAt // ignore: cast_nullable_to_non_nullable
               as String?,
-      updatedAt: freezed == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
+      systemUpdatedAt: freezed == systemUpdatedAt
+          ? _value.systemUpdatedAt
+          : systemUpdatedAt // ignore: cast_nullable_to_non_nullable
               as String?,
       userId: null == userId
           ? _value.userId
@@ -202,11 +337,71 @@ class __$$ExpenseUserModelImplCopyWithImpl<$Res>
       cost: null == cost
           ? _value.cost
           : cost // ignore: cast_nullable_to_non_nullable
-              as num,
+              as double,
       isPaid: null == isPaid
           ? _value.isPaid
           : isPaid // ignore: cast_nullable_to_non_nullable
               as bool,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      dueDate: freezed == dueDate
+          ? _value.dueDate
+          : dueDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      splitType: null == splitType
+          ? _value.splitType
+          : splitType // ignore: cast_nullable_to_non_nullable
+              as String,
+      currency: null == currency
+          ? _value.currency
+          : currency // ignore: cast_nullable_to_non_nullable
+              as String,
+      recipients: null == recipients
+          ? _value._recipients
+          : recipients // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      recurringId: freezed == recurringId
+          ? _value.recurringId
+          : recurringId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      shares: null == shares
+          ? _value.shares
+          : shares // ignore: cast_nullable_to_non_nullable
+              as double,
+      sharePercentage: null == sharePercentage
+          ? _value.sharePercentage
+          : sharePercentage // ignore: cast_nullable_to_non_nullable
+              as double,
+      shareAmount: null == shareAmount
+          ? _value.shareAmount
+          : shareAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      isSettled: null == isSettled
+          ? _value.isSettled
+          : isSettled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      settledAt: freezed == settledAt
+          ? _value.settledAt
+          : settledAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      settlementId: freezed == settlementId
+          ? _value.settlementId
+          : settlementId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -216,14 +411,30 @@ class __$$ExpenseUserModelImplCopyWithImpl<$Res>
 class _$ExpenseUserModelImpl implements _ExpenseUserModel {
   const _$ExpenseUserModelImpl(
       {@JsonKey(name: '\$id') this.id,
-      @JsonKey(name: '\$createdAt') this.createdAt,
-      @JsonKey(name: '\$updatedAt') this.updatedAt,
+      @JsonKey(name: '\$createdAt') this.systemCreatedAt,
+      @JsonKey(name: '\$updatedAt') this.systemUpdatedAt,
       required this.userId,
       required this.groupId,
       required this.boxId,
       required this.expenseId,
       this.cost = 0,
-      this.isPaid = false});
+      this.isPaid = false,
+      required this.createdAt,
+      this.updatedAt,
+      this.dueDate,
+      required this.splitType,
+      required this.currency,
+      required final List<String> recipients,
+      required this.status,
+      this.recurringId,
+      this.notes,
+      this.shares = 0,
+      this.sharePercentage = 0,
+      this.shareAmount = 0,
+      this.isSettled = false,
+      this.settledAt,
+      this.settlementId})
+      : _recipients = recipients;
 
   factory _$ExpenseUserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$ExpenseUserModelImplFromJson(json);
@@ -233,10 +444,10 @@ class _$ExpenseUserModelImpl implements _ExpenseUserModel {
   final String? id;
   @override
   @JsonKey(name: '\$createdAt')
-  final String? createdAt;
+  final String? systemCreatedAt;
   @override
   @JsonKey(name: '\$updatedAt')
-  final String? updatedAt;
+  final String? systemUpdatedAt;
   @override
   final String userId;
   @override
@@ -247,14 +458,54 @@ class _$ExpenseUserModelImpl implements _ExpenseUserModel {
   final String expenseId;
   @override
   @JsonKey()
-  final num cost;
+  final double cost;
   @override
   @JsonKey()
   final bool isPaid;
+  @override
+  final String createdAt;
+  @override
+  final String? updatedAt;
+  @override
+  final String? dueDate;
+  @override
+  final String splitType;
+  @override
+  final String currency;
+  final List<String> _recipients;
+  @override
+  List<String> get recipients {
+    if (_recipients is EqualUnmodifiableListView) return _recipients;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_recipients);
+  }
+
+  @override
+  final String status;
+  @override
+  final String? recurringId;
+  @override
+  final String? notes;
+  @override
+  @JsonKey()
+  final double shares;
+  @override
+  @JsonKey()
+  final double sharePercentage;
+  @override
+  @JsonKey()
+  final double shareAmount;
+  @override
+  @JsonKey()
+  final bool isSettled;
+  @override
+  final String? settledAt;
+  @override
+  final String? settlementId;
 
   @override
   String toString() {
-    return 'ExpenseUserModel(id: $id, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, groupId: $groupId, boxId: $boxId, expenseId: $expenseId, cost: $cost, isPaid: $isPaid)';
+    return 'ExpenseUserModel(id: $id, systemCreatedAt: $systemCreatedAt, systemUpdatedAt: $systemUpdatedAt, userId: $userId, groupId: $groupId, boxId: $boxId, expenseId: $expenseId, cost: $cost, isPaid: $isPaid, createdAt: $createdAt, updatedAt: $updatedAt, dueDate: $dueDate, splitType: $splitType, currency: $currency, recipients: $recipients, status: $status, recurringId: $recurringId, notes: $notes, shares: $shares, sharePercentage: $sharePercentage, shareAmount: $shareAmount, isSettled: $isSettled, settledAt: $settledAt, settlementId: $settlementId)';
   }
 
   @override
@@ -263,23 +514,74 @@ class _$ExpenseUserModelImpl implements _ExpenseUserModel {
         (other.runtimeType == runtimeType &&
             other is _$ExpenseUserModelImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt) &&
-            (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt) &&
+            (identical(other.systemCreatedAt, systemCreatedAt) ||
+                other.systemCreatedAt == systemCreatedAt) &&
+            (identical(other.systemUpdatedAt, systemUpdatedAt) ||
+                other.systemUpdatedAt == systemUpdatedAt) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.groupId, groupId) || other.groupId == groupId) &&
             (identical(other.boxId, boxId) || other.boxId == boxId) &&
             (identical(other.expenseId, expenseId) ||
                 other.expenseId == expenseId) &&
             (identical(other.cost, cost) || other.cost == cost) &&
-            (identical(other.isPaid, isPaid) || other.isPaid == isPaid));
+            (identical(other.isPaid, isPaid) || other.isPaid == isPaid) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.dueDate, dueDate) || other.dueDate == dueDate) &&
+            (identical(other.splitType, splitType) ||
+                other.splitType == splitType) &&
+            (identical(other.currency, currency) ||
+                other.currency == currency) &&
+            const DeepCollectionEquality()
+                .equals(other._recipients, _recipients) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.recurringId, recurringId) ||
+                other.recurringId == recurringId) &&
+            (identical(other.notes, notes) || other.notes == notes) &&
+            (identical(other.shares, shares) || other.shares == shares) &&
+            (identical(other.sharePercentage, sharePercentage) ||
+                other.sharePercentage == sharePercentage) &&
+            (identical(other.shareAmount, shareAmount) ||
+                other.shareAmount == shareAmount) &&
+            (identical(other.isSettled, isSettled) ||
+                other.isSettled == isSettled) &&
+            (identical(other.settledAt, settledAt) ||
+                other.settledAt == settledAt) &&
+            (identical(other.settlementId, settlementId) ||
+                other.settlementId == settlementId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, createdAt, updatedAt, userId,
-      groupId, boxId, expenseId, cost, isPaid);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        systemCreatedAt,
+        systemUpdatedAt,
+        userId,
+        groupId,
+        boxId,
+        expenseId,
+        cost,
+        isPaid,
+        createdAt,
+        updatedAt,
+        dueDate,
+        splitType,
+        currency,
+        const DeepCollectionEquality().hash(_recipients),
+        status,
+        recurringId,
+        notes,
+        shares,
+        sharePercentage,
+        shareAmount,
+        isSettled,
+        settledAt,
+        settlementId
+      ]);
 
   /// Create a copy of ExpenseUserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -301,14 +603,29 @@ class _$ExpenseUserModelImpl implements _ExpenseUserModel {
 abstract class _ExpenseUserModel implements ExpenseUserModel {
   const factory _ExpenseUserModel(
       {@JsonKey(name: '\$id') final String? id,
-      @JsonKey(name: '\$createdAt') final String? createdAt,
-      @JsonKey(name: '\$updatedAt') final String? updatedAt,
+      @JsonKey(name: '\$createdAt') final String? systemCreatedAt,
+      @JsonKey(name: '\$updatedAt') final String? systemUpdatedAt,
       required final String userId,
       required final String groupId,
       required final String boxId,
       required final String expenseId,
-      final num cost,
-      final bool isPaid}) = _$ExpenseUserModelImpl;
+      final double cost,
+      final bool isPaid,
+      required final String createdAt,
+      final String? updatedAt,
+      final String? dueDate,
+      required final String splitType,
+      required final String currency,
+      required final List<String> recipients,
+      required final String status,
+      final String? recurringId,
+      final String? notes,
+      final double shares,
+      final double sharePercentage,
+      final double shareAmount,
+      final bool isSettled,
+      final String? settledAt,
+      final String? settlementId}) = _$ExpenseUserModelImpl;
 
   factory _ExpenseUserModel.fromJson(Map<String, dynamic> json) =
       _$ExpenseUserModelImpl.fromJson;
@@ -318,10 +635,10 @@ abstract class _ExpenseUserModel implements ExpenseUserModel {
   String? get id;
   @override
   @JsonKey(name: '\$createdAt')
-  String? get createdAt;
+  String? get systemCreatedAt;
   @override
   @JsonKey(name: '\$updatedAt')
-  String? get updatedAt;
+  String? get systemUpdatedAt;
   @override
   String get userId;
   @override
@@ -331,9 +648,39 @@ abstract class _ExpenseUserModel implements ExpenseUserModel {
   @override
   String get expenseId;
   @override
-  num get cost;
+  double get cost;
   @override
   bool get isPaid;
+  @override
+  String get createdAt;
+  @override
+  String? get updatedAt;
+  @override
+  String? get dueDate;
+  @override
+  String get splitType;
+  @override
+  String get currency;
+  @override
+  List<String> get recipients;
+  @override
+  String get status;
+  @override
+  String? get recurringId;
+  @override
+  String? get notes;
+  @override
+  double get shares;
+  @override
+  double get sharePercentage;
+  @override
+  double get shareAmount;
+  @override
+  bool get isSettled;
+  @override
+  String? get settledAt;
+  @override
+  String? get settlementId;
 
   /// Create a copy of ExpenseUserModel
   /// with the given fields replaced by the non-null parameter values.

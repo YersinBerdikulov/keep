@@ -123,21 +123,67 @@ class ExpenseRemoteDataSource {
     required String customId,
   }) async {
     try {
-      await _db.createDocument(
+      print('Adding expense user to Appwrite:');
+      print('Collection ID: ${AppwriteConfig.expenseUserCollection}');
+      print('Document ID: $customId');
+
+      // Get the model data and remove any system attributes
+      final modelData = expenseUser.toJson();
+      modelData.remove('\$id');
+      modelData.remove('\$createdAt');
+      modelData.remove('\$updatedAt');
+      
+      // Add required timestamps
+      final now = DateTime.now().toIso8601String();
+      modelData['createdAt'] = now;
+      if (modelData['updatedBy'] != null && modelData['updatedAt'] == null) {
+        modelData['updatedAt'] = now;
+      }
+      
+      // Ensure all required fields are present
+      final requiredFields = [
+        'userId', 'groupId', 'boxId', 'expenseId', 'cost',
+        'isPaid', 'createdAt', 'splitType', 'currency',
+        'recipients', 'status'
+      ];
+      
+      for (var field in requiredFields) {
+        if (!modelData.containsKey(field) || modelData[field] == null) {
+          throw Exception('Missing required field: $field');
+        }
+      }
+      
+      print('Data to be sent: $modelData');
+
+      final document = await _db.createDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.expenseUserCollection,
         documentId: customId,
-        data: expenseUser.toJson(),
+        data: modelData,
       );
+
+      print('Successfully created expense user document:');
+      print('Document ID: ${document.$id}');
+      print('Created At: ${document.$createdAt}');
+      print('Data: ${document.data}');
+
       return right(true);
     } on AppwriteException catch (e, st) {
+      print('Appwrite error creating expense user:');
+      print('Error message: ${e.message}');
+      print('Error code: ${e.code}');
+      print('Error type: ${e.type}');
+      print('Response: ${e.response}');
+
       return left(
         Failure(
-          e.message ?? 'Some unexpected error occurred',
+          e.message ?? 'Some unexpected error occurred while creating expense user',
           st,
         ),
       );
     } catch (e, st) {
+      print('General error creating expense user: $e');
+      print('Stack trace: $st');
       return left(Failure(e.toString(), st));
     }
   }
@@ -254,6 +300,27 @@ class ExpenseRemoteDataSource {
     } catch (e) {
       print('Error fetching expense users: $e');
       return [];
+    }
+  }
+
+  FutureEither<bool> updateExpenseUser(Map updateExpenseUserData) async {
+    try {
+      await _db.updateDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.expenseUserCollection,
+        documentId: updateExpenseUserData["\$id"],
+        data: updateExpenseUserData,
+      );
+      return right(true);
+    } on AppwriteException catch (e, st) {
+      return left(
+        Failure(
+          e.message ?? 'Some unexpected error occurred',
+          st,
+        ),
+      );
+    } catch (e, st) {
+      return left(Failure(e.toString(), st));
     }
   }
 }

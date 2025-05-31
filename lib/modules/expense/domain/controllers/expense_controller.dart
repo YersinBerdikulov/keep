@@ -71,6 +71,12 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       // Create expense user records for each split user
       List<String> expenseUserIds = [];
       List<String> userIds = [];
+      
+      // Calculate individual cost
+      final individualCost = convertedCost / splitUsersList.length;
+      final now = DateTime.now().toIso8601String();
+      final sharePercentage = (100.0 / splitUsersList.length);
+
       for (var uid in splitUsersList) {
         String expenseUserId = ID.custom(const Uuid().v4().substring(0, 32));
         expenseUserIds.add(expenseUserId);
@@ -78,18 +84,39 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
 
         // Create a new ExpenseUserModel
         ExpenseUserModel expenseUser = ExpenseUserModel(
+          id: expenseUserId,
           userId: uid,
           groupId: groupModel.id!,
           boxId: boxModel.id!,
           expenseId: expenseId,
-          cost: convertedCost / splitUsersList.length, // Distribute the cost equally
+          cost: individualCost,
+          isPaid: uid == payerUserId,
+          createdAt: now,
+          updatedAt: now,
+          splitType: 'equal',
+          currency: 'KZT',
+          recipients: splitUsersList,
+          status: 'pending',
+          shares: 1,
+          sharePercentage: sharePercentage,
+          shareAmount: individualCost,
+          isSettled: false,
         );
 
-        print('Creating expense user: ${expenseUser.toString()}');
+        print('Creating expense user: ${expenseUser.toJson()}');
 
-        // Add the expense user
-        await addExpenseUser(expenseUser, customId: expenseUserId);
-        print('Expense user created with ID: $expenseUserId');
+        // Add the expense user with explicit error handling
+        final result = await _expenseRepository.addExpenseUser(expenseUser, customId: expenseUserId);
+        
+        result.fold(
+          (failure) {
+            print('Failed to create expense user: ${failure.message}');
+            throw Exception('Failed to create expense user: ${failure.message}');
+          },
+          (success) {
+            print('Successfully created expense user with ID: $expenseUserId');
+          }
+        );
       }
 
       print('Created expense user IDs: $expenseUserIds');
@@ -106,10 +133,10 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         categoryId: categoryId,
         groupId: groupModel.id!,
         boxId: boxModel.id!,
-        expenseUsers: userIds,  // Store user IDs instead of expense user IDs
+        expenseUsers: userIds,  // Store user IDs
       );
 
-      print('Creating expense model: ${expenseModel.toString()}');
+      print('Creating expense model: ${expenseModel.toJson()}');
 
       final res = await _expenseRepository.addExpense(expenseModel,
           customId: expenseId);
@@ -186,11 +213,23 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
 
           // Create a new ExpenseUserModel with the updated cost
           ExpenseUserModel expenseUser = ExpenseUserModel(
+            id: expenseUserId,
             userId: uid,
             groupId: groupModel.id!,
             boxId: boxModel.id!,
             expenseId: expenseModel.id!,
-            cost: newCost / splitUsers.length, // Distribute the cost equally
+            cost: newCost / splitUsers.length,
+            isPaid: uid == payerUserId,
+            createdAt: DateTime.now().toIso8601String(),
+            updatedAt: DateTime.now().toIso8601String(),
+            splitType: 'equal',
+            currency: 'KZT',
+            recipients: splitUsers,
+            status: 'pending',
+            shares: 1,
+            sharePercentage: 100.0 / splitUsers.length,
+            shareAmount: newCost / splitUsers.length,
+            isSettled: false,
           );
 
           // Add the new expense user
@@ -357,6 +396,108 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       return ExpenseModel.fromJson(expense.data);
     } catch (e, st) {
       throw AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> settleUpExpenseUser(String expenseId, String userId) async {
+    try {
+      // Get the expense details first
+      final expense = await _expenseRepository.getExpenseDetail(expenseId);
+      final expenseModel = ExpenseModel.fromJson(expense.data);
+      
+      // Get expense users
+      final expenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
+      
+      // Update the specific expense user as settled
+      final expenseUser = expenseUsers.firstWhere(
+        (eu) => ExpenseUserModel.fromJson(eu.data).userId == userId,
+        orElse: () {
+          print('Could not find expense user for userId: $userId');
+          print('Available expense users: ${expenseUsers.map((eu) => ExpenseUserModel.fromJson(eu.data).userId).toList()}');
+          throw Exception('Expense user not found');
+        },
+      );
+
+      final now = DateTime.now().toIso8601String();
+      final updateExpenseUserData = {
+        '\$id': expenseUser.$id,
+        'isSettled': true,
+        'settledAt': now,
+      };
+      await _expenseRepository.updateExpenseUser(updateExpenseUserData);
+
+      // Check if all users have settled
+      final allExpenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
+      final allSettled = allExpenseUsers.every(
+        (eu) => ExpenseUserModel.fromJson(eu.data).isSettled == true,
+      );
+
+      // If all users have settled, mark the expense as settled
+      if (allSettled) {
+        final updateExpenseData = {
+          '\$id': expenseId,
+          'isSettled': true,
+          'settledAt': now,
+        };
+        await _expenseRepository.updateExpense(updateExpenseData);
+      }
+
+      // Update the state with the latest expenses
+      final updatedExpenses = await getExpensesInBox(expenseModel.boxId);
+      state = AsyncValue.data(updatedExpenses);
+
+      // Invalidate relevant providers using ref
+      ref.invalidate(expenseDetailsProvider(expenseId));
+      ref.invalidate(getExpenseUsersForExpenseProvider(expenseId));
+      ref.invalidate(getExpensesInBoxProvider(expenseModel.boxId));
+    } catch (e, st) {
+      print('Error in settleUpExpenseUser: $e');
+      print('Stack trace: $st');
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> settleUpExpense(ExpenseModel expenseModel) async {
+    try {
+      final now = DateTime.now().toIso8601String();
+      
+      // Mark the expense as settled
+      final updateData = {
+        '\$id': expenseModel.id,
+        'isSettled': true,
+        'settledAt': now,
+      };
+
+      final res = await _expenseRepository.updateExpense(updateData);
+
+      res.fold(
+        (l) => throw Exception(l.message),
+        (_) async {
+          // Get all expense users
+          final expenseUsers = await _expenseRepository.getExpenseUsers(expenseModel.id!);
+          
+          // Update each expense user as settled
+          for (var expenseUser in expenseUsers) {
+            final updateExpenseUserData = {
+              '\$id': expenseUser.$id,
+              'isSettled': true,
+              'settledAt': now,
+            };
+            await _expenseRepository.updateExpenseUser(updateExpenseUserData);
+          }
+
+          // Update the state with the latest expenses
+          final updatedExpenses = await getExpensesInBox(expenseModel.boxId!);
+          state = AsyncValue.data(updatedExpenses);
+
+          // Invalidate relevant providers using ref
+          ref.invalidate(expenseDetailsProvider(expenseModel.id!));
+          ref.invalidate(getExpenseUsersForExpenseProvider(expenseModel.id!));
+          ref.invalidate(getExpensesInBoxProvider(expenseModel.boxId!));
+        },
+      );
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
     }
   }
 }

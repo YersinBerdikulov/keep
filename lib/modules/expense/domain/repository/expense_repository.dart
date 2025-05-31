@@ -18,4 +18,5 @@ abstract class ExpenseRepository {
   FutureEither<bool> addExpenseUser(ExpenseUserModel expenseUser,
       {required String customId});
   FutureEither<bool> deleteExpenseUser(String id);
+  FutureEither<bool> updateExpenseUser(Map updateExpenseUserData);
 }

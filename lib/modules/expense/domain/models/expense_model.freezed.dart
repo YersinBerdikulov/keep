@@ -36,6 +36,8 @@ mixin _$ExpenseModel {
   num get cost => throw _privateConstructorUsedError;
   bool get equal => throw _privateConstructorUsedError;
   List<String> get expenseUsers => throw _privateConstructorUsedError;
+  bool get isSettled => throw _privateConstructorUsedError;
+  String? get settledAt => throw _privateConstructorUsedError;
 
   /// Serializes this ExpenseModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -66,7 +68,9 @@ abstract class $ExpenseModelCopyWith<$Res> {
       String payerId,
       num cost,
       bool equal,
-      List<String> expenseUsers});
+      List<String> expenseUsers,
+      bool isSettled,
+      String? settledAt});
 }
 
 /// @nodoc
@@ -97,6 +101,8 @@ class _$ExpenseModelCopyWithImpl<$Res, $Val extends ExpenseModel>
     Object? cost = null,
     Object? equal = null,
     Object? expenseUsers = null,
+    Object? isSettled = null,
+    Object? settledAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -151,6 +157,14 @@ class _$ExpenseModelCopyWithImpl<$Res, $Val extends ExpenseModel>
           ? _value.expenseUsers
           : expenseUsers // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      isSettled: null == isSettled
+          ? _value.isSettled
+          : isSettled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      settledAt: freezed == settledAt
+          ? _value.settledAt
+          : settledAt // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -176,7 +190,9 @@ abstract class _$$ExpenseModelImplCopyWith<$Res>
       String payerId,
       num cost,
       bool equal,
-      List<String> expenseUsers});
+      List<String> expenseUsers,
+      bool isSettled,
+      String? settledAt});
 }
 
 /// @nodoc
@@ -205,6 +221,8 @@ class __$$ExpenseModelImplCopyWithImpl<$Res>
     Object? cost = null,
     Object? equal = null,
     Object? expenseUsers = null,
+    Object? isSettled = null,
+    Object? settledAt = freezed,
   }) {
     return _then(_$ExpenseModelImpl(
       id: freezed == id
@@ -259,6 +277,14 @@ class __$$ExpenseModelImplCopyWithImpl<$Res>
           ? _value._expenseUsers
           : expenseUsers // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      isSettled: null == isSettled
+          ? _value.isSettled
+          : isSettled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      settledAt: freezed == settledAt
+          ? _value.settledAt
+          : settledAt // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -279,7 +305,9 @@ class _$ExpenseModelImpl implements _ExpenseModel {
       required this.payerId,
       this.cost = 0,
       this.equal = true,
-      final List<String> expenseUsers = const []})
+      final List<String> expenseUsers = const [],
+      this.isSettled = false,
+      this.settledAt})
       : _expenseUsers = expenseUsers;
 
   factory _$ExpenseModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -324,8 +352,14 @@ class _$ExpenseModelImpl implements _ExpenseModel {
   }
 
   @override
+  @JsonKey()
+  final bool isSettled;
+  @override
+  final String? settledAt;
+
+  @override
   String toString() {
-    return 'ExpenseModel(id: $id, createdAt: $createdAt, updatedAt: $updatedAt, title: $title, description: $description, categoryId: $categoryId, boxId: $boxId, groupId: $groupId, creatorId: $creatorId, payerId: $payerId, cost: $cost, equal: $equal, expenseUsers: $expenseUsers)';
+    return 'ExpenseModel(id: $id, createdAt: $createdAt, updatedAt: $updatedAt, title: $title, description: $description, categoryId: $categoryId, boxId: $boxId, groupId: $groupId, creatorId: $creatorId, payerId: $payerId, cost: $cost, equal: $equal, expenseUsers: $expenseUsers, isSettled: $isSettled, settledAt: $settledAt)';
   }
 
   @override
@@ -351,7 +385,11 @@ class _$ExpenseModelImpl implements _ExpenseModel {
             (identical(other.cost, cost) || other.cost == cost) &&
             (identical(other.equal, equal) || other.equal == equal) &&
             const DeepCollectionEquality()
-                .equals(other._expenseUsers, _expenseUsers));
+                .equals(other._expenseUsers, _expenseUsers) &&
+            (identical(other.isSettled, isSettled) ||
+                other.isSettled == isSettled) &&
+            (identical(other.settledAt, settledAt) ||
+                other.settledAt == settledAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -370,7 +408,9 @@ class _$ExpenseModelImpl implements _ExpenseModel {
       payerId,
       cost,
       equal,
-      const DeepCollectionEquality().hash(_expenseUsers));
+      const DeepCollectionEquality().hash(_expenseUsers),
+      isSettled,
+      settledAt);
 
   /// Create a copy of ExpenseModel
   /// with the given fields replaced by the non-null parameter values.
@@ -402,7 +442,9 @@ abstract class _ExpenseModel implements ExpenseModel {
       required final String payerId,
       final num cost,
       final bool equal,
-      final List<String> expenseUsers}) = _$ExpenseModelImpl;
+      final List<String> expenseUsers,
+      final bool isSettled,
+      final String? settledAt}) = _$ExpenseModelImpl;
 
   factory _ExpenseModel.fromJson(Map<String, dynamic> json) =
       _$ExpenseModelImpl.fromJson;
@@ -436,6 +478,10 @@ abstract class _ExpenseModel implements ExpenseModel {
   bool get equal;
   @override
   List<String> get expenseUsers;
+  @override
+  bool get isSettled;
+  @override
+  String? get settledAt;
 
   /// Create a copy of ExpenseModel
   /// with the given fields replaced by the non-null parameter values.

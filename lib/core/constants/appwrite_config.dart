@@ -11,6 +11,8 @@ class AppwriteConfig {
   static String usersCollection = '68260781000ac685fc36';
   static String userFriendCollection = '6826078f001b57cc9d37';
   static String categoryCollection = '682dffea00155d3e8b5c';
+  static String transactionCollection = '6838c6f6003cfdfbe8aa';
+  static String RecurringExpenseCollection = '6838c8e2003679e850c3';
   static String imagesBucket = '682607b2003c4d883989';
   static String imageUrl(String imageId) =>
       'https://fra.cloud.appwrite.io/v1/storage/buckets/$imagesBucket/files/$imageId/view?project=$projectId&mode=admin';

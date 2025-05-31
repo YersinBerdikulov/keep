@@ -20,6 +20,8 @@ class ExpenseModel with _$ExpenseModel {
     @Default(0) num cost,
     @Default(true) bool equal,
     @Default([]) List<String> expenseUsers,
+    @Default(false) bool isSettled,
+    String? settledAt,
   }) = _ExpenseModel;
 
   factory ExpenseModel.fromJson(Map<String, dynamic> json) =>

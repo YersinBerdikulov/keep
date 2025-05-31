@@ -10,6 +10,7 @@ class ColorConfig {
   static Color midnight = const Color(0xff0C1A26);
   static Color secondary = const Color(0xff48BF7B);
   static Color error = const Color(0xffD94F04);
+  static Color success = const Color(0xff48BF7B);
   static Color grey = const Color(0xffF2F2F2);
   static Color white = const Color(0xffFFFFFF);
   static Color primarySwatch25 = const Color(0xFFC5CCD2);

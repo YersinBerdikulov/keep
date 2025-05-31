@@ -10,6 +10,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:dongi/modules/box/domain/controllers/box_controller.dart';
 import 'package:dongi/modules/user/domain/models/user_model.dart';
+import 'package:dongi/modules/expense/domain/models/expense_user_model.dart';
+import 'package:appwrite/models.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
@@ -222,201 +224,154 @@ class InfoExpenseDetail extends ConsumerWidget {
   }
 }
 
-class SplitDetailsCard extends ConsumerWidget {
+class SplitDetailsCard extends ConsumerStatefulWidget {
   final ExpenseModel expenseModel;
 
   const SplitDetailsCard({super.key, required this.expenseModel});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    print('Building SplitDetailsCard for expense: ${expenseModel.id}');
-    print('Expense users: ${expenseModel.expenseUsers}');
+  ConsumerState<SplitDetailsCard> createState() => _SplitDetailsCardState();
+}
+
+class _SplitDetailsCardState extends ConsumerState<SplitDetailsCard> {
+  @override
+  Widget build(BuildContext context) {
+    // Watch the expense details to get real-time updates
+    final expenseDetailsAsync = ref.watch(expenseDetailsProvider(widget.expenseModel.id!));
     
-    // Use the new provider to fetch expense users
-    final splitUsersAsync = ref.watch(getExpenseUsersProvider(expenseModel.expenseUsers));
+    return expenseDetailsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text('Error: $error')),
+      data: (expenseDetails) {
+        // Use the new provider to fetch expense users
+        final splitUsersAsync = ref.watch(getExpenseUsersProvider(expenseDetails.expenseUsers));
+        
+        return splitUsersAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(child: Text('Error: $error')),
+          data: (users) {
+            if (users.isEmpty) {
+              return const Center(child: Text('No users found'));
+            }
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: ColorConfig.grey,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: ColorConfig.primarySwatch25,
-            width: 1,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.people,
-                        color: ColorConfig.secondary,
-                        size: 16,
+            // Fetch expense users once for all users
+            final expenseUsersAsync = ref.watch(getExpenseUsersForExpenseProvider(expenseDetails.id!));
+            
+            return expenseUsersAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) => Center(child: Text('Error: $error')),
+              data: (expenseUserDocs) {
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: ColorConfig.grey,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: ColorConfig.primarySwatch25,
+                        width: 1,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Split Details',
-                        style: FontConfig.caption().copyWith(
-                          color: ColorConfig.secondary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      // TODO: Implement settle up functionality
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(
-                            'Settle Up',
-                            style: FontConfig.h6().copyWith(
-                              color: ColorConfig.midnight,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          content: Text(
-                            'This feature is coming soon!',
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            expenseDetails.isSettled
+                                ? 'Expense settled'
+                                : 'Split equally between ${users.length} people',
                             style: FontConfig.body2().copyWith(
-                              color: ColorConfig.primarySwatch50,
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text(
-                                'OK',
-                                style: FontConfig.button().copyWith(
-                                  color: ColorConfig.primarySwatch,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    icon: Icon(
-                      Icons.check_circle_outline,
-                      color: ColorConfig.white,
-                      size: 16,
-                    ),
-                    label: Text(
-                      'Settle Up',
-                      style: FontConfig.button().copyWith(
-                        color: ColorConfig.white,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorConfig.primarySwatch,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              splitUsersAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) {
-                  print('Error loading split users: $error');
-                  print('Stack trace: $stack');
-                  return Center(
-                    child: Text('Error: $error'),
-                  );
-                },
-                data: (users) {
-                  print('Loaded users: ${users.map((u) => u.id).toList()}');
-                  if (users.isEmpty) {
-                    return const Center(
-                      child: Text('No users found'),
-                    );
-                  }
-
-                  final perPersonAmount = expenseModel.cost / users.length;
-                  final payer = users.firstWhere(
-                    (u) => u.id == expenseModel.payerId,
-                    orElse: () => users.first,
-                  );
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Split equally between ${users.length} people',
-                        style: FontConfig.body2().copyWith(
-                          color: ColorConfig.midnight,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ...users.map((user) {
-                        final isOwing = user.id != expenseModel.payerId;
-                        final subtitle = isOwing 
-                          ? "Owes ${payer.userName ?? payer.email ?? 'Unknown'} \$${perPersonAmount.toStringAsFixed(2)}"
-                          : "Paid \$${expenseModel.cost.toStringAsFixed(2)}";
-
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: ListTileCard(
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: ColorConfig.primarySwatch25,
-                                  width: 1,
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: user.profileImage != null
-                                    ? Image.network(
-                                        user.profileImage!,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Container(
-                                        color: ColorConfig.primarySwatch.withOpacity(0.1),
-                                        child: Center(
-                                          child: Text(
-                                            (user.userName ?? user.email ?? "?")[0].toUpperCase(),
-                                            style: FontConfig.body1().copyWith(
-                                              color: ColorConfig.primarySwatch,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                              ),
-                            ),
-                            titleString: user.userName ?? user.email ?? "Unknown",
-                            subtitleString: subtitle,
-                            subtitleStyle: TextStyle(
-                              color: isOwing ? ColorConfig.error : ColorConfig.primarySwatch,
+                              color: expenseDetails.isSettled ? ColorConfig.success : ColorConfig.midnight,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                        );
-                      }),
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
+                          const SizedBox(height: 16),
+                          ...users.map((user) {
+                            final expenseUser = expenseUserDocs.firstWhere(
+                              (eu) => ExpenseUserModel.fromJson(eu.data).userId == user.id,
+                              orElse: () {
+                                print('Could not find expense user for userId: ${user.id}');
+                                return expenseUserDocs.first;
+                              },
+                            );
+                            final expenseUserModel = ExpenseUserModel.fromJson(expenseUser.data);
+                            
+                            String subtitle;
+                            if (expenseUserModel.isSettled) {
+                              subtitle = "Settled";
+                            } else if (user.id == expenseDetails.payerId) {
+                              subtitle = "Paid \$${expenseDetails.cost.toStringAsFixed(2)}";
+                            } else {
+                              final payerUser = users.firstWhere(
+                                (u) => u.id == expenseDetails.payerId,
+                                orElse: () => users.first,
+                              );
+                              final payerName = payerUser.userName ?? payerUser.email ?? 'Unknown';
+                              subtitle = "Owes \$${expenseUserModel.cost.toStringAsFixed(2)} to $payerName";
+                            }
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: ListTileCard(
+                                leading: CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: ColorConfig.primarySwatch.withOpacity(0.1),
+                                  child: user.profileImage != null
+                                      ? Image.network(
+                                          user.profileImage!,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Text(
+                                          (user.userName ?? user.email ?? "?")[0].toUpperCase(),
+                                          style: FontConfig.body1().copyWith(
+                                            color: ColorConfig.primarySwatch,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                ),
+                                titleString: user.userName ?? user.email ?? "Unknown",
+                                subtitleString: subtitle,
+                                subtitleStyle: TextStyle(
+                                  color: expenseUserModel.isSettled
+                                      ? ColorConfig.success
+                                      : user.id == expenseDetails.payerId
+                                          ? ColorConfig.primarySwatch
+                                          : ColorConfig.error,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                trailing: user.id != expenseDetails.payerId && !expenseUserModel.isSettled
+                                    ? ElevatedButton(
+                                        onPressed: () async {
+                                          final expenseController = ref.read(expenseNotifierProvider.notifier);
+                                          await expenseController.settleUpExpenseUser(expenseDetails.id!, user.id!);
+                                          
+                                          // Force refresh of providers
+                                          ref.invalidate(expenseDetailsProvider(expenseDetails.id!));
+                                          ref.invalidate(getExpenseUsersForExpenseProvider(expenseDetails.id!));
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: ColorConfig.midnight,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                        child: const Text('Settle'),
+                                      )
+                                    : null,
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

@@ -72,4 +72,9 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   FutureEither<Document> updateExpense(Map updateExpenseModel) {
     return _remoteDataSource.updateExpense(updateExpenseModel);
   }
+
+  @override
+  FutureEither<bool> updateExpenseUser(Map updateExpenseUserData) {
+    return _remoteDataSource.updateExpenseUser(updateExpenseUserData);
+  }
 }

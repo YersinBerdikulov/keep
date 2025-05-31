@@ -5,6 +5,8 @@ import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../expense/presentation/pages/advanced_split_page.dart';
+import 'package:dongi/modules/expense/data/di/expense_di.dart';
+import 'package:appwrite/models.dart';
 
 import '../models/expense_model.dart';
 
@@ -13,31 +15,10 @@ final expenseNotifierProvider =
   ExpenseNotifier.new,
 );
 
-// Cache to store expenses by boxId
-final _expensesByBoxCache =
-    StateProvider<Map<String, List<ExpenseModel>>>((ref) => {});
-
 final getExpensesInBoxProvider =
-    FutureProvider.family.autoDispose((ref, String boxId) {
-  // Check if we have expenses for this box in cache
-  final cache = ref.watch(_expensesByBoxCache);
-
-  if (cache.containsKey(boxId)) {
-    return cache[boxId]!;
-  }
-
-  // Keep provider alive to prevent constant rebuilds
-  ref.keepAlive();
-
+    FutureProvider.family.autoDispose<List<ExpenseModel>, String>((ref, boxId) async {
   final expenseController = ref.watch(expenseNotifierProvider.notifier);
-  return expenseController.getExpensesInBox(boxId).then((expenses) {
-    // Store the result in cache
-    ref.read(_expensesByBoxCache.notifier).update((state) => {
-          ...state,
-          boxId: expenses,
-        });
-    return expenses;
-  });
+  return expenseController.getExpensesInBox(boxId);
 });
 
 final getExpensesDetailProvider =
@@ -115,3 +96,15 @@ final expenseAvailableCurrenciesProvider = Provider<List<String>>((ref) => [
       'CNY',
       'JPY',
     ]);
+
+final expenseDetailsProvider = FutureProvider.autoDispose.family<ExpenseModel, String>((ref, expenseId) async {
+  final expenseRepository = ref.watch(expenseRepositoryProvider);
+  final expenseDoc = await expenseRepository.getExpenseDetail(expenseId);
+  return ExpenseModel.fromJson(expenseDoc.data);
+});
+
+final getExpenseUsersForExpenseProvider = FutureProvider.family<List<Document>, String>((ref, expenseId) async {
+  final expenseRepository = ref.watch(expenseRepositoryProvider);
+  final expenseUsers = await expenseRepository.getExpenseUsers(expenseId);
+  return expenseUsers;
+});
