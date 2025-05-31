@@ -13,21 +13,41 @@ class FriendRemoteDataSource {
 
   FutureEither<Document> addFriend(UserFriendModel friendModel) async {
     try {
-      // Query the collection to check if a request already exists
+      // Query the collection to check if a request already exists in either direction
       final List<Document> existingRequests = await _db.listDocuments(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.userFriendCollection,
         queries: [
-          Query.equal('sendRequestUserId', friendModel.sendRequestUserId),
-          Query.equal('receiveRequestUserId', friendModel.receiveRequestUserId),
+          Query.or([
+            Query.and([
+              Query.equal('sendRequestUserId', friendModel.sendRequestUserId),
+              Query.equal(
+                  'receiveRequestUserId', friendModel.receiveRequestUserId),
+            ]),
+            Query.and([
+              Query.equal(
+                  'sendRequestUserId', friendModel.receiveRequestUserId),
+              Query.equal(
+                  'receiveRequestUserId', friendModel.sendRequestUserId),
+            ]),
+          ]),
           Query.notEqual('status', 'rejected'),
         ],
       ).then((response) => response.documents);
 
-      // If there's already an existing request, return an error
+      // If there's already an existing request or friendship, return an error
       if (existingRequests.isNotEmpty) {
+        // Check if there's an accepted friendship
+        final hasAcceptedFriendship = existingRequests
+            .any((request) => request.data['status'] == 'accepted');
+
         return left(
-          Failure('Friend request already exists', StackTrace.current),
+          Failure(
+            hasAcceptedFriendship
+                ? 'You are already friends with this user'
+                : 'Friend request already exists',
+            StackTrace.current,
+          ),
         );
       }
 
