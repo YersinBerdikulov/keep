@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:appwrite/models.dart' show Document;
 import 'package:dongi/core/di/storage_di.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/box/domain/di/box_usecase_di.dart';
@@ -433,32 +434,118 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
   
   Future<String> getUserRole(String userId, String groupId) async {
     try {
+      // Get all group users
       final groupUsers = await _groupRepository.getGroupUsers(groupId);
-      for (final user in groupUsers) {
-        final userData = GroupUserModel.fromJson(user.data);
-        if (userData.userId == userId) {
-          return userData.role;
+      
+      // Find the user record for this specific group using manual search
+      for (final doc in groupUsers) {
+        if (doc.data['userId'] == userId && doc.data['groupId'] == groupId) {
+          return doc.data['role'] as String;
         }
       }
-      return "member"; // Default role if not found
+      
+      throw Exception('User is not a member of this group');
     } catch (e) {
-      return "member"; // Default role on error
+      // Default to "member" if not found or error
+      return "member";
     }
   }
   
   Future<bool> canUserDeleteItem(String userId, String groupId, String creatorId) async {
-    // User can delete if they are the creator of the item
-    if (userId == creatorId) {
-      return true;
+    try {
+      // Creator can always delete their own items
+      if (userId == creatorId) return true;
+      
+      // Admin can delete any item
+      final role = await getUserRole(userId, groupId);
+      return role == "admin";
+    } catch (e) {
+      return false;
     }
-    
-    // User can delete if they are the group creator
-    final group = await getGroupDetail(groupId);
-    if (userId == group.creatorId) {
-      return true;
+  }
+
+  // Method to update a user's role in a group
+  Future<void> updateUserRole({
+    required String groupId, 
+    required String memberId, 
+    required String newRole,
+  }) async {
+    state = const AsyncLoading();
+    try {
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) throw Exception('User not logged in');
+      
+      // Get all group users for this group
+      final groupUsers = await _groupRepository.getGroupUsers(groupId);
+      print('DEBUG: Found ${groupUsers.length} group user records for group $groupId');
+      
+      // Get the group details to check if current user is creator or admin
+      final group = await getGroupDetail(groupId);
+      print('DEBUG: Group details - creatorId: ${group.creatorId}, current user: ${currentUser.id}');
+      print('DEBUG: Group members: ${group.groupUsers}');
+      
+      // Only creator can change roles (optionally allow admins too)
+      final isCreator = group.creatorId == currentUser.id;
+      if (!isCreator) {
+        throw Exception('Only the group creator can change user roles');
+      }
+      
+      // Verify the member is in the group
+      if (!group.groupUsers.contains(memberId)) {
+        throw Exception('User is not a member of this group');
+      }
+      
+      // Find the specific user record - fix the filtering logic
+      Document? userRecordToUpdate;
+      print('DEBUG: Looking for user record with userId=$memberId and groupId=$groupId');
+      
+      for (final doc in groupUsers) {
+        print('DEBUG: Checking record - userId: ${doc.data['userId']}, groupId: ${doc.data['groupId']}');
+        if (doc.data['userId'] == memberId && doc.data['groupId'] == groupId) {
+          userRecordToUpdate = doc;
+          break;
+        }
+      }
+      
+      // If user doesn't have a group_user record yet, create one
+      if (userRecordToUpdate == null) {
+        print('DEBUG: No matching user record found, creating a new one');
+        
+        // Create a new group user record
+        final newGroupUserModel = GroupUserModel(
+          userId: memberId,
+          groupId: groupId,
+          status: "accepted", // Assume they're already accepted since they're in the group
+          role: newRole,
+        );
+        
+        // Add some debug output to see what fields are being sent
+        print('DEBUG: Creating group user with fields: ${newGroupUserModel.toJson()}');
+        
+        final result = await _groupRepository.addGroupUser(newGroupUserModel);
+        result.fold(
+          (l) => throw Exception('Failed to create user record: ${l.message}'),
+          (r) => print('DEBUG: Successfully created new group user record'),
+        );
+      } else {
+        // Update the role
+        print('DEBUG: Found user record, updating role to $newRole');
+        final groupUserModel = GroupUserModel.fromJson(userRecordToUpdate.data).copyWith(
+          id: userRecordToUpdate.$id,
+          role: newRole,
+        );
+        
+        await _groupRepository.updateGroupUser(groupUserModel);
+      }
+      
+      // Refresh state (no need to modify group list as the role change doesn't affect it)
+      ref.invalidate(homeNotifierProvider);
+      
+      // Force refresh the current state
+      state = AsyncValue.data(await _fetchGroups());
+    } catch (e, st) {
+      print('DEBUG: Error in updateUserRole: $e');
+      state = AsyncValue.error(e, st);
     }
-    
-    // User can delete if they are an admin
-    return await _isUserAdmin(userId, groupId);
   }
 }

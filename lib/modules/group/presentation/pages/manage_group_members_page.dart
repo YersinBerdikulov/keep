@@ -61,11 +61,13 @@ class ManageGroupMembersPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUserId = ref.read(currentUserProvider)!.id;
+    final isCreator = currentUserId == groupModel.creatorId;
     
     // Use hooks to manage state
     final isLoading = useState(true);
     final error = useState<String?>(null);
     final members = useState<List<UserModel>>([]);
+    final memberRoles = useState<Map<String, String>>({});
     
     // Load members when needed
     useEffect(() {
@@ -82,6 +84,23 @@ class ManageGroupMembersPage extends HookConsumerWidget {
           
           if (result.isNotEmpty) {
             members.value = result;
+            
+            // Load member roles if current user is creator
+            if (isCreator) {
+              Map<String, String> roles = {};
+              for (var user in result) {
+                if (user.id != null) {
+                  try {
+                    final role = await ref.read(groupNotifierProvider.notifier)
+                        .getUserRole(user.id!, groupModel.id!);
+                    roles[user.id!] = role;
+                  } catch (e) {
+                    roles[user.id!] = "member";
+                  }
+                }
+              }
+              memberRoles.value = roles;
+            }
           } else {
             members.value = [];
           }
@@ -96,6 +115,34 @@ class ManageGroupMembersPage extends HookConsumerWidget {
       
       return null;
     }, [groupModel.groupUsers]);
+
+    // Update member role
+    Future<void> updateMemberRole(String memberId, String newRole) async {
+      try {
+        await ref.read(groupNotifierProvider.notifier).updateUserRole(
+          groupId: groupModel.id!,
+          memberId: memberId,
+          newRole: newRole,
+        );
+        
+        // Update local state
+        memberRoles.value = {
+          ...memberRoles.value,
+          memberId: newRole,
+        };
+        
+        showSnackBar(
+          context, 
+          content: "Member role updated successfully!",
+        );
+      } catch (e) {
+        showSnackBar(
+          context, 
+          content: "Failed to update role: ${e.toString()}",
+          isError: true,
+        );
+      }
+    }
 
     ref.listen<AsyncValue<List<GroupModel>>>(
       groupNotifierProvider,
@@ -157,8 +204,9 @@ class ManageGroupMembersPage extends HookConsumerWidget {
                                 itemCount: members.value.length,
                                 itemBuilder: (context, index) {
                                   final member = members.value[index];
-                                  final isCreator = member.id == groupModel.creatorId;
+                                  final isGroupCreator = member.id == groupModel.creatorId;
                                   final isCurrentUser = member.id == currentUserId;
+                                  final memberRole = memberRoles.value[member.id] ?? "member";
 
                                   return Container(
                                     margin: const EdgeInsets.only(bottom: 8),
@@ -167,19 +215,46 @@ class ManageGroupMembersPage extends HookConsumerWidget {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor: ColorConfig.primarySwatch.withOpacity(0.1),
-                                        backgroundImage: member.profileImage != null
-                                            ? NetworkImage(member.profileImage!)
-                                            : null,
-                                        child: member.profileImage == null
-                                            ? Text(
-                                                member.userName?[0].toUpperCase() ?? '',
-                                                style: FontConfig.body1().copyWith(
-                                                  color: ColorConfig.primarySwatch,
+                                      leading: Stack(
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundColor: ColorConfig.primarySwatch.withOpacity(0.1),
+                                            backgroundImage: member.profileImage != null
+                                                ? NetworkImage(member.profileImage!)
+                                                : null,
+                                            child: member.profileImage == null
+                                                ? Text(
+                                                    member.userName?[0].toUpperCase() ?? '',
+                                                    style: FontConfig.body1().copyWith(
+                                                      color: ColorConfig.primarySwatch,
+                                                    ),
+                                                  )
+                                                : null,
+                                          ),
+                                          if (isGroupCreator || memberRole == "admin")
+                                            Positioned(
+                                              right: 0,
+                                              bottom: 0,
+                                              child: Container(
+                                                padding: const EdgeInsets.all(2),
+                                                decoration: BoxDecoration(
+                                                  color: isGroupCreator 
+                                                      ? ColorConfig.secondary 
+                                                      : ColorConfig.primarySwatch,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: ColorConfig.white,
+                                                    width: 1.5,
+                                                  ),
                                                 ),
-                                              )
-                                            : null,
+                                                child: Icon(
+                                                  isGroupCreator ? Icons.star : Icons.admin_panel_settings,
+                                                  color: ColorConfig.white,
+                                                  size: 10,
+                                                ),
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                       title: Text(
                                         member.userName ?? 'Unknown User',
@@ -188,64 +263,113 @@ class ManageGroupMembersPage extends HookConsumerWidget {
                                         ),
                                       ),
                                       subtitle: Text(
-                                        isCreator ? 'Creator' : 'Member',
+                                        isGroupCreator 
+                                            ? 'Creator' 
+                                            : memberRole == "admin" ? 'Admin' : 'Member',
                                         style: FontConfig.caption().copyWith(
-                                          color: ColorConfig.primarySwatch50,
+                                          color: isGroupCreator 
+                                              ? ColorConfig.secondary
+                                              : memberRole == "admin" 
+                                                  ? ColorConfig.primarySwatch
+                                                  : ColorConfig.primarySwatch50,
                                         ),
                                       ),
-                                      trailing: !isCreator && !isCurrentUser
-                                          ? CreatorOrAdminWidget(
-                                              groupId: groupModel.id!,
-                                              creatorId: groupModel.creatorId,
-                                              child: IconButton(
-                                                icon: const Icon(Icons.remove_circle_outline),
-                                                color: ColorConfig.error,
-                                                onPressed: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) => AlertDialog(
-                                                      title: Text(
-                                                        'Remove Member',
-                                                        style: FontConfig.h6(),
-                                                      ),
-                                                      content: Text(
-                                                        'Are you sure you want to remove ${member.userName ?? 'this member'} from the group?',
-                                                        style: FontConfig.body2(),
-                                                      ),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () => context.pop(),
-                                                          child: Text(
-                                                            'Cancel',
-                                                            style: FontConfig.body2().copyWith(
-                                                              color: ColorConfig.primarySwatch50,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            context.pop();
-                                                            ref
-                                                                .read(groupNotifierProvider.notifier)
-                                                                .deleteMember(
-                                                                  groupModel: groupModel,
-                                                                  memberIdToDelete: member.id!,
-                                                                );
-                                                          },
-                                                          child: Text(
-                                                            'Remove',
-                                                            style: FontConfig.body2().copyWith(
-                                                              color: ColorConfig.error,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // Admin role selector - only visible to creator and not for self or group creator
+                                          if (isCreator && !isGroupCreator && !isCurrentUser)
+                                            Container(
+                                              margin: const EdgeInsets.only(right: 8),
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: ColorConfig.primarySwatch.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(20),
+                                                border: Border.all(
+                                                  color: ColorConfig.primarySwatch.withOpacity(0.3),
+                                                  width: 1,
+                                                ),
                                               ),
-                                            )
-                                          : null,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  // Toggle between member and admin
+                                                  final newRole = memberRole == "admin" ? "member" : "admin";
+                                                  updateMemberRole(member.id!, newRole);
+                                                },
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      memberRole == "admin" ? "Admin ✓" : "Make Admin",
+                                                      style: FontConfig.caption().copyWith(
+                                                        color: ColorConfig.primarySwatch,
+                                                        fontWeight: FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Icon(
+                                                      memberRole == "admin" 
+                                                          ? Icons.check_circle 
+                                                          : Icons.admin_panel_settings,
+                                                      color: ColorConfig.primarySwatch,
+                                                      size: 16,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          
+                                          // Remove button - not visible for creator or self
+                                          if (!isGroupCreator && !isCurrentUser)
+                                            IconButton(
+                                              icon: const Icon(Icons.remove_circle_outline),
+                                              color: ColorConfig.error,
+                                              onPressed: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) => AlertDialog(
+                                                    title: Text(
+                                                      'Remove Member',
+                                                      style: FontConfig.h6(),
+                                                    ),
+                                                    content: Text(
+                                                      'Are you sure you want to remove ${member.userName ?? 'this member'} from the group?',
+                                                      style: FontConfig.body2(),
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () => context.pop(),
+                                                        child: Text(
+                                                          'Cancel',
+                                                          style: FontConfig.body2().copyWith(
+                                                            color: ColorConfig.primarySwatch50,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          context.pop();
+                                                          ref
+                                                              .read(groupNotifierProvider.notifier)
+                                                              .deleteMember(
+                                                                groupModel: groupModel,
+                                                                memberIdToDelete: member.id!,
+                                                              );
+                                                        },
+                                                        child: Text(
+                                                          'Remove',
+                                                          style: FontConfig.body2().copyWith(
+                                                            color: ColorConfig.error,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },
