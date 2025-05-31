@@ -179,6 +179,86 @@ class InfoExpenseDetail extends ConsumerWidget {
     );
   }
 
+  Widget userInfoCard(BuildContext context, String userId, String title, IconData icon, Color iconColor) {
+    return Container(
+      decoration: BoxDecoration(
+        color: ColorConfig.grey,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: ColorConfig.primarySwatch25,
+          width: 1,
+        ),
+      ),
+      child: Consumer(
+        builder: (context, ref, child) {
+          final userAsync = ref.watch(getUserDataForExpenseProvider(userId));
+          
+          return Padding(
+            padding: const EdgeInsets.all(12),
+            child: userAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => Center(child: Text('Error: $error')),
+              data: (user) => Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: ColorConfig.primarySwatch.withOpacity(0.1),
+                    backgroundImage: user?.profileImage != null
+                        ? NetworkImage(user!.profileImage!)
+                        : null,
+                    child: user?.profileImage == null
+                        ? Text(
+                            user?.userName?.isNotEmpty == true
+                                ? user!.userName![0].toUpperCase()
+                                : '?',
+                            style: FontConfig.body1().copyWith(
+                              color: ColorConfig.primarySwatch,
+                            ),
+                          )
+                        : null,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              icon,
+                              color: iconColor,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              title,
+                              style: FontConfig.caption().copyWith(
+                                color: iconColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          user?.userName ?? user?.email ?? 'Unknown',
+                          style: FontConfig.body1().copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: ColorConfig.midnight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
@@ -207,6 +287,29 @@ class InfoExpenseDetail extends ConsumerWidget {
                 "${expenseModel.expenseUsers.length} people",
                 icon: Icons.group,
                 iconColor: ColorConfig.error,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+          child: Column(
+            children: [
+              userInfoCard(
+                context,
+                expenseModel.creatorId,
+                "Created by",
+                Icons.person_outline,
+                ColorConfig.secondary,
+              ),
+              const SizedBox(height: 10),
+              userInfoCard(
+                context,
+                expenseModel.payerId,
+                "Made by",
+                Icons.account_balance_wallet_outlined,
+                ColorConfig.primarySwatch,
               ),
             ],
           ),
@@ -297,17 +400,18 @@ class _SplitDetailsCardState extends ConsumerState<SplitDetailsCard> {
                             );
                             final expenseUserModel = ExpenseUserModel.fromJson(expenseUser.data);
                             
+                            final payerUser = users.firstWhere(
+                              (u) => u.id == expenseDetails.payerId,
+                              orElse: () => users.first,
+                            );
+                            final payerName = payerUser.userName ?? payerUser.email ?? 'Unknown';
+                            
                             String subtitle;
                             if (expenseUserModel.isSettled) {
                               subtitle = "Settled";
                             } else if (user.id == expenseDetails.payerId) {
                               subtitle = "Paid \$${expenseDetails.cost.toStringAsFixed(2)}";
                             } else {
-                              final payerUser = users.firstWhere(
-                                (u) => u.id == expenseDetails.payerId,
-                                orElse: () => users.first,
-                              );
-                              final payerName = payerUser.userName ?? payerUser.email ?? 'Unknown';
                               subtitle = "Owes \$${expenseUserModel.cost.toStringAsFixed(2)} to $payerName";
                             }
 
