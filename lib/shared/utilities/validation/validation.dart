@@ -49,7 +49,7 @@ class FormValidatorNotifier extends StateNotifier<String?> {
       try {
         final costBigInt = BigInt.parse(value.replaceAll(',', ''));
         final maxInt64 =
-            BigInt.from(9223372036854775807); // Maximum value for 64-bit int
+            BigInt.parse('9223372036854775807'); // Maximum value for 64-bit int
         if (costBigInt <= maxInt64) {
           return null;
         } else {
