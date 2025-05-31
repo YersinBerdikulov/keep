@@ -7,6 +7,7 @@ class ListTileWidget extends ListTile {
   final String? headerString;
   final TextStyle? titleStringStyle;
   final TextStyle? headerStringStyle;
+  final TextStyle? subtitleStyle;
   const ListTileWidget({
     super.key,
     super.trailing,
@@ -18,6 +19,7 @@ class ListTileWidget extends ListTile {
     this.headerString,
     this.headerStringStyle,
     this.titleStringStyle,
+    this.subtitleStyle,
   });
 
   @override
@@ -44,5 +46,10 @@ class ListTileWidget extends ListTile {
       );
 
   @override
-  Widget? get subtitle => subtitleString != null ? Text(subtitleString!) : null;
+  Widget? get subtitle => subtitleString != null 
+    ? Text(
+        subtitleString!,
+        style: subtitleStyle,
+      ) 
+    : null;
 }

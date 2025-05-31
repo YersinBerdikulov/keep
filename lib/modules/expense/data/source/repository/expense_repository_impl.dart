@@ -64,6 +64,11 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   }
 
   @override
+  Future<List<Document>> getExpenseUsers(String expenseId) {
+    return _remoteDataSource.getExpenseUsers(expenseId);
+  }
+
+  @override
   FutureEither<Document> updateExpense(Map updateExpenseModel) {
     return _remoteDataSource.updateExpense(updateExpenseModel);
   }

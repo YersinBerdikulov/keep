@@ -70,9 +70,11 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
 
       // Create expense user records for each split user
       List<String> expenseUserIds = [];
+      List<String> userIds = [];
       for (var uid in splitUsersList) {
         String expenseUserId = ID.custom(const Uuid().v4().substring(0, 32));
         expenseUserIds.add(expenseUserId);
+        userIds.add(uid);
 
         // Create a new ExpenseUserModel
         ExpenseUserModel expenseUser = ExpenseUserModel(
@@ -91,6 +93,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       }
 
       print('Created expense user IDs: $expenseUserIds');
+      print('User IDs: $userIds');
 
       ExpenseModel expenseModel = ExpenseModel(
         id: expenseId,
@@ -103,7 +106,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         categoryId: categoryId,
         groupId: groupModel.id!,
         boxId: boxModel.id!,
-        expenseUsers: expenseUserIds,
+        expenseUsers: userIds,  // Store user IDs instead of expense user IDs
       );
 
       print('Creating expense model: ${expenseModel.toString()}');
@@ -226,10 +229,20 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final res = await _expenseRepository.deleteExpense(expenseModel.id!);
-      for (var eUid in expenseModel.expenseUsers) {
-        await deleteExpenseUser(eUid);
+      print('Deleting expense: ${expenseModel.id}');
+      
+      // First get all expense users
+      final expenseUsers = await _expenseRepository.getExpenseUsers(expenseModel.id!);
+      print('Found ${expenseUsers.length} expense users to delete');
+
+      // Delete each expense user
+      for (var expenseUser in expenseUsers) {
+        print('Deleting expense user: ${expenseUser.$id}');
+        await deleteExpenseUser(expenseUser.$id);
       }
+
+      // Then delete the expense itself
+      final res = await _expenseRepository.deleteExpense(expenseModel.id!);
 
       res.fold(
         (l) => throw Exception(l.message),
@@ -250,6 +263,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       final updatedExpenses = await getExpensesInBox(boxModel.id!);
       state = AsyncValue.data(updatedExpenses);
     } catch (e, st) {
+      print('Error deleting expense: $e');
+      print('Stack trace: $st');
       state = AsyncValue.error(e, st);
     }
   }
@@ -257,6 +272,21 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   Future<void> deleteAllExpense(List<String> ids) async {
     state = const AsyncValue.loading();
     try {
+      print('Deleting all expenses: $ids');
+
+      // First delete all expense users for each expense
+      for (var expenseId in ids) {
+        print('Deleting expense users for expense: $expenseId');
+        final expenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
+        print('Found ${expenseUsers.length} expense users to delete');
+
+        for (var expenseUser in expenseUsers) {
+          print('Deleting expense user: ${expenseUser.$id}');
+          await deleteExpenseUser(expenseUser.$id);
+        }
+      }
+
+      // Then delete all expenses
       final res = await _expenseRepository.deleteAllExpense(ids);
 
       res.fold(
@@ -264,6 +294,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         (_) => state = const AsyncValue.data([]),
       );
     } catch (e, st) {
+      print('Error deleting all expenses: $e');
+      print('Stack trace: $st');
       state = AsyncValue.error(e, st);
     }
   }

@@ -12,6 +12,7 @@ abstract class ExpenseRepository {
   Future<Document> getExpenseDetail(String expenseId);
   Future<List<Document>> getUsersInExpense(List<String> userIds);
   Future<List<Document>> getCurrentUserExpenses(String uid);
+  Future<List<Document>> getExpenseUsers(String expenseId);
   FutureEither<bool> deleteExpense(String id);
   FutureEither<bool> deleteAllExpense(List<String> ids);
   FutureEither<bool> addExpenseUser(ExpenseUserModel expenseUser,

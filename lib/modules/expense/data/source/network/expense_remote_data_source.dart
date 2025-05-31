@@ -203,17 +203,25 @@ class ExpenseRemoteDataSource {
       if (userIds.isEmpty) return [];
       print('Fetching users with IDs: $userIds');
 
-      // Fetch all users in one query using Query.any for multiple IDs
-      final document = await _db.listDocuments(
-        databaseId: AppwriteConfig.databaseId,
-        collectionId: AppwriteConfig.usersCollection,
-        queries: [
-          Query.any('\$id', userIds),
-        ],
-      );
+      // Fetch users one by one since we can't query multiple IDs at once
+      List<Document> allUsers = [];
+      for (String id in userIds) {
+        try {
+          final document = await _db.getDocument(
+            databaseId: AppwriteConfig.databaseId,
+            collectionId: AppwriteConfig.usersCollection,
+            documentId: id,
+          );
+          allUsers.add(document);
+        } catch (e) {
+          print('Error fetching user $id: $e');
+          // Continue with other users even if one fails
+          continue;
+        }
+      }
 
-      print('Found users: ${document.documents.map((d) => d.$id).toList()}');
-      return document.documents;
+      print('Found users: ${allUsers.map((d) => d.$id).toList()}');
+      return allUsers;
     } catch (e) {
       print('Error fetching users: $e');
       return [];
@@ -229,5 +237,23 @@ class ExpenseRemoteDataSource {
       ],
     );
     return document.documents;
+  }
+
+  Future<List<Document>> getExpenseUsers(String expenseId) async {
+    try {
+      print('Fetching expense users for expense: $expenseId');
+      final document = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.expenseUserCollection,
+        queries: [
+          Query.equal('expenseId', expenseId),
+        ],
+      );
+      print('Found ${document.documents.length} expense users');
+      return document.documents;
+    } catch (e) {
+      print('Error fetching expense users: $e');
+      return [];
+    }
   }
 }

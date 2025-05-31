@@ -252,18 +252,75 @@ class SplitDetailsCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    Icons.people,
-                    color: ColorConfig.secondary,
-                    size: 16,
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.people,
+                        color: ColorConfig.secondary,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Split Details',
+                        style: FontConfig.caption().copyWith(
+                          color: ColorConfig.secondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Split Details',
-                    style: FontConfig.caption().copyWith(
-                      color: ColorConfig.secondary,
-                      fontWeight: FontWeight.w500,
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      // TODO: Implement settle up functionality
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(
+                            'Settle Up',
+                            style: FontConfig.h6().copyWith(
+                              color: ColorConfig.midnight,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          content: Text(
+                            'This feature is coming soon!',
+                            style: FontConfig.body2().copyWith(
+                              color: ColorConfig.primarySwatch50,
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                'OK',
+                                style: FontConfig.button().copyWith(
+                                  color: ColorConfig.primarySwatch,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: Icon(
+                      Icons.check_circle_outline,
+                      color: ColorConfig.white,
+                      size: 16,
+                    ),
+                    label: Text(
+                      'Settle Up',
+                      style: FontConfig.button().copyWith(
+                        color: ColorConfig.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorConfig.primarySwatch,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ],
@@ -287,6 +344,10 @@ class SplitDetailsCard extends ConsumerWidget {
                   }
 
                   final perPersonAmount = expenseModel.cost / users.length;
+                  final payer = users.firstWhere(
+                    (u) => u.id == expenseModel.payerId,
+                    orElse: () => users.first,
+                  );
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,58 +360,55 @@ class SplitDetailsCard extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      ...users.map((user) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 32,
-                              height: 32,
+                      ...users.map((user) {
+                        final isOwing = user.id != expenseModel.payerId;
+                        final subtitle = isOwing 
+                          ? "Owes ${payer.userName ?? payer.email ?? 'Unknown'} \$${perPersonAmount.toStringAsFixed(2)}"
+                          : "Paid \$${expenseModel.cost.toStringAsFixed(2)}";
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: ListTileCard(
+                            leading: Container(
+                              width: 40,
+                              height: 40,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: ColorConfig.primarySwatch25,
                                   width: 1,
                                 ),
                               ),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(20),
                                 child: user.profileImage != null
                                     ? Image.network(
                                         user.profileImage!,
                                         fit: BoxFit.cover,
                                       )
-                                    : Icon(
-                                        Icons.person,
-                                        size: 20,
-                                        color: ColorConfig.secondary,
+                                    : Container(
+                                        color: ColorConfig.primarySwatch.withOpacity(0.1),
+                                        child: Center(
+                                          child: Text(
+                                            (user.userName ?? user.email ?? "?")[0].toUpperCase(),
+                                            style: FontConfig.body1().copyWith(
+                                              color: ColorConfig.primarySwatch,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    user.userName ?? user.email ?? 'Unknown',
-                                    style: FontConfig.body2().copyWith(
-                                      color: ColorConfig.midnight,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    '\$${perPersonAmount.toStringAsFixed(2)}',
-                                    style: FontConfig.caption().copyWith(
-                                      color: ColorConfig.primarySwatch50,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            titleString: user.userName ?? user.email ?? "Unknown",
+                            subtitleString: subtitle,
+                            subtitleStyle: TextStyle(
+                              color: isOwing ? ColorConfig.error : ColorConfig.primarySwatch,
+                              fontWeight: FontWeight.w500,
                             ),
-                          ],
-                        ),
-                      )).toList(),
+                          ),
+                        );
+                      }),
                     ],
                   );
                 },

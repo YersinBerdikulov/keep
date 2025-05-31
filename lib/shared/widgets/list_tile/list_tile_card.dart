@@ -12,6 +12,7 @@ class ListTileCard extends StatelessWidget {
   final void Function()? onTap;
   final Color? borderColor;
   final Color? backColor;
+  final TextStyle? subtitleStyle;
   const ListTileCard({
     super.key,
     required this.titleString,
@@ -23,6 +24,7 @@ class ListTileCard extends StatelessWidget {
     this.onTap,
     this.borderColor,
     this.backColor,
+    this.subtitleStyle,
   });
 
   @override
@@ -40,6 +42,7 @@ class ListTileCard extends StatelessWidget {
               trailing: trailing,
               leading: leading,
               visualDensity: visualDensity,
+              subtitleStyle: subtitleStyle,
             )
           : ListTileWidget(
               titleString: titleString,

@@ -11,6 +11,7 @@ import '../../../group/domain/models/group_model.dart';
 import '../../../box/domain/di/box_controller_di.dart';
 import '../../domain/di/expense_controller_di.dart';
 import '../widgets/create_expense_widget.dart';
+import '../../../../core/router/router_names.dart';
 
 class CreateExpensePage extends ConsumerStatefulWidget {
   final GroupModel groupModel;
@@ -95,9 +96,19 @@ class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
       expenseNotifierProvider,
       (previous, next) {
         next.when(
-          data: (_) {
-            showSnackBar(context, content: "Successfully Created!!");
-            context.pop();
+          data: (expenses) {
+            // Get the latest expense (it will be the first one since we sort by createdAt desc)
+            if (expenses.isNotEmpty) {
+              final latestExpense = expenses.first;
+              showSnackBar(context, content: "Successfully Created!!");
+              // Navigate to expense detail page
+              context.push(
+                RouteName.expenseDetail,
+                extra: {"expenseId": latestExpense.id},
+              );
+            } else {
+              context.pop();
+            }
           },
           loading: () {
             // Optionally show a loading spinner
