@@ -9,6 +9,7 @@ import 'package:dongi/modules/expense/data/di/expense_di.dart';
 import 'package:appwrite/models.dart';
 
 import '../models/expense_model.dart';
+import '../models/expense_user_model.dart';
 
 final expenseNotifierProvider =
     AsyncNotifierProvider<ExpenseNotifier, List<ExpenseModel>>(
@@ -107,4 +108,53 @@ final getExpenseUsersForExpenseProvider = FutureProvider.family<List<Document>, 
   final expenseRepository = ref.watch(expenseRepositoryProvider);
   final expenseUsers = await expenseRepository.getExpenseUsers(expenseId);
   return expenseUsers;
+});
+
+// Optimized provider to track a single expense user's settlement status with caching
+final expenseUserSettlementStatusProvider = FutureProvider.family<bool, Map<String, String>>((ref, params) async {
+  final expenseId = params['expenseId'];
+  final userId = params['userId'];
+  
+  if (expenseId == null || userId == null) {
+    throw Exception('Invalid params: expenseId and userId are required');
+  }
+  
+  print('Checking settlement status for expense: $expenseId, user: $userId');
+  
+  // Use the cached expense users if available
+  final allExpenseUsersAsync = ref.watch(getExpenseUsersForExpenseProvider(expenseId));
+  
+  // If we already have the expense users loaded, use them
+  if (allExpenseUsersAsync.hasValue) {
+    try {
+      final expenseUsers = allExpenseUsersAsync.value!;
+      final expenseUser = expenseUsers.firstWhere(
+        (eu) => ExpenseUserModel.fromJson(eu.data).userId == userId,
+      );
+      
+      final isSettled = ExpenseUserModel.fromJson(expenseUser.data).isSettled;
+      print('Settlement status for user $userId: $isSettled (from cache)');
+      return isSettled;
+    } catch (e) {
+      print('Error getting expense user from cache: $e');
+      // Fall through to direct fetch if cache lookup fails
+    }
+  }
+  
+  // Direct fetch if not in cache
+  final repository = ref.read(expenseRepositoryProvider);
+  final expenseUsers = await repository.getExpenseUsers(expenseId);
+  
+  try {
+    final expenseUser = expenseUsers.firstWhere(
+      (eu) => ExpenseUserModel.fromJson(eu.data).userId == userId,
+    );
+    
+    final isSettled = ExpenseUserModel.fromJson(expenseUser.data).isSettled;
+    print('Settlement status for user $userId: $isSettled (direct fetch)');
+    return isSettled;
+  } catch (e) {
+    print('Error getting expense user: $e');
+    return false;
+  }
 });

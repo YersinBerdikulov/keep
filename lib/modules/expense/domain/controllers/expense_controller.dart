@@ -19,14 +19,12 @@ import '../../../group/domain/models/group_model.dart';
 import '../../../box/domain/di/box_controller_di.dart';
 
 class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
-  late final ExpenseRepository _expenseRepository;
-  late final UpdateBoxUseCase _updateBoxUseCase;
+  // Use getters instead of late variables to prevent initialization errors
+  ExpenseRepository get _expenseRepository => ref.read(expenseRepositoryProvider);
+  UpdateBoxUseCase get _updateBoxUseCase => ref.read(updateBoxUseCaseProvider);
 
   @override
   Future<List<ExpenseModel>> build() async {
-    _expenseRepository = ref.read(expenseRepositoryProvider);
-    _updateBoxUseCase = ref.read(updateBoxUseCaseProvider);
-
     // Watch the current user to rebuild when user changes
     ref.watch(currentUserProvider);
 
@@ -400,13 +398,19 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   }
 
   Future<void> settleUpExpenseUser(String expenseId, String userId) async {
+    state = const AsyncValue.loading(); // Set loading state immediately
+    
     try {
+      print('Starting settle up for expense: $expenseId, user: $userId');
+      
       // Get the expense details first
       final expense = await _expenseRepository.getExpenseDetail(expenseId);
       final expenseModel = ExpenseModel.fromJson(expense.data);
+      print('Found expense: ${expenseModel.id}');
       
       // Get expense users
       final expenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
+      print('Found ${expenseUsers.length} expense users');
       
       // Update the specific expense user as settled
       final expenseUser = expenseUsers.firstWhere(
@@ -417,6 +421,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
           throw Exception('Expense user not found');
         },
       );
+      print('Found expense user to update: ${expenseUser.$id}');
 
       final now = DateTime.now().toIso8601String();
       final updateExpenseUserData = {
@@ -424,36 +429,130 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         'isSettled': true,
         'settledAt': now,
       };
-      await _expenseRepository.updateExpenseUser(updateExpenseUserData);
+      print('Updating expense user with data: $updateExpenseUserData');
+      final expenseUserResult = await _expenseRepository.updateExpenseUser(updateExpenseUserData);
+      expenseUserResult.fold(
+        (l) {
+          print('Error updating expense user: ${l.message}');
+          throw Exception(l.message);
+        },
+        (r) => print('Successfully updated expense user'),
+      );
 
       // Check if all users have settled
+      print('Checking if all users have settled');
       final allExpenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
       final allSettled = allExpenseUsers.every(
         (eu) => ExpenseUserModel.fromJson(eu.data).isSettled == true,
       );
+      print('All users settled: $allSettled');
 
       // If all users have settled, mark the expense as settled
       if (allSettled) {
+        print('All users settled, updating expense status');
         final updateExpenseData = {
           '\$id': expenseId,
           'isSettled': true,
           'settledAt': now,
         };
-        await _expenseRepository.updateExpense(updateExpenseData);
+        final expenseResult = await _expenseRepository.updateExpense(updateExpenseData);
+        expenseResult.fold(
+          (l) {
+            print('Error updating expense: ${l.message}');
+            throw Exception(l.message);
+          },
+          (r) => print('Successfully updated expense'),
+        );
       }
 
       // Update the state with the latest expenses
+      print('Fetching updated expenses for box: ${expenseModel.boxId}');
       final updatedExpenses = await getExpensesInBox(expenseModel.boxId);
+      print('Got ${updatedExpenses.length} updated expenses');
       state = AsyncValue.data(updatedExpenses);
 
-      // Invalidate relevant providers using ref
-      ref.invalidate(expenseDetailsProvider(expenseId));
-      ref.invalidate(getExpenseUsersForExpenseProvider(expenseId));
-      ref.invalidate(getExpensesInBoxProvider(expenseModel.boxId));
+      // Notify the UI to refresh
+      print('Notifying listeners to refresh UI');
+      ref.notifyListeners();
     } catch (e, st) {
       print('Error in settleUpExpenseUser: $e');
       print('Stack trace: $st');
       state = AsyncValue.error(e, st);
+      rethrow; // Rethrow to allow UI to catch and handle the error
+    }
+  }
+
+  Future<void> cancelSettleUpExpenseUser(String expenseId, String userId) async {
+    state = const AsyncValue.loading(); // Set loading state immediately
+    
+    try {
+      print('Starting cancel settle up for expense: $expenseId, user: $userId');
+      
+      // Get the expense details first
+      final expense = await _expenseRepository.getExpenseDetail(expenseId);
+      final expenseModel = ExpenseModel.fromJson(expense.data);
+      print('Found expense: ${expenseModel.id}');
+      
+      // Get expense users
+      final expenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
+      print('Found ${expenseUsers.length} expense users');
+      
+      // Update the specific expense user as not settled
+      final expenseUser = expenseUsers.firstWhere(
+        (eu) => ExpenseUserModel.fromJson(eu.data).userId == userId,
+        orElse: () {
+          print('Could not find expense user for userId: $userId');
+          print('Available expense users: ${expenseUsers.map((eu) => ExpenseUserModel.fromJson(eu.data).userId).toList()}');
+          throw Exception('Expense user not found');
+        },
+      );
+      print('Found expense user to update: ${expenseUser.$id}');
+
+      final updateExpenseUserData = {
+        '\$id': expenseUser.$id,
+        'isSettled': false,
+        'settledAt': null,
+      };
+      print('Updating expense user with data: $updateExpenseUserData');
+      final expenseUserResult = await _expenseRepository.updateExpenseUser(updateExpenseUserData);
+      expenseUserResult.fold(
+        (l) {
+          print('Error updating expense user: ${l.message}');
+          throw Exception(l.message);
+        },
+        (r) => print('Successfully updated expense user'),
+      );
+
+      // Since we're unsettling a user, the expense should also be marked as not settled
+      final updateExpenseData = {
+        '\$id': expenseId,
+        'isSettled': false,
+        'settledAt': null,
+      };
+      print('Updating expense with data: $updateExpenseData');
+      final expenseResult = await _expenseRepository.updateExpense(updateExpenseData);
+      expenseResult.fold(
+        (l) {
+          print('Error updating expense: ${l.message}');
+          throw Exception(l.message);
+        },
+        (r) => print('Successfully updated expense'),
+      );
+
+      // Update the state with the latest expenses
+      print('Fetching updated expenses for box: ${expenseModel.boxId}');
+      final updatedExpenses = await getExpensesInBox(expenseModel.boxId);
+      print('Got ${updatedExpenses.length} updated expenses');
+      state = AsyncValue.data(updatedExpenses);
+
+      // Notify the UI to refresh
+      print('Notifying listeners to refresh UI');
+      ref.notifyListeners();
+    } catch (e, st) {
+      print('Error in cancelSettleUpExpenseUser: $e');
+      print('Stack trace: $st');
+      state = AsyncValue.error(e, st);
+      rethrow; // Rethrow to allow UI to catch and handle the error
     }
   }
 
@@ -489,11 +588,6 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
           // Update the state with the latest expenses
           final updatedExpenses = await getExpensesInBox(expenseModel.boxId!);
           state = AsyncValue.data(updatedExpenses);
-
-          // Invalidate relevant providers using ref
-          ref.invalidate(expenseDetailsProvider(expenseModel.id!));
-          ref.invalidate(getExpenseUsersForExpenseProvider(expenseModel.id!));
-          ref.invalidate(getExpensesInBoxProvider(expenseModel.boxId!));
         },
       );
     } catch (e, st) {

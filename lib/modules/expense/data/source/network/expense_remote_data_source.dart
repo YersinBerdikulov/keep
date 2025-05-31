@@ -53,14 +53,30 @@ class ExpenseRemoteDataSource {
 
   FutureEither<Document> updateExpense(Map updateExpenseModel) async {
     try {
+      print('Updating expense in Appwrite:');
+      print('Document ID: ${updateExpenseModel["\$id"]}');
+      print('Update data: $updateExpenseModel');
+
       final document = await _db.updateDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.expenseCollection,
         documentId: updateExpenseModel["\$id"],
         data: updateExpenseModel,
       );
+
+      print('Successfully updated expense:');
+      print('Document ID: ${document.$id}');
+      print('Updated At: ${document.$updatedAt}');
+      print('Data: ${document.data}');
+
       return right(document);
     } on AppwriteException catch (e, st) {
+      print('Appwrite error updating expense:');
+      print('Error message: ${e.message}');
+      print('Error code: ${e.code}');
+      print('Error type: ${e.type}');
+      print('Response: ${e.response}');
+
       return left(
         Failure(
           e.message ?? 'Some unexpected error occurred',
@@ -68,6 +84,7 @@ class ExpenseRemoteDataSource {
         ),
       );
     } catch (e, st) {
+      print('General error updating expense: $e');
       return left(Failure(e.toString(), st));
     }
   }
@@ -305,14 +322,30 @@ class ExpenseRemoteDataSource {
 
   FutureEither<bool> updateExpenseUser(Map updateExpenseUserData) async {
     try {
-      await _db.updateDocument(
+      print('Updating expense user in Appwrite:');
+      print('Document ID: ${updateExpenseUserData["\$id"]}');
+      print('Update data: $updateExpenseUserData');
+
+      final document = await _db.updateDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.expenseUserCollection,
         documentId: updateExpenseUserData["\$id"],
         data: updateExpenseUserData,
       );
+
+      print('Successfully updated expense user:');
+      print('Document ID: ${document.$id}');
+      print('Updated At: ${document.$updatedAt}');
+      print('Data: ${document.data}');
+
       return right(true);
     } on AppwriteException catch (e, st) {
+      print('Appwrite error updating expense user:');
+      print('Error message: ${e.message}');
+      print('Error code: ${e.code}');
+      print('Error type: ${e.type}');
+      print('Response: ${e.response}');
+
       return left(
         Failure(
           e.message ?? 'Some unexpected error occurred',
@@ -320,6 +353,7 @@ class ExpenseRemoteDataSource {
         ),
       );
     } catch (e, st) {
+      print('General error updating expense user: $e');
       return left(Failure(e.toString(), st));
     }
   }
