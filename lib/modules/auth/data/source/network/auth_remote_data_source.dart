@@ -69,17 +69,19 @@ class AuthRemoteDataSource {
 
   FutureEither<User> authWithGoogle() async {
     try {
-      // First, check if there's an existing session and clear it
+      print("Starting Google authentication with account selection...");
+
+      // First, try to delete the current session to ensure we're starting fresh
       try {
-        final sessions = await _account.listSessions();
-        if (sessions.sessions.isNotEmpty) {
-          await _account.deleteSessions();
-        }
+        await _account.deleteSession(sessionId: 'current');
       } catch (e) {
-        // Ignore session clearing errors
+        // Ignore errors if no session exists
+        print("No active session to delete: $e");
       }
 
       // Create the OAuth2 session with Google
+      // The session should be forced to show the account selector because
+      // we've deleted any existing session before this call
       await _account.createOAuth2Session(
         provider: OAuthProvider.google,
       );
@@ -96,7 +98,7 @@ class AuthRemoteDataSource {
           account = await currentUserAccount();
           if (account != null) break;
         } catch (e) {
-          // Ignore errors during retry
+          print("Retry error: $e");
         }
 
         await Future.delayed(const Duration(milliseconds: 500));
@@ -109,11 +111,13 @@ class AuthRemoteDataSource {
 
       return right(account);
     } on AppwriteException catch (e, stackTrace) {
+      print("Appwrite exception: ${e.message}");
       return left(
         Failure(e.message ?? 'Google authentication failed. Please try again.',
             stackTrace),
       );
     } catch (e, stackTrace) {
+      print("General exception: $e");
       return left(
         Failure(e.toString(), stackTrace),
       );
@@ -131,6 +135,7 @@ class AuthRemoteDataSource {
         Failure(e.message ?? 'Some unexpected error occurred', stackTrace),
       );
     } catch (e, stackTrace) {
+      print("Logout error: $e");
       return left(
         Failure(e.toString(), stackTrace),
       );

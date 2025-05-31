@@ -26,16 +26,27 @@ class _HomePageState extends ConsumerState<HomePage> {
     // Check user name after widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkUserName();
+      // Refresh data when page loads
+      refreshData();
     });
   }
 
   void checkUserName() async {
     final userData = await ref.read(userNotifierProvider.future);
     if (mounted &&
+       
         userData != null &&
+       
         (userData.userName == null || userData.userName!.isEmpty)) {
       context.go(RouteName.enterName);
     }
+  }
+
+  // Method to refresh all relevant data
+  void refreshData() {
+    // Invalidate and refresh providers
+    ref.invalidate(homeNotifierProvider);
+    ref.invalidate(userNotifierProvider);
   }
 
   @override
@@ -46,15 +57,49 @@ class _HomePageState extends ConsumerState<HomePage> {
       error: (error, stackTrace) => Center(child: Text(error.toString())),
       data: (data) {
         return Scaffold(
-          // floatingActionButton: FloatingActionButton(
-          //   onPressed: () async {
-          //     String appScheme = '';
-          //     String uri = '$appScheme://authentication?key=12345';
-          //     await launchUrlString(uri);
-          //   },
-          // ),
           backgroundColor: ColorConfig.white,
-          appBar: AppBarWidget(),
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: Builder(
+              builder: (context) => IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: ColorConfig.baseGrey,
+                  ),
+                  child: Icon(
+                    Icons.menu,
+                    color: ColorConfig.midnight,
+                    size: 20,
+                  ),
+                ),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              ),
+            ),
+            actions: [
+              IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: ColorConfig.baseGrey,
+                  ),
+                  child: Icon(
+                    Icons.refresh,
+                    color: ColorConfig.midnight,
+                    size: 20,
+                  ),
+                ),
+                onPressed: refreshData,
+                tooltip: 'Refresh data',
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
           drawer: const DrawerWidget(),
           body: RefreshIndicator(
             onRefresh: () async {
@@ -65,17 +110,22 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ref.refresh(boxNotifierProvider('').future),
               ]);
             },
+            child: RefreshIndicator(
+            onRefresh: () async {
+              refreshData();
+            },
             child: ListView(
-              children: [
-                const HomeExpenseSummery(),
-                const SizedBox(height: 30),
-                HomeRecentGroup(data),
-                const SizedBox(height: 30),
-                HomeWeeklyAnalytic(),
-                const SizedBox(height: 30),
-                const HomeRecentTransaction(),
-                const SizedBox(height: 30),
-              ],
+                children: [
+                  const HomeExpenseSummery(),
+                  const SizedBox(height: 30),
+                  HomeRecentGroup(data),
+                  const SizedBox(height: 30),
+                  HomeWeeklyAnalytic(),
+                  const SizedBox(height: 30),
+                  const HomeRecentTransaction(),
+                  const SizedBox(height: 30),
+                ],
+            ),
             ),
           ),
         );

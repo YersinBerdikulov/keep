@@ -4,6 +4,7 @@ import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
 import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
+import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
 import 'package:dongi/shared/widgets/dialog/dialog_widget.dart';
 import 'package:dongi/shared/widgets/image/image_widget.dart';
@@ -18,6 +19,11 @@ class DrawerWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(userNotifierProvider);
     final friendList = ref.watch(getFriendProvider);
+
+    // Refresh data when drawer is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(homeNotifierProvider);
+    });
 
     return Drawer(
       backgroundColor: ColorConfig.white,
