@@ -69,7 +69,18 @@ class AuthController extends AsyncNotifier<AuthUserModel?> {
   Future<AuthUserModel?> authWithGoogle() async {
     state = const AsyncValue.loading();
 
+    // First logout to force a new login session
+    try {
+      await authRepository.logout();
+    } catch (e) {
+      // Ignore errors if not logged in
+      print("Logout before Google auth: $e");
+    }
+
     final googleAuthResult = await authRepository.authWithGoogle();
+    print("--------------------------");
+    print(googleAuthResult);
+    print("--------------------------");
 
     return await googleAuthResult.fold(
       (l) {

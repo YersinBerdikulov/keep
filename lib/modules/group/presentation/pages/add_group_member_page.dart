@@ -15,6 +15,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
 import '../../../../core/constants/size_config.dart';
+import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 
 class AddGroupMemberPage extends HookConsumerWidget {
   final GroupModel groupModel;
@@ -78,6 +79,8 @@ class AddGroupMemberPage extends HookConsumerWidget {
         state.whenOrNull(
           data: (_) {
             showSnackBar(context, content: "Members added successfully!");
+            // Refresh home data when members are added
+            ref.invalidate(homeNotifierProvider);
             context.pop();
           },
           error: (error, _) => showSnackBar(context, content: error.toString()),

@@ -62,15 +62,50 @@ class ManageGroupMembersPage extends HookConsumerWidget {
     final currentUserId = ref.read(currentUserProvider)!.id;
     final groupMembers = ref.watch(groupMembersProvider(groupModel.groupUsers));
 
+    void _removeUserFromGroup(String userId) async {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      try {
+        // Remove user from group
+        await ref.read(groupNotifierProvider.notifier).deleteMember(
+              groupModel: groupModel,
+              memberIdToDelete: userId,
+            );
+
+        // Refresh data in home and group screens
+        ref.invalidate(homeNotifierProvider);
+        ref.invalidate(groupMembersProvider(groupModel.groupUsers));
+
+        // Close loading dialog
+        if (context.mounted) Navigator.pop(context);
+
+        // Show success message
+        if (context.mounted) {
+          showSnackBar(context, content: 'Member removed successfully');
+        }
+      } catch (e) {
+        // Close loading dialog
+        if (context.mounted) Navigator.pop(context);
+
+        // Show error message
+        if (context.mounted) {
+          showSnackBar(context,
+              content: 'Failed to remove member: ${e.toString()}');
+        }
+      }
+    }
+
     ref.listen<AsyncValue<List<GroupModel>>>(
       groupNotifierProvider,
       (_, state) {
         state.whenOrNull(
           data: (_) {
-            showSnackBar(context, content: "Member removed successfully!");
-            ref.invalidate(usersInGroupProvider(groupModel.groupUsers));
-            ref.invalidate(groupDetailProvider(groupModel.id!));
-            context.pop();
+            // Data updated successfully
           },
           error: (error, _) => showSnackBar(context, content: error.toString()),
         );
@@ -125,7 +160,8 @@ class ManageGroupMembersPage extends HookConsumerWidget {
                             ),
                             child: ListTile(
                               leading: CircleAvatar(
-                                backgroundColor: ColorConfig.primarySwatch.withOpacity(0.1),
+                                backgroundColor:
+                                    ColorConfig.primarySwatch.withOpacity(0.1),
                                 backgroundImage: member.profileImage != null
                                     ? NetworkImage(member.profileImage!)
                                     : null,
@@ -152,7 +188,8 @@ class ManageGroupMembersPage extends HookConsumerWidget {
                               ),
                               trailing: !isCreator && !isCurrentUser
                                   ? IconButton(
-                                      icon: const Icon(Icons.remove_circle_outline),
+                                      icon: const Icon(
+                                          Icons.remove_circle_outline),
                                       color: ColorConfig.error,
                                       onPressed: () {
                                         showDialog(
@@ -171,24 +208,23 @@ class ManageGroupMembersPage extends HookConsumerWidget {
                                                 onPressed: () => context.pop(),
                                                 child: Text(
                                                   'Cancel',
-                                                  style: FontConfig.body2().copyWith(
-                                                    color: ColorConfig.primarySwatch50,
+                                                  style: FontConfig.body2()
+                                                      .copyWith(
+                                                    color: ColorConfig
+                                                        .primarySwatch50,
                                                   ),
                                                 ),
                                               ),
                                               TextButton(
                                                 onPressed: () {
                                                   context.pop();
-                                                  ref
-                                                      .read(groupNotifierProvider.notifier)
-                                                      .deleteMember(
-                                                        groupModel: groupModel,
-                                                        memberIdToDelete: member.id!,
-                                                      );
+                                                  _removeUserFromGroup(
+                                                      member.id!);
                                                 },
                                                 child: Text(
                                                   'Remove',
-                                                  style: FontConfig.body2().copyWith(
+                                                  style: FontConfig.body2()
+                                                      .copyWith(
                                                     color: ColorConfig.error,
                                                   ),
                                                 ),
@@ -222,4 +258,4 @@ class ManageGroupMembersPage extends HookConsumerWidget {
       ),
     );
   }
-} 
+}
