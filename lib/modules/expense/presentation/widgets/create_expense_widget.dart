@@ -631,6 +631,7 @@ class CreateExpenseCreateButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCurrency = ref.watch(expenseCurrencyProvider);
+    final hasMultipleMembers = boxModel.boxUsers.length > 1;
 
     return SafeArea(
       child: Padding(
@@ -640,22 +641,27 @@ class CreateExpenseCreateButton extends ConsumerWidget {
                 loading: () => true,
                 orElse: () => false,
               ),
-          onPressed: () {
-            if (formKey.currentState!.validate()) {
-              ref.read(expenseNotifierProvider.notifier).addExpense(
-                    expenseTitle: expenseTitle,
-                    expenseDescription: expenseDescription,
-                    expenseCost: expenseCost,
-                    groupModel: groupModel,
-                    boxModel: boxModel.copyWith(currency: selectedCurrency),
-                  );
+          onPressed: !hasMultipleMembers
+              ? null
+              : () {
+                  if (formKey.currentState!.validate()) {
+                    ref.read(expenseNotifierProvider.notifier).addExpense(
+                          expenseTitle: expenseTitle,
+                          expenseDescription: expenseDescription,
+                          expenseCost: expenseCost,
+                          groupModel: groupModel,
+                          boxModel:
+                              boxModel.copyWith(currency: selectedCurrency),
+                        );
 
-              // Reset the category selection
-              ref.read(selectedCategoryProvider.notifier).state = null;
-              ref.read(expenseCategoryIdProvider.notifier).state = null;
-            }
-          },
-          title: "Create",
+                    // Reset the category selection
+                    ref.read(selectedCategoryProvider.notifier).state = null;
+                    ref.read(expenseCategoryIdProvider.notifier).state = null;
+                  }
+                },
+          title: hasMultipleMembers
+              ? "Create"
+              : "Need more members to create expense",
           textColor: ColorConfig.secondary,
         ),
       ),
