@@ -19,10 +19,17 @@ class ExpenseRemoteDataSource {
     try {
       // Create a copy of the data for better debugging
       final data = expenseModel.toJson();
+      
+      // Add a plain createdAt field that Appwrite expects
+      // This is necessary because the model uses $createdAt but Appwrite expects createdAt
+      if (data[r'$createdAt'] != null) {
+        data['createdAt'] = data[r'$createdAt'];
+      }
 
       // Log the data being sent to Appwrite
       print('Adding expense to Appwrite with data: $data');
       print('Category ID in data: ${data['categoryId']}');
+      print('CreatedAt in data: ${data['createdAt']}');
 
       final document = await _db.createDocument(
         databaseId: AppwriteConfig.databaseId,

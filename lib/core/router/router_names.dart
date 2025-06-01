@@ -19,7 +19,7 @@ class RouteName {
   static String addBoxMember = '/boxes/members/add';
   static String friendList = '/friends';
   static String addFriend = '/friends/add';
-  static String createExpense = '/e expenseUserCollectionxpenses/create';
+  static String createExpense = '/expenses/create';
   static String updateExpense = '/expenses/update';
   static String expenseMadeBy = '/expenses/made-by';
   static String expenseSplit = '/expenses/split';

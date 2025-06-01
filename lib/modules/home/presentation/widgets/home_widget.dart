@@ -765,7 +765,7 @@ class HomeRecentTransaction extends ConsumerWidget {
             ),
           ),
           data: (transactions) {
-            // Get only the most recent 5 transactions
+            // Get only the most recent 5 transactions for the home page preview
             final recentTransactions = ref.read(homeTransactionsProvider.notifier).getRecentTransactions();
             
             if (recentTransactions.isEmpty) {

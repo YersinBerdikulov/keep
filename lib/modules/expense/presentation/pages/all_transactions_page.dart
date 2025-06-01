@@ -18,6 +18,7 @@ class AllTransactionsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Use the full transactions list directly from the provider
     final transactionsProvider = ref.watch(homeTransactionsProvider);
     final categoriesProvider = ref.watch(categoryNotifierProvider);
 

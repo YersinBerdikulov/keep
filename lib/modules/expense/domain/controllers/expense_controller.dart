@@ -122,6 +122,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       print('Created expense user IDs: $expenseUserIds');
       print('User IDs: $userIds');
 
+      // Use the existing 'now' variable for createdAt field
       ExpenseModel expenseModel = ExpenseModel(
         id: expenseId,
         title: expenseTitle.text,
@@ -134,6 +135,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         groupId: groupModel.id!,
         boxId: boxModel.id!,
         expenseUsers: userIds,  // Store user IDs
+        createdAt: now,  // Add createdAt field with current timestamp
       );
 
       print('Creating expense model: ${expenseModel.toJson()}');
