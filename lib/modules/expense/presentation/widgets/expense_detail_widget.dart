@@ -118,8 +118,18 @@ class InfoExpenseDetail extends ConsumerWidget {
 
   String _getMonthName(int month) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
     return months[month - 1];
   }
@@ -182,7 +192,8 @@ class InfoExpenseDetail extends ConsumerWidget {
     );
   }
 
-  Widget userInfoCard(BuildContext context, String userId, String title, IconData icon, Color iconColor) {
+  Widget userInfoCard(BuildContext context, String userId, String title,
+      IconData icon, Color iconColor) {
     return Container(
       decoration: BoxDecoration(
         color: ColorConfig.grey,
@@ -195,7 +206,7 @@ class InfoExpenseDetail extends ConsumerWidget {
       child: Consumer(
         builder: (context, ref, child) {
           final userAsync = ref.watch(getUserDataForExpenseProvider(userId));
-          
+
           return Padding(
             padding: const EdgeInsets.all(12),
             child: userAsync.when(
@@ -353,35 +364,38 @@ class _SplitDetailsCardState extends ConsumerState<SplitDetailsCard> {
 
   Future<void> _refreshExpenseData() async {
     if (!mounted) return;
-    
+
     // Safety check for expense ID
     final expenseId = widget.expenseModel.id;
     if (expenseId == null) {
       print('Cannot refresh: expense ID is null');
       return;
     }
-    
+
     try {
       // Use the expenseNotifier to get data instead of direct repository access
       final expenseNotifier = ref.read(expenseNotifierProvider.notifier);
       final expenseModel = await expenseNotifier.getExpenseDetail(expenseId);
-      
+
       if (expenseModel == null || !mounted) return;
-      
+
       // Use the expenseDetailsProvider to get the expense users safely
-      final expenseUsersProvider = getExpenseUsersForExpenseProvider(expenseModel.id!);
-      final expenseUsersAsyncValue = await ref.read(expenseUsersProvider.future);
-      
+      final expenseUsersProvider =
+          getExpenseUsersForExpenseProvider(expenseModel.id!);
+      final expenseUsersAsyncValue =
+          await ref.read(expenseUsersProvider.future);
+
       if (!mounted) return;
-      
+
       setState(() {
         for (var expenseUser in expenseUsersAsyncValue) {
           if (expenseUser.data == null) continue;
-          
+
           try {
-            final expenseUserModel = ExpenseUserModel.fromJson(expenseUser.data);
+            final expenseUserModel =
+                ExpenseUserModel.fromJson(expenseUser.data);
             final userId = expenseUserModel.userId;
-            
+
             // userId can be null, which is fine for our Map with nullable keys
             _userSettlementStates[userId] = expenseUserModel.isSettled;
             _userLoadingStates[userId] = false;
@@ -400,7 +414,7 @@ class _SplitDetailsCardState extends ConsumerState<SplitDetailsCard> {
       }
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     // Safety check for null ID
@@ -408,24 +422,26 @@ class _SplitDetailsCardState extends ConsumerState<SplitDetailsCard> {
     if (expenseId == null) {
       return const Center(child: Text('Invalid expense ID'));
     }
-    
+
     // Watch the expense details to get real-time updates
     final expenseDetailsAsync = ref.watch(expenseDetailsProvider(expenseId));
-    
+
     // Listen for changes in expense details
     ref.listen(expenseDetailsProvider(expenseId), (previous, next) {
       // Only proceed if both values are not null and are of the right type
-      if (previous != null && next != null && 
-          previous is AsyncData<ExpenseModel> && next is AsyncData<ExpenseModel>) {
+      if (previous != null &&
+          next != null &&
+          previous is AsyncData<ExpenseModel> &&
+          next is AsyncData<ExpenseModel>) {
         // Only refresh if the data actually changed
-        if (previous.value?.id != next.value?.id || 
+        if (previous.value?.id != next.value?.id ||
             previous.value?.updatedAt != next.value?.updatedAt) {
           print('Expense details changed, refreshing data');
           _refreshExpenseData();
         }
       }
     });
-    
+
     // Handle the result of the watch
     return expenseDetailsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -449,19 +465,22 @@ class _SplitDetailsCardState extends ConsumerState<SplitDetailsCard> {
       ),
       data: (expenseDetails) {
         // Use the provider to fetch expense users
-        final splitUsersAsync = ref.watch(getExpenseUsersProvider(expenseDetails.expenseUsers));
-        
+        final splitUsersAsync =
+            ref.watch(getExpenseUsersProvider(expenseDetails.expenseUsers));
+
         return splitUsersAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stack) => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Error fetching users: ${error.toString().split('\n')[0]}'),
+                Text(
+                    'Error fetching users: ${error.toString().split('\n')[0]}'),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    ref.invalidate(getExpenseUsersProvider(expenseDetails.expenseUsers));
+                    ref.invalidate(
+                        getExpenseUsersProvider(expenseDetails.expenseUsers));
                     _refreshExpenseData();
                   },
                   child: const Text('Retry'),
@@ -470,519 +489,447 @@ class _SplitDetailsCardState extends ConsumerState<SplitDetailsCard> {
             ),
           ),
           data: (users) {
-            // Debug print to check user IDs
-            print('Split users: ${users.map((u) => u.id).toList()}');
-            print('Expected users: ${expenseDetails.expenseUsers}');
-            
-            if (users.isEmpty && expenseDetails.expenseUsers.isNotEmpty) {
-              // Use the user repository directly as a fallback
-              return FutureBuilder<List<UserModel>>(
-                future: ref.read(userRepositoryProvider).getUsersByIds(expenseDetails.expenseUsers),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
-                  
-                  final fetchedUsers = snapshot.data ?? [];
-                  if (fetchedUsers.isEmpty) {
-                    // One more fallback - try to get any users from the system
-                    return FutureBuilder<List<UserModel>>(
-                      future: _fetchAnyUsers(ref),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        
-                        final anyUsers = snapshot.data ?? [];
-                        if (anyUsers.isEmpty) {
-                          return Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.error_outline, size: 48, color: ColorConfig.error),
-                                  const SizedBox(height: 16),
-                                  const Text(
-                                    'No users found. The expense might have invalid user references.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'Try refreshing or contact support if this issue persists.',
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }
-                        
-                        // If we found any users in the system, show them
-                        // This is better than showing nothing
-                        print('Using ${anyUsers.length} system users as fallback');
-                        final expenseUsersAsync = ref.watch(getExpenseUsersForExpenseProvider(expenseDetails.id!));
-                        return _buildExpenseUsersList(expenseDetails, anyUsers, expenseUsersAsync);
-                      },
-                    );
-                  }
-                  
-                  // Continue with the fetched users
-                  users = fetchedUsers;
-                  
-                  // Fetch expense users once for all users
-                  final expenseUsersAsync = ref.watch(getExpenseUsersForExpenseProvider(expenseDetails.id!));
-                  
-                  // Same logic as below but with fetched users
-                  return _buildExpenseUsersList(expenseDetails, fetchedUsers, expenseUsersAsync);
-                },
-              );
-            }
-            
-            if (users.isEmpty) {
-              return const Center(child: Text('No users found'));
-            }
+            // Get the first expense user to determine split type
+            final expenseUsersProvider =
+                getExpenseUsersForExpenseProvider(expenseDetails.id!);
+            final expenseUsersAsync = ref.watch(expenseUsersProvider);
 
-            // Fetch expense users once for all users
-            final expenseUsersAsync = ref.watch(getExpenseUsersForExpenseProvider(expenseDetails.id!));
-            
-            return _buildExpenseUsersList(expenseDetails, users, expenseUsersAsync);
-          },
-        );
-      },
-    );
-  }
+            return expenseUsersAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) => Center(child: Text('Error: $error')),
+              data: (expenseUsers) {
+                if (expenseUsers.isEmpty) {
+                  return const Center(child: Text('No expense users found'));
+                }
 
-  Widget _buildExpenseUsersList(ExpenseModel expenseDetails, List<UserModel> users, AsyncValue<List<Document>> expenseUsersAsync) {
-    // Listen for changes in expense users
-    ref.listen(getExpenseUsersForExpenseProvider(expenseDetails.id!), (previous, next) {
-      if (previous != null && next != null && 
-          previous is AsyncData<List<Document>> && next is AsyncData<List<Document>>) {
-        // Only refresh if the data actually changed
-        final prevList = previous.value;
-        final nextList = next.value;
-        
-        if (prevList != null && nextList != null) {
-          if (prevList.length != nextList.length || 
-              prevList.any((prevDoc) {
-                // Find matching document in next list
-                final matchingDocs = nextList.where((nextDoc) => nextDoc.$id == prevDoc.$id).toList();
-                if (matchingDocs.isEmpty) return true;
-                
-                // Compare data
-                return !_mapsEqual(prevDoc.data, matchingDocs.first.data);
-              })) {
-            print('Expense users changed, refreshing data');
-            _refreshExpenseData();
-          }
-        }
-      }
-    });
-    
-    return expenseUsersAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text('Error: $error')),
-      data: (expenseUserDocs) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: ColorConfig.grey,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: ColorConfig.primarySwatch25,
-                width: 1,
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    expenseDetails.isSettled
-                        ? 'Expense settled'
-                        : 'Split equally between ${users.length} people',
-                    style: FontConfig.body2().copyWith(
-                      color: expenseDetails.isSettled ? ColorConfig.success : ColorConfig.midnight,
-                      fontWeight: FontWeight.w500,
+                // Get split type from the first expense user
+                final firstExpenseUser =
+                    ExpenseUserModel.fromJson(expenseUsers.first.data);
+                final splitType = firstExpenseUser.splitType;
+
+                // Build split type description
+                String splitDescription;
+                if (expenseDetails.isSettled) {
+                  splitDescription = 'Expense settled';
+                } else {
+                  switch (splitType) {
+                    case 'equal':
+                      if (users.length == 1) {
+                        // Get the expense user data to determine who owes
+                        final expenseUser = expenseUsers.first;
+                        final expenseUserModel =
+                            ExpenseUserModel.fromJson(expenseUser.data);
+
+                        // Find who paid (the creditor)
+                        final creditor = users.firstWhere(
+                          (u) => u.id == expenseDetails.payerId,
+                          orElse: () => users.first,
+                        );
+
+                        // Find who owes (the debtor) from the expenseUsers data
+                        final debtor = users.firstWhere(
+                          (u) => u.id == expenseUserModel.userId,
+                          orElse: () => users.first,
+                        );
+
+                        // Only show "owes full amount" if the debtor is different from the creditor
+                        if (debtor.id != creditor.id) {
+                          splitDescription =
+                              'Full amount (Total: ${expenseDetails.cost} \$)';
+                        } else {
+                          // Fallback description if something is wrong with the data
+                          splitDescription =
+                              'Split with 1 person (Total: ${expenseDetails.cost} \$)';
+                        }
+                      } else {
+                        splitDescription =
+                            'Split equally between ${users.length} people (Total: ${expenseDetails.cost} \$)';
+                      }
+                      break;
+                    case 'percentage':
+                      final totalPercentage = expenseUsers
+                          .map((eu) => ExpenseUserModel.fromJson(eu.data)
+                              .sharePercentage)
+                          .fold(0.0, (sum, percent) => sum + (percent ?? 0));
+                      splitDescription = users.length == 1
+                          ? 'Split by percentage with 1 person (Total: ${expenseDetails.cost} \$)'
+                          : 'Split by percentage between ${users.length} people (Total: ${expenseDetails.cost} \$)';
+                      break;
+                    case 'amount':
+                      final totalAmount = expenseUsers
+                          .map((eu) =>
+                              ExpenseUserModel.fromJson(eu.data).shareAmount)
+                          .fold(0.0, (sum, amount) => sum + (amount ?? 0));
+                      splitDescription = users.length == 1
+                          ? 'Split by custom amount with 1 person (\$${totalAmount.toStringAsFixed(2)})'
+                          : 'Split by custom amounts between ${users.length} people (\$${totalAmount.toStringAsFixed(2)})';
+                      break;
+                    case 'shares':
+                      final totalShares = expenseUsers
+                          .map(
+                              (eu) => ExpenseUserModel.fromJson(eu.data).shares)
+                          .fold(0.0, (sum, shares) => sum + (shares ?? 0));
+                      splitDescription = users.length == 1
+                          ? 'Split by shares with 1 person (${totalShares.toStringAsFixed(0)} shares)'
+                          : 'Split by shares between ${users.length} people (${totalShares.toStringAsFixed(0)} shares)';
+                      break;
+                    default:
+                      splitDescription = users.length == 1
+                          ? 'Split with 1 person'
+                          : 'Split between ${users.length} people';
+                  }
+                }
+
+                return Container(
+                  margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  decoration: BoxDecoration(
+                    color: ColorConfig.grey,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: ColorConfig.primarySwatch25,
+                      width: 1,
                     ),
                   ),
-                  
-                  // Add refresh button row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextButton.icon(
-                        onPressed: () async {
-                          // Show loading indicator
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Refreshing data...'),
-                              duration: Duration(seconds: 1),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                splitDescription,
+                                style: FontConfig.body2().copyWith(
+                                  color: expenseDetails.isSettled
+                                      ? ColorConfig.success
+                                      : ColorConfig.midnight,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
-                          );
-                          
-                          try {
-                            // Call the refresh method
-                            final expenseController = ref.read(expenseNotifierProvider.notifier);
-                            await expenseController.refreshExpenseData(
-                              expenseDetails.id!,
-                              expenseDetails.boxId!,
+                            TextButton.icon(
+                              onPressed: () async {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Refreshing data...'),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                                try {
+                                  await _refreshExpenseData();
+                                  ref.invalidate(
+                                      expenseDetailsProvider(expenseId));
+                                  ref.invalidate(
+                                      getExpenseUsersForExpenseProvider(
+                                          expenseId));
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Data refreshed'),
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Error refreshing: $e'),
+                                        duration: const Duration(seconds: 2),
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              icon: const Icon(Icons.refresh, size: 16),
+                              label: const Text('Refresh'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: ColorConfig.secondary,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                minimumSize: const Size(0, 32),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: users.length,
+                          itemBuilder: (context, index) {
+                            final user = users[index];
+                            if (user.id == null) return const SizedBox.shrink();
+
+                            final expenseUser = expenseUsers.firstWhere(
+                              (eu) =>
+                                  ExpenseUserModel.fromJson(eu.data).userId ==
+                                  user.id,
+                              orElse: () => expenseUsers.first,
                             );
-                            
-                            // Invalidate providers to force UI refresh
-                            ref.invalidate(expenseDetailsProvider(expenseDetails.id!));
-                            ref.invalidate(getExpenseUsersForExpenseProvider(expenseDetails.id!));
-                            
-                            // Refresh local state
-                            await _refreshExpenseData();
-                            
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Data refreshed successfully'),
-                                  backgroundColor: Colors.green,
-                                  duration: Duration(seconds: 1),
-                                ),
-                              );
+                            final expenseUserModel =
+                                ExpenseUserModel.fromJson(expenseUser.data);
+
+                            String amountText;
+                            switch (splitType) {
+                              case 'percentage':
+                                amountText =
+                                    '${expenseUserModel.sharePercentage.toStringAsFixed(1)}% (${expenseUserModel.shareAmount.toStringAsFixed(2)} \$)';
+                                break;
+                              case 'shares':
+                                amountText =
+                                    '${expenseUserModel.shares} shares (${expenseUserModel.shareAmount.toStringAsFixed(2)} \$)';
+                                break;
+                              default:
+                                amountText =
+                                    '${expenseUserModel.shareAmount.toStringAsFixed(2)} \$';
                             }
-                          } catch (e) {
-                            print('Error refreshing data: $e');
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Error refreshing data: $e'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        icon: const Icon(Icons.refresh, size: 16),
-                        label: const Text('Refresh'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: ColorConfig.primarySwatch,
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage: user.profileImage != null
+                                        ? NetworkImage(user.profileImage!)
+                                        : null,
+                                    child: user.profileImage == null
+                                        ? Text(
+                                            user.userName?[0] ?? user.email[0],
+                                            style: FontConfig.h6(),
+                                          )
+                                        : null,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          user.userName ?? user.email,
+                                          style: FontConfig.body1().copyWith(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          amountText,
+                                          style: FontConfig.caption().copyWith(
+                                            color: ColorConfig.secondary,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (!expenseDetails.isSettled)
+                                    _userLoadingStates[user.id] == true
+                                        ? const SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : _userSettlementStates[user.id] == true
+                                            ? TextButton.icon(
+                                                onPressed: () async {
+                                                  // Show confirmation dialog
+                                                  final shouldCancel =
+                                                      await showDialog<bool>(
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        AlertDialog(
+                                                      title: const Text(
+                                                          'Cancel Settlement'),
+                                                      content: const Text(
+                                                          'Are you sure you want to cancel this settlement?'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () =>
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop(false),
+                                                          child:
+                                                              const Text('No'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () =>
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop(true),
+                                                          child:
+                                                              const Text('Yes'),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+
+                                                  if (shouldCancel == true) {
+                                                    // Update local state first
+                                                    setState(() {
+                                                      _userLoadingStates[
+                                                          user.id] = true;
+                                                    });
+
+                                                    try {
+                                                      final expenseController =
+                                                          ref.read(
+                                                              expenseNotifierProvider
+                                                                  .notifier);
+                                                      await expenseController
+                                                          .cancelSettleUpExpenseUser(
+                                                              expenseDetails
+                                                                  .id!,
+                                                              user.id!);
+
+                                                      // Update local state
+                                                      if (mounted) {
+                                                        setState(() {
+                                                          _userSettlementStates[
+                                                              user.id] = false;
+                                                          _userLoadingStates[
+                                                              user.id] = false;
+                                                        });
+                                                      }
+
+                                                      // Invalidate all relevant providers
+                                                      ref.invalidate(
+                                                          expenseNotifierProvider);
+                                                      ref.invalidate(
+                                                          expenseDetailsProvider(
+                                                              expenseDetails
+                                                                  .id!));
+                                                      ref.invalidate(
+                                                          getExpenseUsersForExpenseProvider(
+                                                              expenseDetails
+                                                                  .id!));
+                                                    } catch (e) {
+                                                      print(
+                                                          'Error canceling settlement: $e');
+                                                      if (mounted) {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                              content: Text(
+                                                                  'Failed to cancel settlement: $e')),
+                                                        );
+                                                        setState(() {
+                                                          _userLoadingStates[
+                                                              user.id] = false;
+                                                        });
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                icon: const Icon(Icons.undo,
+                                                    size: 16),
+                                                label: const Text(
+                                                    'Cancel Settlement'),
+                                                style: TextButton.styleFrom(
+                                                  foregroundColor:
+                                                      ColorConfig.error,
+                                                ),
+                                              )
+                                            : ElevatedButton(
+                                                onPressed: () async {
+                                                  // Ensure we have a valid user ID
+                                                  if (user.id == null) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                          content: Text(
+                                                              'Invalid user ID')),
+                                                    );
+                                                    return;
+                                                  }
+
+                                                  // Update local state first
+                                                  setState(() {
+                                                    _userLoadingStates[
+                                                        user.id] = true;
+                                                  });
+
+                                                  try {
+                                                    final expenseController =
+                                                        ref.read(
+                                                            expenseNotifierProvider
+                                                                .notifier);
+                                                    await expenseController
+                                                        .settleUpExpenseUser(
+                                                            expenseDetails.id!,
+                                                            user.id!);
+
+                                                    // Update local state
+                                                    if (mounted) {
+                                                      setState(() {
+                                                        _userSettlementStates[
+                                                            user.id] = true;
+                                                        _userLoadingStates[
+                                                            user.id] = false;
+                                                      });
+                                                    }
+
+                                                    // Invalidate all relevant providers
+                                                    ref.invalidate(
+                                                        expenseNotifierProvider);
+                                                    ref.invalidate(
+                                                        expenseDetailsProvider(
+                                                            expenseDetails
+                                                                .id!));
+                                                    ref.invalidate(
+                                                        getExpenseUsersForExpenseProvider(
+                                                            expenseDetails
+                                                                .id!));
+                                                  } catch (e) {
+                                                    print(
+                                                        'Error settling up: $e');
+                                                    if (mounted) {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                            content: Text(
+                                                                'Failed to settle up: $e')),
+                                                      );
+                                                      setState(() {
+                                                        _userLoadingStates[
+                                                            user.id] = false;
+                                                      });
+                                                    }
+                                                  }
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      ColorConfig.primarySwatch,
+                                                  foregroundColor: Colors.white,
+                                                ),
+                                                child: const Text('Settle'),
+                                              ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
                   ),
-                  
-                  const SizedBox(height: 16),
-                  ...users.map((user) {
-                    if (user.id == null) {
-                      return const SizedBox.shrink();
-                    }
-                    
-                    // Try to find the matching expense user
-                    Document? matchingExpenseUser;
-                    ExpenseUserModel? expenseUserModel;
-                    
-                    try {
-                      // First try exact match
-                      try {
-                        matchingExpenseUser = expenseUserDocs.firstWhere(
-                          (eu) {
-                            final model = ExpenseUserModel.fromJson(eu.data);
-                            return model.userId == user.id;
-                          },
-                        );
-                      } catch (e) {
-                        // If exact match fails, try prefix match (handling truncated IDs)
-                        print('Exact match failed for user ${user.id}, trying prefix match');
-                        matchingExpenseUser = expenseUserDocs.firstWhere(
-                          (eu) {
-                            final model = ExpenseUserModel.fromJson(eu.data);
-                            // Check if either ID starts with the other (handles truncation in either direction)
-                            final userId = model.userId;
-                            if (userId == null || user.id == null) return false;
-                            
-                            return userId.startsWith(user.id!) || user.id!.startsWith(userId);
-                          },
-                          orElse: () => throw Exception('No matching expense user found with prefix match'),
-                        );
-                      }
-                      
-                      expenseUserModel = ExpenseUserModel.fromJson(matchingExpenseUser.data);
-                    } catch (e) {
-                      print('Error finding expense user for ${user.id}: $e');
-                      // If we can't find a matching expense user, just skip this user
-                      return const SizedBox.shrink();
-                    }
-                    
-                    // Update local state on first load
-                    if (!_userSettlementStates.containsKey(user.id)) {
-                      _userSettlementStates[user.id] = expenseUserModel.isSettled;
-                    }
-                    
-                    // Find the payer user
-                    UserModel payerUser;
-                    try {
-                      payerUser = users.firstWhere(
-                        (u) => u.id == expenseDetails.payerId,
-                        orElse: () => throw Exception('Payer user not found'),
-                      );
-                    } catch (e) {
-                      print('Error finding payer user: $e');
-                      payerUser = user; // Fallback to current user if payer not found
-                    }
-                    
-                    final payerName = payerUser.userName ?? payerUser.email ?? 'Unknown';
-                    
-                    // Use our local state
-                    final isLoading = _userLoadingStates[user.id] ?? false;
-                    final isSettled = _userSettlementStates[user.id] ?? expenseUserModel.isSettled;
-                    
-                    String subtitle;
-                    if (isSettled) {
-                      subtitle = "Settled";
-                    } else if (user.id == expenseDetails.payerId) {
-                      subtitle = "Paid \$${expenseDetails.cost.toStringAsFixed(2)}";
-                    } else {
-                      subtitle = "Owes \$${expenseUserModel.cost.toStringAsFixed(2)} to $payerName";
-                    }
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: ListTileCard(
-                        leading: CircleAvatar(
-                          radius: 20,
-                          backgroundColor: ColorConfig.primarySwatch.withOpacity(0.1),
-                          backgroundImage: user.profileImage != null
-                              ? NetworkImage(user.profileImage!)
-                              : null,
-                          child: user.profileImage == null
-                              ? Text(
-                                  (user.userName ?? user.email ?? "?")[0].toUpperCase(),
-                                  style: FontConfig.body1().copyWith(
-                                    color: ColorConfig.primarySwatch,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                )
-                              : null,
-                        ),
-                        titleString: user.userName ?? user.email ?? "Unknown",
-                        subtitleString: isLoading ? "Updating status..." : subtitle,
-                        subtitleStyle: TextStyle(
-                          color: isSettled
-                              ? ColorConfig.success
-                              : user.id == expenseDetails.payerId
-                                  ? ColorConfig.primarySwatch
-                                  : ColorConfig.error,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        trailing: user.id != expenseDetails.payerId
-                            ? isLoading
-                                ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : isSettled
-                                    ? TextButton.icon(
-                                        onPressed: () async {
-                                          // Ensure we have a valid user ID
-                                          if (user.id == null) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Invalid user ID')),
-                                            );
-                                            return;
-                                          }
-
-                                          // Show confirmation dialog
-                                          final shouldCancel = await showDialog<bool>(
-                                            context: context,
-                                            builder: (context) => AlertDialog(
-                                              title: const Text('Cancel Settlement'),
-                                              content: const Text('Are you sure you want to cancel this settlement?'),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () => Navigator.of(context).pop(false),
-                                                  child: const Text('No'),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () => Navigator.of(context).pop(true),
-                                                  child: const Text('Yes'),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-
-                                          if (shouldCancel == true) {
-                                            // Update local state first
-                                            setState(() {
-                                              _userLoadingStates[user.id] = true;
-                                            });
-                                            
-                                            try {
-                                              final expenseController = ref.read(expenseNotifierProvider.notifier);
-                                              await expenseController.cancelSettleUpExpenseUser(expenseDetails.id!, user.id!);
-                                              
-                                              // Update local state
-                                              if (mounted) {
-                                                setState(() {
-                                                  _userSettlementStates[user.id] = false;
-                                                  _userLoadingStates[user.id] = false;
-                                                });
-                                              }
-                                              
-                                              // Invalidate all relevant providers
-                                              ref.invalidate(expenseNotifierProvider);
-                                              ref.invalidate(expenseDetailsProvider(expenseDetails.id!));
-                                              ref.invalidate(getExpenseUsersForExpenseProvider(expenseDetails.id!));
-                                            } catch (e) {
-                                              print('Error canceling settlement: $e');
-                                              if (mounted) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(content: Text('Failed to cancel settlement: $e')),
-                                                );
-                                                setState(() {
-                                                  _userLoadingStates[user.id] = false;
-                                                });
-                                              }
-                                            }
-                                          }
-                                        },
-                                        icon: const Icon(Icons.undo, size: 16),
-                                        label: const Text('Cancel Settlement'),
-                                        style: TextButton.styleFrom(
-                                          foregroundColor: ColorConfig.error,
-                                        ),
-                                      )
-                                    : ElevatedButton(
-                                        onPressed: () async {
-                                          // Ensure we have a valid user ID
-                                          if (user.id == null) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Invalid user ID')),
-                                            );
-                                            return;
-                                          }
-
-                                          // Update local state first
-                                          setState(() {
-                                            _userLoadingStates[user.id] = true;
-                                          });
-                                          
-                                          try {
-                                            final expenseController = ref.read(expenseNotifierProvider.notifier);
-                                            await expenseController.settleUpExpenseUser(expenseDetails.id!, user.id!);
-                                            
-                                            // Update local state
-                                            if (mounted) {
-                                              setState(() {
-                                                _userSettlementStates[user.id] = true;
-                                                _userLoadingStates[user.id] = false;
-                                              });
-                                            }
-                                            
-                                            // Invalidate all relevant providers
-                                            ref.invalidate(expenseNotifierProvider);
-                                            ref.invalidate(expenseDetailsProvider(expenseDetails.id!));
-                                            ref.invalidate(getExpenseUsersForExpenseProvider(expenseDetails.id!));
-                                          } catch (e) {
-                                            print('Error settling up: $e');
-                                            if (mounted) {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text('Failed to settle: $e')),
-                                              );
-                                              setState(() {
-                                                _userLoadingStates[user.id] = false;
-                                              });
-                                            }
-                                          }
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: ColorConfig.midnight,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        child: const Text('Settle'),
-                                      )
-                            : null,
-                      ),
-                    );
-                  }).toList(),
-                ],
-              ),
-            ),
-          ),
+                );
+              },
+            );
+          },
         );
       },
     );
-  }
-
-  // Helper method to compare maps
-  bool _mapsEqual(Map<String, dynamic>? map1, Map<String, dynamic>? map2) {
-    if (map1 == null && map2 == null) return true;
-    if (map1 == null || map2 == null) return false;
-    if (map1.length != map2.length) return false;
-    
-    for (final key in map1.keys) {
-      if (!map2.containsKey(key)) return false;
-      if (map1[key] != map2[key]) return false;
-    }
-    
-    return true;
-  }
-
-  // Helper method to fetch any users from the system as a last resort
-  Future<List<UserModel>> _fetchAnyUsers(WidgetRef ref) async {
-    try {
-      print('Attempting to fetch any users from the system as fallback');
-      // Try to get the current user first
-      final currentUser = ref.read(currentUserProvider);
-      if (currentUser != null) {
-        print('Using current user as fallback');
-        // Convert AuthUserModel to UserModel by fetching it from the repository
-        try {
-          final userController = ref.read(userNotifierProvider.notifier);
-          final userModel = await userController.getUserData(currentUser.id);
-          if (userModel != null) {
-            print('Successfully converted AuthUserModel to UserModel');
-            return [userModel];
-          }
-        } catch (e) {
-          print('Error converting current user to UserModel: $e');
-        }
-      }
-      
-      // If that fails, try to get users from the box
-      try {
-        final boxUsers = ref.read(userInBoxStoreProvider);
-        if (boxUsers.isNotEmpty) {
-          print('Using ${boxUsers.length} users from current box');
-          return boxUsers;
-        }
-      } catch (e) {
-        print('Error getting box users: $e');
-      }
-      
-      // Last resort - try to get any users via the repository
-      try {
-        final userRepository = ref.read(userRepositoryProvider);
-        final users = await userRepository.getUsersByIds([]);
-        if (users.isNotEmpty) {
-          print('Found ${users.length} users in system');
-          return users.take(3).toList(); // Limit to 3 users
-        }
-      } catch (e) {
-        print('Error fetching any users: $e');
-      }
-      
-      return [];
-    } catch (e) {
-      print('Error in _fetchAnyUsers: $e');
-      return [];
-    }
   }
 }
 

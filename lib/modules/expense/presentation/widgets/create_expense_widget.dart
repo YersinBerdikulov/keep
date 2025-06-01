@@ -632,6 +632,12 @@ class CreateExpenseCreateButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCurrency = ref.watch(expenseCurrencyProvider);
     final hasMultipleMembers = boxModel.boxUsers.length > 1;
+    final selectedSplitOption = ref.watch(selectedSplitOptionProvider);
+    final advancedMethod = ref.watch(advancedSplitMethodProvider);
+
+    // Check if a split method is selected
+    final hasSplitMethod = selectedSplitOption >= 0 ||
+        (advancedMethod != null && advancedMethod.isNotEmpty);
 
     return SafeArea(
       child: Padding(
@@ -641,7 +647,7 @@ class CreateExpenseCreateButton extends ConsumerWidget {
                 loading: () => true,
                 orElse: () => false,
               ),
-          onPressed: !hasMultipleMembers
+          onPressed: (!hasMultipleMembers || !hasSplitMethod)
               ? null
               : () {
                   if (formKey.currentState!.validate()) {
@@ -659,9 +665,11 @@ class CreateExpenseCreateButton extends ConsumerWidget {
                     ref.read(expenseCategoryIdProvider.notifier).state = null;
                   }
                 },
-          title: hasMultipleMembers
-              ? "Create"
-              : "Need more members to create expense",
+          title: !hasMultipleMembers
+              ? "Need more members to create expense"
+              : !hasSplitMethod
+                  ? "Select split method first"
+                  : "Create",
           textColor: ColorConfig.secondary,
         ),
       ),
