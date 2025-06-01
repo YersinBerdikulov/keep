@@ -664,7 +664,18 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
 
     // Filter expenses by category if one is selected
     final filteredExpenses = selectedCategory != null && _expenses != null
-        ? _expenses!.where((e) => e.categoryId == selectedCategory).toList()
+        ? _expenses!.where((e) {
+            if (e.categoryId == null) return false;
+            // Extract the category name from the ID (remove timestamp prefix)
+            final expenseCategoryName = e.categoryId!.contains('_')
+                ? e.categoryId!.split('_').sublist(1).join('_')
+                : e.categoryId!;
+            final selectedCategoryName = selectedCategory.contains('_')
+                ? selectedCategory.split('_').sublist(1).join('_')
+                : selectedCategory;
+            return expenseCategoryName.toLowerCase() ==
+                selectedCategoryName.toLowerCase();
+          }).toList()
         : _expenses;
 
     return Padding(
@@ -1015,11 +1026,43 @@ class _ExpenseCardItemState extends ConsumerState<ExpenseCardItem> {
                   ),
                   child: ListTileCard(
                     titleString: widget.expenseModel.title,
-                    trailing: Text("\$${widget.expenseModel.cost}"),
-                    visualDensity: const VisualDensity(vertical: -2),
-                    subtitleString: categoryData != null
-                        ? categoryData['name']
-                        : widget.expenseModel.createdAt!.toTimeAgo(),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text("\$${widget.expenseModel.cost}"),
+                        if (categoryData != null)
+                          Container(
+                            margin: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: ColorConfig.secondary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  categoryData['icon'],
+                                  size: 12,
+                                  color: ColorConfig.secondary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  categoryData['name'],
+                                  style: FontConfig.caption().copyWith(
+                                    color: ColorConfig.secondary,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                    visualDensity: const VisualDensity(vertical: -1),
+                    subtitleString: widget.expenseModel.createdAt!.toTimeAgo(),
                     leading: GestureDetector(
                       onTap: () {
                         if (widget.expenseModel.categoryId != null) {
