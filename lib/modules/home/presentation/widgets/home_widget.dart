@@ -7,6 +7,7 @@ import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/modules/home/domain/controllers/home_transactions_controller.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
@@ -552,24 +553,180 @@ class GroupCardWidget extends ConsumerWidget {
   }
 }
 
-class HomeWeeklyAnalytic extends StatelessWidget {
+class HomeWeeklyAnalytic extends ConsumerStatefulWidget {
   HomeWeeklyAnalytic({super.key});
 
-  final List<ChartData> chartData = <ChartData>[
-    ChartData(x: "SAT", y: 5),
-    ChartData(x: "SUN", y: 2),
-    ChartData(x: "MON", y: 8),
-    ChartData(x: "TUE", y: 4),
-    ChartData(x: "WEN", y: 7),
-    ChartData(x: "THU", y: 5),
-    ChartData(x: "FRI", y: 10),
-  ];
+  @override
+  ConsumerState<HomeWeeklyAnalytic> createState() => _HomeWeeklyAnalyticState();
+}
 
-  chartWidget() {
+class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
+  String? selectedDay;
+  List<RecentTransactionModel> dayTransactions = [];
+
+  // Helper method to get the week day name from a date
+  String _getDayName(DateTime date) {
+    switch (date.weekday) {
+      case DateTime.monday:
+        return "MON";
+      case DateTime.tuesday:
+        return "TUE";
+      case DateTime.wednesday:
+        return "WED";
+      case DateTime.thursday:
+        return "THU";
+      case DateTime.friday:
+        return "FRI";
+      case DateTime.saturday:
+        return "SAT";
+      case DateTime.sunday:
+        return "SUN";
+      default:
+        return "";
+    }
+  }
+
+  // Generate chart data from transactions
+  List<ChartData> _generateChartData(
+      List<RecentTransactionModel> transactions) {
+    // Get the current date and calculate the start of the week (Sunday)
+    final now = DateTime.now();
+    // Calculate start of week (Sunday)
+    final startOfWeek = DateTime(now.year, now.month, now.day - now.weekday);
+
+    print('Generating chart data from ${transactions.length} transactions');
+    print('Current date: ${now.toString()}');
+    print('Start of week: ${startOfWeek.toString()}');
+
+    // Initialize a map to hold daily totals
+    final Map<String, double> dailyTotals = {};
+
+    // Initialize with all days of the week with zero values
+    for (int i = 0; i < 7; i++) {
+      final day = startOfWeek.add(Duration(days: i));
+      final dayName = _getDayName(day);
+      dailyTotals[dayName] = 0.0;
+      print('Initialized day: $dayName for ${day.toString()}');
+    }
+
+    print('Initial daily totals: $dailyTotals');
+
+    // Sum up transactions for each day of the current week
+    for (var transaction in transactions) {
+      if (transaction.createdAt.isNotEmpty) {
+        try {
+          final transactionDate = DateTime.parse(transaction.createdAt);
+          print(
+              'Transaction date: ${transactionDate.toString()}, Amount: ${transaction.cost}');
+
+          // Calculate the start of the transaction's week
+          final transactionDay = DateTime(
+              transactionDate.year, transactionDate.month, transactionDate.day);
+          final daysSinceStartOfWeek =
+              transactionDay.difference(startOfWeek).inDays;
+
+          // Check if the transaction is from the current week (0-6 days from start of week)
+          if (daysSinceStartOfWeek >= 0 && daysSinceStartOfWeek < 7) {
+            final dayName = _getDayName(transactionDay);
+            dailyTotals[dayName] =
+                (dailyTotals[dayName] ?? 0) + transaction.cost.toDouble();
+            print(
+                'Added to $dayName: ${transaction.cost}, new total: ${dailyTotals[dayName]}');
+          } else {
+            print(
+                'Transaction outside current week range: $daysSinceStartOfWeek days from start of week');
+          }
+        } catch (e) {
+          print('Error parsing date: ${transaction.createdAt}, Error: $e');
+        }
+      } else {
+        print('Empty createdAt field in transaction');
+      }
+    }
+
+    print('Final daily totals: $dailyTotals');
+
+    // Convert to chart data format
+    final chartData = dailyTotals.entries
+        .map((entry) => ChartData(x: entry.key, y: entry.value))
+        .toList();
+
+    // Sort by day of week
+    final dayOrder = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    chartData.sort((a, b) => dayOrder.indexOf(a.x!) - dayOrder.indexOf(b.x!));
+
+    print('Chart data points: ${chartData.length}');
+    for (var data in chartData) {
+      print('Day: ${data.x}, Value: ${data.y}');
+    }
+
+    return chartData;
+  }
+
+  // Get transactions for a specific day
+  List<RecentTransactionModel> _getTransactionsForDay(
+      List<RecentTransactionModel> allTransactions, String dayName) {
+    // Get the current date and calculate the start of the week (Sunday)
+    final now = DateTime.now();
+    // Calculate start of week (Sunday)
+    final startOfWeek = DateTime(now.year, now.month, now.day - now.weekday);
+
+    // Find the date for the selected day
+    final dayOrder = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    final dayIndex = dayOrder.indexOf(dayName);
+    final selectedDate = startOfWeek.add(Duration(days: dayIndex));
+
+    print('Getting transactions for $dayName (${selectedDate.toString()})');
+
+    // Filter transactions for the selected day
+    final result = allTransactions.where((transaction) {
+      if (transaction.createdAt.isNotEmpty) {
+        try {
+          final transactionDate = DateTime.parse(transaction.createdAt);
+          final isSameDay = transactionDate.year == selectedDate.year &&
+              transactionDate.month == selectedDate.month &&
+              transactionDate.day == selectedDate.day;
+
+          if (isSameDay) {
+            print(
+                'Found matching transaction: ${transaction.title}, ${transaction.cost}');
+          }
+
+          return isSameDay;
+        } catch (e) {
+          print('Error parsing date: ${transaction.createdAt}, Error: $e');
+          return false;
+        }
+      }
+      return false;
+    }).toList();
+
+    print('Found ${result.length} transactions for $dayName');
+    return result;
+  }
+
+  chartWidget(
+      List<ChartData> chartData, List<RecentTransactionModel> allTransactions) {
+    // Find the maximum expense value for the Y-axis
+    double maxExpense = 0;
+    for (var data in chartData) {
+      if (data.y > maxExpense) maxExpense = data.y;
+    }
+    // Round up to the nearest 10 for a cleaner Y-axis
+    maxExpense = ((maxExpense / 10).ceil() * 10).toDouble();
+    // Ensure minimum scale
+    maxExpense = maxExpense < 10 ? 10 : maxExpense;
+
+    print('Max expense for chart: $maxExpense');
+
+    // Get current day name to highlight it
+    final currentDayName = _getDayName(DateTime.now());
+    print('Current day name: $currentDayName');
+
     return SfCartesianChart(
       margin: const EdgeInsets.fromLTRB(32, 32, 32, 16),
       plotAreaBorderWidth: 0,
-      primaryYAxis: CategoryAxis(
+      primaryYAxis: NumericAxis(
         axisLine: const AxisLine(width: 0),
         majorTickLines: const MajorTickLines(width: 0),
         majorGridLines: MajorGridLines(
@@ -578,14 +735,12 @@ class HomeWeeklyAnalytic extends StatelessWidget {
           color: ColorConfig.primarySwatch50.withOpacity(0.3),
         ),
         opposedPosition: true,
-        maximum: 10,
-        interval: 5,
-        edgeLabelPlacement: EdgeLabelPlacement.hide,
-        axisLabelFormatter: (axisLabelRenderArgs) => ChartAxisLabel(
-          "\$${axisLabelRenderArgs.text}00",
-          FontConfig.overline().copyWith(
-            color: ColorConfig.primarySwatch50,
-          ),
+        minimum: 0,
+        maximum: maxExpense,
+        interval: maxExpense > 0 ? maxExpense / 2 : 5,
+        labelFormat: '\${value}',
+        labelStyle: FontConfig.overline().copyWith(
+          color: ColorConfig.primarySwatch50,
         ),
       ),
       primaryXAxis: CategoryAxis(
@@ -606,16 +761,37 @@ class HomeWeeklyAnalytic extends StatelessWidget {
           borderRadius: BorderRadius.circular(50),
           spacing: 0.2,
           width: 0.8,
-          color: ColorConfig.secondary.withOpacity(0.3),
+          pointColorMapper: (ChartData data, _) => data.x == selectedDay
+              ? ColorConfig.primarySwatch
+              : data.x == currentDayName
+                  ? ColorConfig.secondary
+                  : ColorConfig.secondary.withOpacity(0.3),
           onPointTap: (pointInteractionDetails) {
-            // Handle bar tap
+            final pointIndex = pointInteractionDetails.pointIndex;
+            if (pointIndex != null &&
+                pointIndex >= 0 &&
+                pointIndex < chartData.length) {
+              final tappedDay = chartData[pointIndex].x;
+              setState(() {
+                // Toggle selection
+                selectedDay = selectedDay == tappedDay ? null : tappedDay;
+                if (selectedDay != null) {
+                  dayTransactions =
+                      _getTransactionsForDay(allTransactions, selectedDay!);
+                  print(
+                      'Selected day: $selectedDay, found ${dayTransactions.length} transactions');
+                } else {
+                  dayTransactions = [];
+                }
+              });
+            }
           },
         ),
       ],
       tooltipBehavior: TooltipBehavior(
         enable: true,
         canShowMarker: false,
-        format: 'point.x : \$point.y00',
+        format: 'point.x : \$point.y',
         header: '',
         textStyle: FontConfig.caption().copyWith(
           color: ColorConfig.white,
@@ -627,6 +803,9 @@ class HomeWeeklyAnalytic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get transactions data
+    final transactionsProvider = ref.watch(homeTransactionsProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -639,19 +818,47 @@ class HomeWeeklyAnalytic extends StatelessWidget {
                 "Weekly Analytics",
                 style: FontConfig.h6(),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: ColorConfig.secondary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  "This Week",
-                  style: FontConfig.caption().copyWith(
-                    color: ColorConfig.secondary,
+              Row(
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: ColorConfig.secondary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      "This Week",
+                      style: FontConfig.caption().copyWith(
+                        color: ColorConfig.secondary,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: () {
+                      // Refresh transactions data
+                      ref.invalidate(homeTransactionsProvider);
+                      // Clear selection
+                      setState(() {
+                        selectedDay = null;
+                        dayTransactions = [];
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: ColorConfig.secondary.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.refresh,
+                        color: ColorConfig.secondary,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -662,9 +869,274 @@ class HomeWeeklyAnalytic extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
             child: CardWidget(
-              child: chartWidget(),
+              child: transactionsProvider.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => Center(
+                  child: Text('Error loading analytics: $error'),
+                ),
+                data: (transactions) {
+                  if (transactions.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.bar_chart,
+                            size: 48,
+                            color: ColorConfig.secondary.withOpacity(0.3),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "No transaction data yet",
+                            style: FontConfig.body2().copyWith(
+                              color: ColorConfig.midnight.withOpacity(0.5),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Add expenses to see your weekly analytics",
+                            style: FontConfig.caption().copyWith(
+                              color: ColorConfig.midnight.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  final chartData = _generateChartData(transactions);
+                  if (chartData.every((data) => data.y == 0)) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.bar_chart,
+                            size: 48,
+                            color: ColorConfig.secondary.withOpacity(0.3),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "No expenses this week",
+                            style: FontConfig.body2().copyWith(
+                              color: ColorConfig.midnight.withOpacity(0.5),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Your weekly spending chart will appear here",
+                            style: FontConfig.caption().copyWith(
+                              color: ColorConfig.midnight.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return chartWidget(chartData, transactions);
+                },
+              ),
             ),
           ),
+        ),
+        // Show day detail if a day is selected
+        if (selectedDay != null && dayTransactions.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: CardWidget(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "$selectedDay Transactions",
+                        style: FontConfig.body1().copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            selectedDay = null;
+                            dayTransactions = [];
+                          });
+                        },
+                        child: Icon(
+                          Icons.close,
+                          size: 18,
+                          color: ColorConfig.midnight.withOpacity(0.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ...dayTransactions
+                      .take(3)
+                      .map(
+                        (transaction) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: ColorConfig.secondary.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.account_balance_wallet,
+                                  color: ColorConfig.secondary,
+                                  size: 16,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  transaction.title,
+                                  style: FontConfig.caption(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Text(
+                                "\$${transaction.cost.toStringAsFixed(2)}",
+                                style: FontConfig.caption().copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: ColorConfig.error,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  if (dayTransactions.length > 3)
+                    Align(
+                      alignment: Alignment.center,
+                      child: TextButton(
+                        onPressed: () {
+                          // Navigate to a filtered view of transactions for this day
+                          ref.invalidate(homeTransactionsProvider);
+                          context.push(RouteName.allTransactions);
+                        },
+                        child: Text(
+                          "View all ${dayTransactions.length} transactions",
+                          style: FontConfig.caption().copyWith(
+                            color: ColorConfig.secondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        const SizedBox(height: 16),
+        transactionsProvider.when(
+          loading: () => const SizedBox(),
+          error: (_, __) => const SizedBox(),
+          data: (transactions) {
+            // Calculate weekly summary
+            final now = DateTime.now();
+            final startOfWeek = now.subtract(Duration(days: now.weekday % 7));
+
+            double weeklyTotal = 0;
+            int transactionCount = 0;
+
+            // Sum up transactions for the week
+            for (var transaction in transactions) {
+              if (transaction.createdAt.isNotEmpty) {
+                final transactionDate = DateTime.parse(transaction.createdAt);
+                if (transactionDate.isAfter(startOfWeek) &&
+                    transactionDate
+                        .isBefore(now.add(const Duration(days: 1)))) {
+                  weeklyTotal += transaction.cost.toDouble();
+                  transactionCount++;
+                }
+              }
+            }
+
+            // Calculate average daily expense
+            final daysInWeek =
+                DateTime.now().weekday == 0 ? 7 : DateTime.now().weekday;
+            final dailyAverage = daysInWeek > 0 ? weeklyTotal / daysInWeek : 0;
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CardWidget(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Weekly Total",
+                            style: FontConfig.caption().copyWith(
+                              color: ColorConfig.midnight.withOpacity(0.6),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "\$${weeklyTotal.toStringAsFixed(2)}",
+                            style: FontConfig.h6().copyWith(
+                              color: ColorConfig.error,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "$transactionCount transactions",
+                            style: FontConfig.overline().copyWith(
+                              color: ColorConfig.midnight.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CardWidget(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Daily Average",
+                            style: FontConfig.caption().copyWith(
+                              color: ColorConfig.midnight.withOpacity(0.6),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "\$${dailyAverage.toStringAsFixed(2)}",
+                            style: FontConfig.h6().copyWith(
+                              color: ColorConfig.secondary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "This week",
+                            style: FontConfig.overline().copyWith(
+                              color: ColorConfig.midnight.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ],
     );
@@ -890,7 +1362,10 @@ class HomeRecentTransaction extends ConsumerWidget {
 }
 
 class ChartData {
-  ChartData({this.x, this.y});
-  final String? x;
-  final double? y;
+  ChartData({required this.x, required this.y});
+  final String x;
+  final double y;
+
+  @override
+  String toString() => 'ChartData(x: $x, y: $y)';
 }
