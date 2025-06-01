@@ -45,6 +45,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     // Invalidate and refresh providers
     ref.invalidate(homeNotifierProvider);
     ref.invalidate(userNotifierProvider);
+    ref.invalidate(homeTransactionsProvider);
   }
 
   @override
@@ -108,6 +109,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ref.refresh(homeNotifierProvider.future),
                     ref.refresh(groupNotifierProvider.future),
                     ref.refresh(boxNotifierProvider('').future),
+                    ref.refresh(homeTransactionsProvider.future),
                   ]);
                 },
                 child: SingleChildScrollView(

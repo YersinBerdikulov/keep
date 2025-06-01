@@ -58,8 +58,10 @@ class RecentTransactionModel {
   }
 }
 
-class HomeTransactionsNotifier extends AsyncNotifier<List<RecentTransactionModel>> {
-  ExpenseRepository get _expenseRepository => ref.read(expenseRepositoryProvider);
+class HomeTransactionsNotifier
+    extends AsyncNotifier<List<RecentTransactionModel>> {
+  ExpenseRepository get _expenseRepository =>
+      ref.read(expenseRepositoryProvider);
 
   @override
   Future<List<RecentTransactionModel>> build() async {
@@ -73,31 +75,35 @@ class HomeTransactionsNotifier extends AsyncNotifier<List<RecentTransactionModel
       final user = ref.read(currentUserProvider);
       if (user == null) return [];
 
-      // Get user's expenses
+      // Get user's expenses with cache disabled to ensure fresh data
       final expenses = await _expenseRepository.getRecentExpenses(user.id!);
-      
+
       // Convert to transaction models and sort by creation date (newest first)
-      final transactions = expenses
-          .map((expense) {
-            final expenseModel = ExpenseModel.fromJson(expense.data);
-            return RecentTransactionModel.fromExpense(expenseModel);
-          })
-          .toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      
+      final transactions = expenses.map((expense) {
+        final expenseModel = ExpenseModel.fromJson(expense.data);
+        return RecentTransactionModel.fromExpense(expenseModel);
+      }).toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
       return transactions;
     } catch (e) {
       print('Error fetching transactions: $e');
       return [];
     }
   }
-  
+
   // Method to get only the most recent transactions for the home page
   List<RecentTransactionModel> getRecentTransactions() {
     final transactions = state.value;
     if (transactions == null || transactions.isEmpty) return [];
-    
+
     // Return only the most recent 5 transactions
     return transactions.take(5).toList();
   }
-} 
+
+  // Method to explicitly refresh the transactions data
+  Future<void> refreshTransactions() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => getAllTransactions());
+  }
+}

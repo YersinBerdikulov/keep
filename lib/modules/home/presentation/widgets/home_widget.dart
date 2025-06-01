@@ -674,7 +674,7 @@ class HomeWeeklyAnalytic extends StatelessWidget {
 class HomeRecentTransaction extends ConsumerWidget {
   const HomeRecentTransaction({super.key});
 
-  _recentTransactionsTitle(BuildContext context) {
+  _recentTransactionsTitle(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 10, 10),
       child: Row(
@@ -687,6 +687,8 @@ class HomeRecentTransaction extends ConsumerWidget {
           const Spacer(),
           InkWell(
             onTap: () {
+              // Refresh transactions data before navigating
+              ref.invalidate(homeTransactionsProvider);
               // Navigate to the AllTransactionsPage
               context.push(RouteName.allTransactions);
             },
@@ -748,123 +750,140 @@ class HomeRecentTransaction extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionsProvider = ref.watch(homeTransactionsProvider);
 
+    // Function to refresh transaction data
+    void refreshTransactions() {
+      ref.invalidate(homeTransactionsProvider);
+    }
+
     return Column(
       children: [
-        _recentTransactionsTitle(context),
+        _recentTransactionsTitle(context, ref),
         transactionsProvider.when(
-          loading: () => const Center(
-            child: SizedBox(
-              height: 120,
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          error: (error, stack) => Center(
-            child: SizedBox(
-              height: 120,
-              child: Text('Error: $error'),
-            ),
-          ),
-          data: (transactions) {
-            // Get only the most recent 5 transactions for the home page preview
-            final recentTransactions = ref.read(homeTransactionsProvider.notifier).getRecentTransactions();
-            
-            if (recentTransactions.isEmpty) {
-              return const SizedBox(
-                height: 120,
-                child: Center(
-                  child: Text('No recent transactions'),
+            loading: () => const Center(
+                  child: SizedBox(
+                    height: 120,
+                    child: CircularProgressIndicator(),
+                  ),
                 ),
-              );
-            }
-            
-            return SizedBox(
-              height: 120,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: recentTransactions.length,
-                itemBuilder: (context, index) {
-                  final transaction = recentTransactions[index];
-                  return SizedBox(
-                    width: 160,
-                    child: CardWidget(
-                      padding: const EdgeInsets.all(16),
-                      margin: const EdgeInsets.only(right: 10),
-                      child: InkWell(
-                        onTap: () {
-                          // Navigate to expense detail page when clicked
-                          if (transaction.id.isNotEmpty) {
-                            // Pass expense ID as an extra parameter rather than in the URL path
-                            context.push(
-                              RouteName.expenseDetail,
-                              extra: {'expenseId': transaction.id},
-                            );
-                          }
-                        },
-                        borderRadius: BorderRadius.circular(12),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    transaction.title,
-                                    style: FontConfig.body2(),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+            error: (error, stack) => Center(
+                  child: SizedBox(
+                    height: 120,
+                    child: Text('Error: $error'),
+                  ),
+                ),
+            data: (transactions) {
+              // Get only the most recent 5 transactions for the home page preview
+              final recentTransactions = ref
+                  .read(homeTransactionsProvider.notifier)
+                  .getRecentTransactions();
+
+              if (recentTransactions.isEmpty) {
+                return const SizedBox(
+                  height: 120,
+                  child: Center(
+                    child: Text('No recent transactions'),
+                  ),
+                );
+              }
+
+              return SizedBox(
+                height: 120,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: recentTransactions.length,
+                  itemBuilder: (context, index) {
+                    final transaction = recentTransactions[index];
+                    return SizedBox(
+                      width: 160,
+                      child: CardWidget(
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.only(right: 10),
+                        child: InkWell(
+                          onTap: () {
+                            // Navigate to expense detail page when clicked
+                            if (transaction.id.isNotEmpty) {
+                              // Pass expense ID as an extra parameter rather than in the URL path
+                              context.push(
+                                RouteName.expenseDetail,
+                                extra: {'expenseId': transaction.id},
+                              );
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      transaction.title,
+                                      style: FontConfig.body2(),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    color: ColorConfig.secondary.withOpacity(0.1),
-                                    shape: BoxShape.circle,
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: ColorConfig.secondary
+                                          .withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      _getCategoryIcon(transaction.categoryId),
+                                      color: ColorConfig.secondary,
+                                      size: 16,
+                                    ),
                                   ),
-                                  child: Icon(
-                                    _getCategoryIcon(transaction.categoryId),
-                                    color: ColorConfig.secondary,
-                                    size: 16,
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    transaction.creatorId ==
+                                            (ref
+                                                    .read(currentUserProvider)
+                                                    ?.id ??
+                                                '')
+                                        ? "You paid"
+                                        : "You owe",
+                                    style: FontConfig.overline().copyWith(
+                                      color:
+                                          ColorConfig.midnight.withOpacity(0.5),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  transaction.creatorId == (ref.read(currentUserProvider)?.id ?? '')
-                                      ? "You paid"
-                                      : "You owe",
-                                  style: FontConfig.overline().copyWith(
-                                    color: ColorConfig.midnight.withOpacity(0.5),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "\$${transaction.cost.toStringAsFixed(2)}",
+                                    style: FontConfig.body1().copyWith(
+                                      color: transaction.creatorId ==
+                                              (ref
+                                                      .read(currentUserProvider)
+                                                      ?.id ??
+                                                  '')
+                                          ? ColorConfig.error
+                                          : ColorConfig.secondary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  "\$${transaction.cost.toStringAsFixed(2)}",
-                                  style: FontConfig.body1().copyWith(
-                                    color: transaction.creatorId == (ref.read(currentUserProvider)?.id ?? '')
-                                        ? ColorConfig.error
-                                        : ColorConfig.secondary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            );
-          }
-        ),
+                    );
+                  },
+                ),
+              );
+            }),
       ],
     );
   }

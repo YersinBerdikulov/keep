@@ -13,11 +13,26 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class AllTransactionsPage extends ConsumerWidget {
+class AllTransactionsPage extends ConsumerStatefulWidget {
   const AllTransactionsPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AllTransactionsPage> createState() =>
+      _AllTransactionsPageState();
+}
+
+class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Refresh data when page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(homeTransactionsProvider);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Use the full transactions list directly from the provider
     final transactionsProvider = ref.watch(homeTransactionsProvider);
     final categoriesProvider = ref.watch(categoryNotifierProvider);
@@ -48,68 +63,77 @@ class AllTransactionsPage extends ConsumerWidget {
             ),
             data: (categories) {
               // Group transactions by date
-              final groupedTransactions = <String, List<RecentTransactionModel>>{};
-              
+              final groupedTransactions =
+                  <String, List<RecentTransactionModel>>{};
+
               for (var transaction in transactions) {
-                final date = transaction.createdAt.isNotEmpty 
-                    ? DateFormat('yyyy-MM-dd').format(DateTime.parse(transaction.createdAt))
+                final date = transaction.createdAt.isNotEmpty
+                    ? DateFormat('yyyy-MM-dd')
+                        .format(DateTime.parse(transaction.createdAt))
                     : 'Unknown Date';
-                
+
                 if (!groupedTransactions.containsKey(date)) {
                   groupedTransactions[date] = [];
                 }
-                
+
                 groupedTransactions[date]!.add(transaction);
               }
-              
+
               // Sort dates newest first
               final sortedDates = groupedTransactions.keys.toList()
                 ..sort((a, b) => b.compareTo(a));
 
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: sortedDates.length,
-                itemBuilder: (context, index) {
-                  final date = sortedDates[index];
-                  final dateTransactions = groupedTransactions[date]!;
-                  
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Text(
-                          _formatDate(date),
-                          style: FontConfig.h6().copyWith(
-                            fontWeight: FontWeight.bold,
+              return RefreshIndicator(
+                onRefresh: () async {
+                  // Refresh transactions data
+                  await ref.refresh(homeTransactionsProvider.future);
+                },
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: sortedDates.length,
+                  itemBuilder: (context, index) {
+                    final date = sortedDates[index];
+                    final dateTransactions = groupedTransactions[date]!;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            _formatDate(date),
+                            style: FontConfig.h6().copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      ...dateTransactions.map((transaction) {
-                        final category = categories.firstWhere(
-                          (c) => c.id == transaction.categoryId,
-                          orElse: () => Category(
-                            name: 'Other', 
-                            icon: 'others',
-                          ),
-                        );
-                        
-                        return TransactionCard(
-                          transaction: transaction,
-                          category: category,
-                          currentUserId: ref.read(currentUserProvider)?.id ?? '',
-                          onTap: () {
-                            context.push(
-                              RouteName.expenseDetail,
-                              extra: {'expenseId': transaction.id},
-                            );
-                          },
-                        );
-                      }).toList(),
-                      const SizedBox(height: 8),
-                    ],
-                  );
-                },
+                        ...dateTransactions.map((transaction) {
+                          final category = categories.firstWhere(
+                            (c) => c.id == transaction.categoryId,
+                            orElse: () => Category(
+                              name: 'Other',
+                              icon: 'others',
+                            ),
+                          );
+
+                          return TransactionCard(
+                            transaction: transaction,
+                            category: category,
+                            currentUserId:
+                                ref.read(currentUserProvider)?.id ?? '',
+                            onTap: () {
+                              context.push(
+                                RouteName.expenseDetail,
+                                extra: {'expenseId': transaction.id},
+                              );
+                            },
+                          );
+                        }).toList(),
+                        const SizedBox(height: 8),
+                      ],
+                    );
+                  },
+                ),
               );
             },
           );
@@ -120,15 +144,17 @@ class AllTransactionsPage extends ConsumerWidget {
 
   String _formatDate(String dateStr) {
     if (dateStr == 'Unknown Date') return dateStr;
-    
+
     try {
       final date = DateTime.parse(dateStr);
       final now = DateTime.now();
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
-      
-      if (DateFormat('yyyy-MM-dd').format(date) == DateFormat('yyyy-MM-dd').format(now)) {
+
+      if (DateFormat('yyyy-MM-dd').format(date) ==
+          DateFormat('yyyy-MM-dd').format(now)) {
         return 'Today';
-      } else if (DateFormat('yyyy-MM-dd').format(date) == DateFormat('yyyy-MM-dd').format(yesterday)) {
+      } else if (DateFormat('yyyy-MM-dd').format(date) ==
+          DateFormat('yyyy-MM-dd').format(yesterday)) {
         return 'Yesterday';
       } else {
         return DateFormat('MMMM d, yyyy').format(date);
@@ -144,7 +170,7 @@ class TransactionCard extends StatelessWidget {
   final Category category;
   final String currentUserId;
   final VoidCallback onTap;
-  
+
   const TransactionCard({
     Key? key,
     required this.transaction,
@@ -179,7 +205,7 @@ class TransactionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCreator = transaction.creatorId == currentUserId;
-    
+
     return CardWidget(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
@@ -231,13 +257,15 @@ class TransactionCard extends StatelessWidget {
                   '\$${transaction.cost.toStringAsFixed(2)}',
                   style: FontConfig.body1().copyWith(
                     fontWeight: FontWeight.bold,
-                    color: isCreator ? ColorConfig.error : ColorConfig.secondary,
+                    color:
+                        isCreator ? ColorConfig.error : ColorConfig.secondary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 if (transaction.createdAt.isNotEmpty)
                   Text(
-                    DateFormat('h:mm a').format(DateTime.parse(transaction.createdAt)),
+                    DateFormat('h:mm a')
+                        .format(DateTime.parse(transaction.createdAt)),
                     style: FontConfig.caption().copyWith(
                       color: ColorConfig.midnight.withOpacity(0.5),
                     ),
@@ -249,4 +277,4 @@ class TransactionCard extends StatelessWidget {
       ),
     );
   }
-} 
+}

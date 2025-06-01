@@ -19,7 +19,7 @@ class ExpenseRemoteDataSource {
     try {
       // Create a copy of the data for better debugging
       final data = expenseModel.toJson();
-      
+
       // Add a plain createdAt field that Appwrite expects
       // This is necessary because the model uses $createdAt but Appwrite expects createdAt
       if (data[r'$createdAt'] != null) {
@@ -156,27 +156,35 @@ class ExpenseRemoteDataSource {
       modelData.remove('\$id');
       modelData.remove('\$createdAt');
       modelData.remove('\$updatedAt');
-      
+
       // Add required timestamps
       final now = DateTime.now().toIso8601String();
       modelData['createdAt'] = now;
       if (modelData['updatedBy'] != null && modelData['updatedAt'] == null) {
         modelData['updatedAt'] = now;
       }
-      
+
       // Ensure all required fields are present
       final requiredFields = [
-        'userId', 'groupId', 'boxId', 'expenseId', 'cost',
-        'isPaid', 'createdAt', 'splitType', 'currency',
-        'recipients', 'status'
+        'userId',
+        'groupId',
+        'boxId',
+        'expenseId',
+        'cost',
+        'isPaid',
+        'createdAt',
+        'splitType',
+        'currency',
+        'recipients',
+        'status'
       ];
-      
+
       for (var field in requiredFields) {
         if (!modelData.containsKey(field) || modelData[field] == null) {
           throw Exception('Missing required field: $field');
         }
       }
-      
+
       print('Data to be sent: $modelData');
 
       final document = await _db.createDocument(
@@ -201,7 +209,8 @@ class ExpenseRemoteDataSource {
 
       return left(
         Failure(
-          e.message ?? 'Some unexpected error occurred while creating expense user',
+          e.message ??
+              'Some unexpected error occurred while creating expense user',
           st,
         ),
       );
@@ -333,41 +342,49 @@ class ExpenseRemoteDataSource {
   Future<List<Document>> getRecentExpenses(String uid) async {
     try {
       print('Fetching all expenses for user: $uid');
-      
+
+      // Add a cache-busting timestamp query parameter
+      final cacheKey = DateTime.now().millisecondsSinceEpoch.toString();
+
       // First, get all expenses where the user is the creator
       final creatorExpenses = await _db.listDocuments(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.expenseCollection,
         queries: [
-          Query.orderDesc('\$createdAt'),  // Sort by creation date (newest first)
-          Query.equal('creatorId', uid),   // User is the creator
+          Query.orderDesc(
+              '\$createdAt'), // Sort by creation date (newest first)
+          Query.equal('creatorId', uid), // User is the creator
+          Query.limit(100), // Limit to 100 most recent expenses
         ],
       );
-      
+
       // Then, get all expenses where the user is a participant (in expenseUsers array)
       final participantExpenses = await _db.listDocuments(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.expenseCollection,
         queries: [
-          Query.orderDesc('\$createdAt'),  // Sort by creation date (newest first)
-          Query.search('expenseUsers', uid),  // User is in the expense users list
+          Query.orderDesc(
+              '\$createdAt'), // Sort by creation date (newest first)
+          Query.search(
+              'expenseUsers', uid), // User is in the expense users list
+          Query.limit(100), // Limit to 100 most recent expenses
         ],
       );
-      
+
       // Combine both sets of expenses, removing duplicates
       final allExpenses = [...creatorExpenses.documents];
-      
+
       // Add participant expenses that aren't already in the list (avoid duplicates)
       for (var expense in participantExpenses.documents) {
         if (!allExpenses.any((e) => e.$id == expense.$id)) {
           allExpenses.add(expense);
         }
       }
-      
+
       // Sort all expenses by creation date (newest first)
-      allExpenses.sort((a, b) => 
-        (b.data['\$createdAt'] ?? '').compareTo(a.data['\$createdAt'] ?? ''));
-      
+      allExpenses.sort((a, b) =>
+          (b.data['\$createdAt'] ?? '').compareTo(a.data['\$createdAt'] ?? ''));
+
       print('Found ${allExpenses.length} total expenses for user');
       return allExpenses;
     } catch (e) {
@@ -429,7 +446,7 @@ class ExpenseRemoteDataSource {
       print('Note: Error in cache refresh operation: $e');
     }
   }
-  
+
   Future<void> clearCacheForExpenseUsers(String expenseId) async {
     try {
       // This is a dummy operation that forces a refresh of the cache
@@ -447,16 +464,18 @@ class ExpenseRemoteDataSource {
       print('Note: Error in cache refresh operation: $e');
     }
   }
-  
+
   Future<List<Document>> getAllUsers() async {
     try {
       print('Fetching all users from database');
       final documents = await _db.listDocuments(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.usersCollection,
-        queries: [Query.limit(100)], // Use Query.limit instead of limit parameter
+        queries: [
+          Query.limit(100)
+        ], // Use Query.limit instead of limit parameter
       );
-      
+
       print('Found ${documents.documents.length} users in database');
       return documents.documents;
     } catch (e) {
@@ -464,7 +483,7 @@ class ExpenseRemoteDataSource {
       return [];
     }
   }
-  
+
   Future<Document> getUserDataById(String userId) async {
     try {
       print('Fetching user data for ID: $userId');
