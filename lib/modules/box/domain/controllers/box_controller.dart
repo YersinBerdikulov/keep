@@ -112,20 +112,28 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
   }) async {
     state = const AsyncValue.loading();
     try {
+      print('Starting box update for boxId: $boxId');
+      print('Received boxUsers: $boxUsers');
+
       // First get the current box data
       final currentBox = await boxRepository.getBoxDetail(boxId);
       final currentBoxModel = BoxModel.fromJson(currentBox.data);
-      
+
+      print('Current box members: ${currentBoxModel.boxUsers}');
+
       // Check if current user has permission to update
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) throw Exception('User not logged in');
-      
+
       final isCreator = currentBoxModel.creatorId == currentUser.id;
-      final canEdit = await ref.read(groupNotifierProvider.notifier)
-          .canUserDeleteItem(currentUser.id!, currentBoxModel.groupId, currentBoxModel.creatorId);
-      
+      final canEdit = await ref
+          .read(groupNotifierProvider.notifier)
+          .canUserDeleteItem(currentUser.id!, currentBoxModel.groupId,
+              currentBoxModel.creatorId);
+
       if (!isCreator && !canEdit) {
-        throw Exception('Only the box creator or group admin can update this box');
+        throw Exception(
+            'Only the box creator or group admin can update this box');
       }
 
       // Prepare update data with all existing fields
@@ -150,26 +158,35 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
         updateData['expenseIds'] = expenseIds;
       }
       if (boxUsers != null) {
+        print('Updating box users to: $boxUsers');
         updateData['boxUsers'] = boxUsers;
       }
       if (total != null) {
         updateData['total'] = total;
       }
 
+      print('Final update data: $updateData');
       final updateBoxModel = BoxModel.fromJson(updateData);
+      print('Converted BoxModel members: ${updateBoxModel.boxUsers}');
+
       final res = await boxRepository.updateBox(updateBoxModel);
 
       res.fold(
         (l) => state = AsyncValue.error(l.message, l.stackTrace),
         (r) async {
+          print('Box update successful');
           // Fetch the updated box details
           final updatedBox = await boxRepository.getBoxDetail(boxId);
           if (updatedBox != null) {
+            final updatedBoxModel = BoxModel.fromJson(updatedBox.data);
+            print(
+                'Updated box members after save: ${updatedBoxModel.boxUsers}');
+
             // Update the box in the state
             final currentBoxes = state.value ?? [];
             final updatedBoxes = currentBoxes.map((box) {
               if (box.id == boxId) {
-                return BoxModel.fromJson(updatedBox.data);
+                return updatedBoxModel;
               }
               return box;
             }).toList();
@@ -178,6 +195,7 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
         },
       );
     } catch (e, st) {
+      print('Error updating box: $e');
       state = AsyncValue.error(e, st);
     }
   }
@@ -191,14 +209,17 @@ class BoxNotifier extends FamilyAsyncNotifier<List<BoxModel>, String> {
       // Check if current user has permission to delete
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) throw Exception('User not logged in');
-      
-      final canDelete = await ref.read(groupNotifierProvider.notifier)
-          .canUserDeleteItem(currentUser.id!, boxModel.groupId, boxModel.creatorId);
-      
+
+      final canDelete = await ref
+          .read(groupNotifierProvider.notifier)
+          .canUserDeleteItem(
+              currentUser.id!, boxModel.groupId, boxModel.creatorId);
+
       if (!canDelete) {
-        throw Exception('Only the box creator or group admin can delete this box');
+        throw Exception(
+            'Only the box creator or group admin can delete this box');
       }
-      
+
       // Remove the box from the server
       final res = await boxRepository.deleteBox(boxModel.id!);
 

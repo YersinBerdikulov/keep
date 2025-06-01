@@ -169,7 +169,8 @@ class ReviewBodyBoxDetail extends ConsumerWidget {
 
 class FriendListBoxDetail extends ConsumerStatefulWidget {
   final BoxModel boxModel;
-  const FriendListBoxDetail(this.boxModel, {super.key});
+  final Function(BoxModel)? onBoxUpdate;
+  const FriendListBoxDetail(this.boxModel, {this.onBoxUpdate, super.key});
 
   @override
   ConsumerState<FriendListBoxDetail> createState() =>
@@ -302,11 +303,20 @@ class _FriendListBoxDetailState extends ConsumerState<FriendListBoxDetail> {
         (box) => box.id == widget.boxModel.id,
         orElse: () => widget.boxModel,
       );
-      if (updatedBox.id == widget.boxModel.id &&
-          !listEquals(updatedBox.boxUsers, widget.boxModel.boxUsers)) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _fetchUsers();
-        });
+
+      // Enhanced member update check
+      if (updatedBox.id == widget.boxModel.id) {
+        final hasUserChanges =
+            !listEquals(updatedBox.boxUsers, widget.boxModel.boxUsers);
+        final hasDataChanges = updatedBox != widget.boxModel;
+
+        if (hasUserChanges || hasDataChanges) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _fetchUsers();
+            // Notify parent widget of box update if needed
+            widget.onBoxUpdate?.call(updatedBox);
+          });
+        }
       }
     });
 

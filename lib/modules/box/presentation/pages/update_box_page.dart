@@ -22,6 +22,7 @@ class UpdateBoxPage extends HookConsumerWidget {
     final boxDescription = useTextEditingController(text: boxModel.description);
     final oldBoxImage = useState<String?>(boxModel.image);
     final newBoxImage = useState<File?>(null);
+    final selectedMembers = useState<Set<String>>({});
 
     /// by using listen we are not gonna rebuild our app
     ref.listen<AsyncValue<List<BoxModel>>>(
@@ -46,25 +47,34 @@ class UpdateBoxPage extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: ColorConfig.white,
       appBar: AppBarWidget(title: "Update Box"),
-      body: Column(
-        children: [
-          UpdateBoxInfoCard(
-            oldGroupImage: oldBoxImage,
-            newGroupImage: newBoxImage,
-            boxTitle: boxTitle,
-            boxDescription: boxDescription,
-            formKey: _formKey,
-          ),
-          const UpdateBoxSelectFriends(),
-          const Spacer(),
-          UpdateBoxButton(
-            formKey: _formKey,
-            newBoxImage: newBoxImage,
-            boxTitle: boxTitle,
-            boxDescription: boxDescription,
-            boxModel: boxModel,
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            UpdateBoxInfoCard(
+              oldGroupImage: oldBoxImage,
+              newGroupImage: newBoxImage,
+              boxTitle: boxTitle,
+              boxDescription: boxDescription,
+              formKey: _formKey,
+            ),
+            UpdateBoxSelectFriends(
+              boxModel: boxModel,
+              onMembersSelected: (members) {
+                selectedMembers.value = members;
+              },
+            ),
+            const SizedBox(height: 20),
+            UpdateBoxButton(
+              formKey: _formKey,
+              newBoxImage: newBoxImage,
+              boxTitle: boxTitle,
+              boxDescription: boxDescription,
+              boxModel: boxModel,
+              selectedMembers: selectedMembers.value,
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

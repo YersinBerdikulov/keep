@@ -16,7 +16,6 @@ import '../../../../shared/widgets/loading/loading.dart';
 import '../widgets/box_detail_widget.dart';
 import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
 
-// Convert to StatefulWidget to prevent infinite refreshes
 class BoxDetailPage extends ConsumerStatefulWidget {
   final String boxId;
   final GroupModel groupModel;
@@ -33,7 +32,6 @@ class BoxDetailPage extends ConsumerStatefulWidget {
 class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
   BoxModel? _boxModel;
   bool _isLoading = true;
-  String? _error;
   final _refreshKey = GlobalKey<RefreshIndicatorState>();
 
   @override
@@ -47,11 +45,9 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
 
     setState(() {
       _isLoading = true;
-      _error = null;
     });
 
     try {
-      // Get repository directly to bypass provider system
       final boxRepository = ref.read(boxRepositoryProvider);
 
       // Fetch box details directly from repository
@@ -59,34 +55,30 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
 
       if (!mounted) return;
 
-      setState(() {
-        _boxModel = BoxModel.fromJson(boxResult.data);
-        _isLoading = false;
-      });
+      try {
+        setState(() {
+          _boxModel = BoxModel.fromJson(boxResult.data);
+          _isLoading = false;
+        });
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        if (mounted) {
+          showSnackBar(context, content: 'Error loading box: ${e.toString()}');
+        }
+      }
     } catch (e) {
       if (!mounted) return;
-
       setState(() {
-        _error = e.toString();
         _isLoading = false;
       });
+      showSnackBar(context, content: e.toString());
     }
   }
 
   Future<void> _handleRefresh() async {
-    try {
-      // Fetch fresh box details
-      await _fetchBoxDetail();
-
-      // Notify expense list to refresh
-      if (mounted) {
-        ref.invalidate(expenseNotifierProvider);
-      }
-    } catch (e) {
-      if (mounted) {
-        showSnackBar(context, content: 'Error refreshing: ${e.toString()}');
-      }
-    }
+    await _fetchBoxDetail();
   }
 
   @override
@@ -94,15 +86,7 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
     if (_isLoading) {
       return const Scaffold(
         body: Center(
-          child: LoadingWidget(),
-        ),
-      );
-    }
-
-    if (_error != null) {
-      return Scaffold(
-        body: Center(
-          child: ErrorTextWidget(_error!),
+          child: CircularProgressIndicator(),
         ),
       );
     }
@@ -110,10 +94,12 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
     if (_boxModel == null) {
       return const Scaffold(
         body: Center(
-          child: ErrorTextWidget('Box not found'),
+          child: Text('Box not found'),
         ),
       );
     }
+
+    final selectedCategory = ref.watch(selectedCategoryFilterProvider);
 
     return Scaffold(
       body: RefreshIndicator(
@@ -129,7 +115,14 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
             physics: const AlwaysScrollableScrollPhysics(),
             children: [
               const CategoryListBoxDetail(),
-              FriendListBoxDetail(_boxModel!),
+              FriendListBoxDetail(
+                _boxModel!,
+                onBoxUpdate: (updatedBox) {
+                  setState(() {
+                    _boxModel = updatedBox;
+                  });
+                },
+              ),
               ExpenseListBoxDetail(
                 boxModel: _boxModel!,
                 groupModel: widget.groupModel,
@@ -138,14 +131,10 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
           ),
         ),
       ),
-      floatingActionButton: FABWidget(
-        title: 'Expense',
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Get the selected category from the filter
-          final selectedCategory = ref.read(selectedCategoryFilterProvider);
-          // Pass it to the create expense page
-          context.push(
-            RouteName.createExpense,
+          context.pushNamed(
+            'add-expense',
             extra: {
               "boxModel": _boxModel,
               "groupModel": widget.groupModel,
@@ -153,6 +142,7 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
             },
           );
         },
+        child: const Icon(Icons.add),
       ),
     );
   }

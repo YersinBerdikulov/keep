@@ -1,8 +1,13 @@
 import 'dart:io';
 import 'package:dongi/shared/utilities/helpers/image_picker_util.dart';
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
+import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
+import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
@@ -161,46 +166,223 @@ class UpdateBoxInfoCard extends ConsumerWidget {
   }
 }
 
-class UpdateBoxSelectFriends extends ConsumerWidget {
-  const UpdateBoxSelectFriends({super.key});
+class UpdateBoxSelectFriends extends HookConsumerWidget {
+  final BoxModel boxModel;
+  final void Function(Set<String>) onMembersSelected;
+  const UpdateBoxSelectFriends({
+    super.key,
+    required this.boxModel,
+    required this.onMembersSelected,
+  });
+
+  Widget _buildEmptyState() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: ColorConfig.primarySwatch.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.people_outline,
+              size: 32,
+              color: ColorConfig.primarySwatch,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No Available Members',
+            style: FontConfig.h6().copyWith(
+              color: ColorConfig.midnight,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'All group members are already in this box',
+            textAlign: TextAlign.center,
+            style: FontConfig.body2().copyWith(
+              color: ColorConfig.primarySwatch50,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedFriends = useState<Set<String>>({});
+    final friendList = ref.watch(friendNotifierProvider);
+    final currentUserId = ref.read(currentUserProvider)!.id;
+    final groupState = ref.watch(groupNotifierProvider);
+
+    // Call onMembersSelected whenever selection changes
+    useEffect(() {
+      onMembersSelected(selectedFriends.value);
+      return null;
+    }, [selectedFriends.value]);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'select member',
-            style: FontConfig.body1(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Select Member',
+                style: FontConfig.body1().copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: ColorConfig.secondary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.people,
+                      size: 16,
+                      color: ColorConfig.secondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "Selected: ${selectedFriends.value.length}",
+                      style: FontConfig.caption().copyWith(
+                        color: ColorConfig.secondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           Container(
-            padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
             width: SizeConfig.width(context),
             decoration: BoxDecoration(
               color: ColorConfig.grey,
               borderRadius: BorderRadius.circular(15),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GridView.builder(
+            child: friendList.when(
+              data: (data) {
+                // Get the current group
+                final currentGroup = groupState.whenOrNull(
+                  data: (groups) => groups.firstWhere(
+                    (group) => group.id == boxModel.groupId,
+                  ),
+                );
+
+                if (currentGroup == null) {
+                  return _buildEmptyState();
+                }
+
+                final approvedFriends = data
+                    .where(
+                      (element) =>
+                          element.status == FriendRequestStatus.accepted &&
+                          !boxModel.boxUsers.contains(
+                            element.receiveRequestUserId == currentUserId
+                                ? element.sendRequestUserId
+                                : element.receiveRequestUserId,
+                          ) &&
+                          currentGroup.groupUsers.contains(
+                            element.receiveRequestUserId == currentUserId
+                                ? element.sendRequestUserId
+                                : element.receiveRequestUserId,
+                          ),
+                    )
+                    .toList();
+
+                if (approvedFriends.isEmpty) {
+                  return _buildEmptyState();
+                }
+
+                return GridView.builder(
+                  padding: const EdgeInsets.all(15),
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 12,
+                  itemCount: approvedFriends.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 4,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
-                    // childAspectRatio: ,
                   ),
-                  itemBuilder: (context, i) => FriendWidget(
-                    backgroundColor: ColorConfig.white,
-                  ),
+                  itemBuilder: (context, i) {
+                    final friend = approvedFriends[i];
+                    final friendIdToAdd =
+                        friend.receiveRequestUserId == currentUserId
+                            ? friend.sendRequestUserId
+                            : friend.receiveRequestUserId;
+                    final isSelected =
+                        selectedFriends.value.contains(friendIdToAdd);
+
+                    // Get the friend's name and profile pic
+                    final friendName = friend.sendRequestUserId == currentUserId
+                        ? friend.receiveRequestUserName ??
+                            friend.receiveRequestUserId
+                        : friend.sendRequestUserName ??
+                            friend.sendRequestUserId;
+
+                    final friendProfilePic =
+                        friend.sendRequestUserId == currentUserId
+                            ? friend.receiveRequestProfilePic
+                            : friend.sendRequestProfilePic;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (isSelected) {
+                          selectedFriends.value.remove(friendIdToAdd);
+                        } else {
+                          selectedFriends.value.add(friendIdToAdd);
+                        }
+                        selectedFriends.value = Set.from(selectedFriends.value);
+                      },
+                      child: Column(
+                        children: [
+                          FriendWidget(
+                            image: friendProfilePic,
+                            isSelected: isSelected,
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: Text(
+                              friendName,
+                              style: FontConfig.caption().copyWith(
+                                color: ColorConfig.secondary,
+                                fontSize: 10,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => Center(
+                child: Text(
+                  error.toString(),
+                  style: FontConfig.body2().copyWith(color: Colors.red),
                 ),
-              ],
+              ),
             ),
           ),
         ],
@@ -215,6 +397,7 @@ class UpdateBoxButton extends ConsumerWidget {
   final TextEditingController boxDescription;
   final GlobalKey<FormState> formKey;
   final BoxModel boxModel;
+  final Set<String> selectedMembers;
 
   const UpdateBoxButton({
     super.key,
@@ -223,6 +406,7 @@ class UpdateBoxButton extends ConsumerWidget {
     required this.boxDescription,
     required this.formKey,
     required this.boxModel,
+    required this.selectedMembers,
   });
 
   @override
@@ -236,17 +420,27 @@ class UpdateBoxButton extends ConsumerWidget {
             ),
         onPressed: () {
           if (formKey.currentState!.validate()) {
-            ref
-                .read(boxNotifierProvider((boxModel.groupId)).notifier)
-                .updateBox(
-                  image: newBoxImage,
+            // Create a set to handle duplicates automatically
+            final Set<String> uniqueMembers = {...boxModel.boxUsers};
+            uniqueMembers.addAll(selectedMembers);
+
+            // Convert back to list for the API
+            final List<String> updatedMembers = uniqueMembers.toList();
+
+            print('Existing members: ${boxModel.boxUsers}');
+            print('Selected new members: $selectedMembers');
+            print('Final combined members: $updatedMembers');
+
+            ref.read(boxNotifierProvider(boxModel.groupId).notifier).updateBox(
+                  boxId: boxModel.id!,
                   boxTitle: boxTitle,
                   boxDescription: boxDescription,
-                  boxId: boxModel.id!,
+                  image: newBoxImage,
+                  boxUsers: updatedMembers,
                 );
           }
         },
-        title: 'update',
+        title: 'Update',
         textColor: ColorConfig.secondary,
       ),
     );
