@@ -117,7 +117,7 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
       body: SliverAppBarWidget(
         image: _boxModel!.image,
         height: 200,
-        appbarTitle: TotalExpenseBoxDetail(_boxModel!.total),
+        appbarTitle: BoxTitleHeader(_boxModel!),
         child: ListView(
           padding: EdgeInsets.zero,
           shrinkWrap: true,
