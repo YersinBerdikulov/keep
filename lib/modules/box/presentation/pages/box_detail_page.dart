@@ -133,8 +133,8 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.pushNamed(
-            'add-expense',
+          context.push(
+            RouteName.createExpense,
             extra: {
               "boxModel": _boxModel,
               "groupModel": widget.groupModel,
