@@ -26,6 +26,50 @@ import '../../../../shared/widgets/permission_widgets.dart';
 import '../../../auth/domain/di/auth_controller_di.dart';
 import '../../../group/domain/di/group_controller_di.dart';
 
+class BoxTitleHeader extends ConsumerWidget {
+  final BoxModel boxModel;
+  const BoxTitleHeader(this.boxModel, {super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          boxModel.title,
+          style: FontConfig.h5().copyWith(
+            color: ColorConfig.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: ColorConfig.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  "${boxModel.boxUsers.length} members",
+                  style: FontConfig.caption().copyWith(
+                    color: ColorConfig.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class TotalExpenseBoxDetail extends ConsumerWidget {
   final num total;
   const TotalExpenseBoxDetail(this.total, {super.key});
@@ -725,14 +769,12 @@ class _ExpenseCardItemState extends ConsumerState<ExpenseCardItem> {
     ];
 
     // Conditionally add delete option
-    if (ref.read(currentUserProvider)?.id == widget.expenseModel.creatorId || 
+    if (ref.read(currentUserProvider)?.id == widget.expenseModel.creatorId ||
         ref.watch(isCurrentUserAdminProvider(widget.groupModel.id!))) {
-      menuItems.add(
-        PopupMenuItem(
-          onTap: _deleteExpense,
-          child: const Text('Delete'),
-        )
-      );
+      menuItems.add(PopupMenuItem(
+        onTap: _deleteExpense,
+        child: const Text('Delete'),
+      ));
     }
 
     return Column(
@@ -803,6 +845,24 @@ class _ExpenseCardItemState extends ConsumerState<ExpenseCardItem> {
                     trailing: Text("\$${widget.expenseModel.cost}"),
                     visualDensity: const VisualDensity(vertical: -2),
                     subtitleString: widget.expenseModel.createdAt!.toTimeAgo(),
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: widget.expenseModel.isSettled
+                            ? ColorConfig.success.withOpacity(0.1)
+                            : const Color(0xFFFE4A49).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        widget.expenseModel.isSettled
+                            ? Icons.check_circle
+                            : Icons.currency_exchange,
+                        size: 16,
+                        color: widget.expenseModel.isSettled
+                            ? ColorConfig.success
+                            : const Color(0xFFFE4A49),
+                      ),
+                    ),
                   ),
                 ),
               ),

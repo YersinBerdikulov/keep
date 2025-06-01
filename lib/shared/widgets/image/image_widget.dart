@@ -12,8 +12,8 @@ class ImageWidget extends StatelessWidget {
   final bool borderEnable;
   const ImageWidget({
     super.key,
-    this.width = 32,
-    this.height = 32,
+    this.width = 42,
+    this.height = 42,
     this.imageUrl,
     this.color,
     this.borderRadius,

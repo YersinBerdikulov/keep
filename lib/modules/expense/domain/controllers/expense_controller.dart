@@ -14,6 +14,14 @@ import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import 'package:dongi/shared/utilities/extensions/date_extension.dart';
+import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
+import 'package:dongi/shared/widgets/card/grey_card.dart';
+import 'package:dongi/shared/widgets/list_tile/list_tile.dart';
+import 'package:dongi/shared/widgets/list_tile/list_tile_card.dart';
+import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
+import 'package:dongi/modules/box/domain/controllers/box_controller.dart';
+import 'package:dongi/modules/expense/presentation/pages/advanced_split_page.dart'; // Import for SplitMethod enum
 
 import '../../../box/domain/models/box_model.dart';
 import '../models/expense_model.dart';
@@ -22,7 +30,8 @@ import '../../../box/domain/di/box_controller_di.dart';
 
 class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   // Use getters instead of late variables to prevent initialization errors
-  ExpenseRepository get _expenseRepository => ref.read(expenseRepositoryProvider);
+  ExpenseRepository get _expenseRepository =>
+      ref.read(expenseRepositoryProvider);
   UpdateBoxUseCase get _updateBoxUseCase => ref.read(updateBoxUseCaseProvider);
 
   @override
@@ -45,12 +54,17 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       final currentUser = ref.read(currentUserProvider);
       final payerUserId = ref.read(expensePayerIdProvider);
       final categoryId = ref.read(expenseCategoryIdProvider);
+      final splitMethod = ref.read(splitMethodProvider);
+      final customPercentages = ref.read(customSplitPercentagesProvider);
+      final customAmounts = ref.read(customSplitAmountsProvider);
+      final userShares = ref.read(userSharesProvider);
 
       // Debug prints
       print('Starting expense creation...');
       print('Current user: ${currentUser?.id}');
       print('Payer user ID: $payerUserId');
       print('Category ID: $categoryId');
+      print('Split method: $splitMethod');
 
       final expenseId = ID.custom(const Uuid().v4().substring(0, 32));
       final convertedCost = num.parse(expenseCost.text.replaceAll(',', ''));
@@ -62,7 +76,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       if (splitUsersList.isEmpty) {
         // If no split users are selected, default to all users in the box
         final boxUsers = ref.read(userInBoxStoreProvider);
-        print('No split users selected, using box users: ${boxUsers.map((u) => u.id).toList()}');
+        print(
+            'No split users selected, using box users: ${boxUsers.map((u) => u.id).toList()}');
         splitUsersList = boxUsers.map((user) => user.id!).toList();
       }
 
@@ -71,16 +86,51 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       // Create expense user records for each split user
       List<String> expenseUserIds = [];
       List<String> userIds = [];
-      
-      // Calculate individual cost
-      final individualCost = convertedCost / splitUsersList.length;
+
       final now = DateTime.now().toIso8601String();
-      final sharePercentage = (100.0 / splitUsersList.length);
+
+      // Calculate total shares if using share-based split
+      final totalShares = splitMethod == SplitMethod.shares
+          ? userShares.values.fold(0, (sum, value) => sum + value)
+          : 0;
 
       for (var uid in splitUsersList) {
         String expenseUserId = ID.custom(const Uuid().v4().substring(0, 32));
         expenseUserIds.add(expenseUserId);
         userIds.add(uid);
+
+        // Calculate share details based on split method
+        double shareAmount;
+        double sharePercentage;
+        double shares;
+        String splitType;
+
+        switch (splitMethod) {
+          case SplitMethod.percentage:
+            sharePercentage = customPercentages[uid] ?? 0;
+            shareAmount = convertedCost * (sharePercentage / 100);
+            shares = 0;
+            splitType = 'percentage';
+            break;
+          case SplitMethod.amount:
+            shareAmount = customAmounts[uid] ?? 0;
+            sharePercentage = (shareAmount / convertedCost) * 100;
+            shares = 0;
+            splitType = 'amount';
+            break;
+          case SplitMethod.shares:
+            shares = userShares[uid]?.toDouble() ?? 1;
+            shareAmount = convertedCost * (shares / totalShares);
+            sharePercentage = (shares / totalShares) * 100;
+            splitType = 'shares';
+            break;
+          case SplitMethod.equal:
+          default:
+            shareAmount = convertedCost / splitUsersList.length;
+            sharePercentage = 100 / splitUsersList.length;
+            shares = 1;
+            splitType = 'equal';
+        }
 
         // Create a new ExpenseUserModel
         ExpenseUserModel expenseUser = ExpenseUserModel(
@@ -89,34 +139,32 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
           groupId: groupModel.id!,
           boxId: boxModel.id!,
           expenseId: expenseId,
-          cost: individualCost,
+          cost: shareAmount,
           isPaid: uid == payerUserId,
           createdAt: now,
           updatedAt: now,
-          splitType: 'equal',
+          splitType: splitType,
           currency: 'KZT',
           recipients: splitUsersList,
           status: 'pending',
-          shares: 1,
+          shares: shares,
           sharePercentage: sharePercentage,
-          shareAmount: individualCost,
+          shareAmount: shareAmount,
           isSettled: false,
         );
 
         print('Creating expense user: ${expenseUser.toJson()}');
 
         // Add the expense user with explicit error handling
-        final result = await _expenseRepository.addExpenseUser(expenseUser, customId: expenseUserId);
-        
-        result.fold(
-          (failure) {
-            print('Failed to create expense user: ${failure.message}');
-            throw Exception('Failed to create expense user: ${failure.message}');
-          },
-          (success) {
-            print('Successfully created expense user with ID: $expenseUserId');
-          }
-        );
+        final result = await _expenseRepository.addExpenseUser(expenseUser,
+            customId: expenseUserId);
+
+        result.fold((failure) {
+          print('Failed to create expense user: ${failure.message}');
+          throw Exception('Failed to create expense user: ${failure.message}');
+        }, (success) {
+          print('Successfully created expense user with ID: $expenseUserId');
+        });
       }
 
       print('Created expense user IDs: $expenseUserIds');
@@ -134,15 +182,16 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         categoryId: categoryId,
         groupId: groupModel.id!,
         boxId: boxModel.id!,
-        expenseUsers: userIds,  // Store user IDs
-        createdAt: now,  // Add createdAt field with current timestamp
+        expenseUsers: userIds,
+        createdAt: now,
+        equal: splitMethod == SplitMethod.equal,
       );
 
       print('Creating expense model: ${expenseModel.toJson()}');
 
       final res = await _expenseRepository.addExpense(expenseModel,
           customId: expenseId);
-      
+
       print('Expense creation result: $res');
 
       res.fold(
@@ -181,20 +230,27 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       // Check if current user has permission to update
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) throw Exception('User not logged in');
-      
+
       final isCreator = expenseModel.creatorId == currentUser.id;
-      final canEdit = await ref.read(groupNotifierProvider.notifier)
-          .canUserDeleteItem(currentUser.id!, groupModel.id!, expenseModel.creatorId);
-      
+      final canEdit = await ref
+          .read(groupNotifierProvider.notifier)
+          .canUserDeleteItem(
+              currentUser.id!, groupModel.id!, expenseModel.creatorId);
+
       if (!isCreator && !canEdit) {
-        throw Exception('Only the expense creator or group admin can update this expense');
+        throw Exception(
+            'Only the expense creator or group admin can update this expense');
       }
-      
+
       Map<String, dynamic> updateData = {'\$id': expenseModel.id};
       final splitUsers = ref.read(splitUserProvider);
       final payerUserId = ref.read(expensePayerIdProvider);
+      final splitMethod = ref.read(splitMethodProvider);
+      final customPercentages = ref.read(customSplitPercentagesProvider);
+      final customAmounts = ref.read(customSplitAmountsProvider);
+      final userShares = ref.read(userSharesProvider);
 
-      updateData['payerId'] = payerUserId ?? currentUser!.id;
+      updateData['payerId'] = payerUserId ?? currentUser.id;
 
       if (expenseTitle != null && expenseTitle.text.isNotEmpty) {
         updateData['title'] = expenseTitle.text;
@@ -210,48 +266,85 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         updateData['cost'] = newCost;
       }
 
-      // Check if the split users or cost have changed
-      if (!splitUsers.equals(expenseModel.expenseUsers) ||
-          newCost != expenseModel.cost) {
-        // Delete the existing expense users
-        for (var eUid in expenseModel.expenseUsers) {
-          await deleteExpenseUser(eUid);
-        }
+      // Calculate total shares if using share-based split
+      final totalShares = splitMethod == SplitMethod.shares
+          ? userShares.values.fold(0, (sum, value) => sum + value)
+          : 0;
 
-        // Create a new list of expense users
-        List<String> updatedExpenseUserIds = [];
-        for (var uid in splitUsers) {
-          String expenseUserId = ID.custom(const Uuid().v4().substring(0, 32));
-          updatedExpenseUserIds.add(expenseUserId);
-
-          // Create a new ExpenseUserModel with the updated cost
-          ExpenseUserModel expenseUser = ExpenseUserModel(
-            id: expenseUserId,
-            userId: uid,
-            groupId: groupModel.id!,
-            boxId: boxModel.id!,
-            expenseId: expenseModel.id!,
-            cost: newCost / splitUsers.length,
-            isPaid: uid == payerUserId,
-            createdAt: DateTime.now().toIso8601String(),
-            updatedAt: DateTime.now().toIso8601String(),
-            splitType: 'equal',
-            currency: 'KZT',
-            recipients: splitUsers,
-            status: 'pending',
-            shares: 1,
-            sharePercentage: 100.0 / splitUsers.length,
-            shareAmount: newCost / splitUsers.length,
-            isSettled: false,
-          );
-
-          // Add the new expense user
-          await addExpenseUser(expenseUser, customId: expenseUserId);
-        }
-
-        // Update the data with the new expense users
-        updateData['expenseUsers'] = updatedExpenseUserIds;
+      // Delete the existing expense users
+      for (var eUid in expenseModel.expenseUsers) {
+        await deleteExpenseUser(eUid);
       }
+
+      // Create a new list of expense users
+      List<String> updatedExpenseUserIds = [];
+      final now = DateTime.now().toIso8601String();
+
+      for (var uid in splitUsers) {
+        String expenseUserId = ID.custom(const Uuid().v4().substring(0, 32));
+        updatedExpenseUserIds.add(expenseUserId);
+
+        // Calculate share details based on split method
+        double shareAmount;
+        double sharePercentage;
+        double shares;
+        String splitType;
+
+        switch (splitMethod) {
+          case SplitMethod.percentage:
+            sharePercentage = customPercentages[uid] ?? 0;
+            shareAmount = newCost * (sharePercentage / 100);
+            shares = 0;
+            splitType = 'percentage';
+            break;
+          case SplitMethod.amount:
+            shareAmount = customAmounts[uid] ?? 0;
+            sharePercentage = (shareAmount / newCost) * 100;
+            shares = 0;
+            splitType = 'amount';
+            break;
+          case SplitMethod.shares:
+            shares = userShares[uid]?.toDouble() ?? 1;
+            shareAmount = newCost * (shares / totalShares);
+            sharePercentage = (shares / totalShares) * 100;
+            splitType = 'shares';
+            break;
+          case SplitMethod.equal:
+          default:
+            shareAmount = newCost / splitUsers.length;
+            sharePercentage = 100 / splitUsers.length;
+            shares = 1;
+            splitType = 'equal';
+        }
+
+        // Create a new ExpenseUserModel with the updated cost
+        ExpenseUserModel expenseUser = ExpenseUserModel(
+          id: expenseUserId,
+          userId: uid,
+          groupId: groupModel.id!,
+          boxId: boxModel.id!,
+          expenseId: expenseModel.id!,
+          cost: shareAmount,
+          isPaid: uid == payerUserId,
+          createdAt: now,
+          updatedAt: now,
+          splitType: splitType,
+          currency: 'KZT',
+          recipients: splitUsers,
+          status: 'pending',
+          shares: shares,
+          sharePercentage: sharePercentage,
+          shareAmount: shareAmount,
+          isSettled: false,
+        );
+
+        // Add the new expense user
+        await addExpenseUser(expenseUser, customId: expenseUserId);
+      }
+
+      // Update the data with the new expense users
+      updateData['expenseUsers'] = updatedExpenseUserIds;
+      updateData['equal'] = splitMethod == SplitMethod.equal;
 
       final res = await _expenseRepository.updateExpense(updateData);
 
@@ -284,19 +377,23 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       // Check if current user has permission to delete
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) throw Exception('User not logged in');
-      
+
       final isCreator = expenseModel.creatorId == currentUser.id;
-      final canDelete = await ref.read(groupNotifierProvider.notifier)
-          .canUserDeleteItem(currentUser.id!, expenseModel.groupId, expenseModel.creatorId);
-      
+      final canDelete = await ref
+          .read(groupNotifierProvider.notifier)
+          .canUserDeleteItem(
+              currentUser.id!, expenseModel.groupId, expenseModel.creatorId);
+
       if (!isCreator && !canDelete) {
-        throw Exception('Only the expense creator or group admin can delete this expense');
+        throw Exception(
+            'Only the expense creator or group admin can delete this expense');
       }
-      
+
       print('Deleting expense: ${expenseModel.id}');
-      
+
       // First get all expense users
-      final expenseUsers = await _expenseRepository.getExpenseUsers(expenseModel.id!);
+      final expenseUsers =
+          await _expenseRepository.getExpenseUsers(expenseModel.id!);
       print('Found ${expenseUsers.length} expense users to delete');
 
       // Delete each expense user
@@ -341,7 +438,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       // First delete all expense users for each expense
       for (var expenseId in ids) {
         print('Deleting expense users for expense: $expenseId');
-        final expenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
+        final expenseUsers =
+            await _expenseRepository.getExpenseUsers(expenseId);
         print('Found ${expenseUsers.length} expense users to delete');
 
         for (var expenseUser in expenseUsers) {
@@ -371,7 +469,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     try {
       print('Adding expense user with ID: $customId');
       print('Expense user details: ${expenseUser.toString()}');
-      
+
       final res = await _expenseRepository.addExpenseUser(
         expenseUser,
         customId: customId,
@@ -419,7 +517,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     try {
       final expenseDoc = await _expenseRepository.getExpenseDetail(expenseId);
       final expenseModel = ExpenseModel.fromJson(expenseDoc.data);
-      
+
       // Check and fix truncated IDs
       return await fixTruncatedExpenseUserIds(expenseModel);
     } catch (e, st) {
@@ -431,25 +529,26 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
 
   Future<void> settleUpExpenseUser(String expenseId, String userId) async {
     state = const AsyncValue.loading(); // Set loading state immediately
-    
+
     try {
       print('Starting settle up for expense: $expenseId, user: $userId');
-      
+
       // Get the expense details first with cache disabled
       final expense = await _expenseRepository.getExpenseDetail(expenseId);
       final expenseModel = ExpenseModel.fromJson(expense.data);
       print('Found expense: ${expenseModel.id}');
-      
+
       // Get expense users with cache disabled
       final expenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
       print('Found ${expenseUsers.length} expense users');
-      
+
       // Update the specific expense user as settled
       final expenseUser = expenseUsers.firstWhere(
         (eu) => ExpenseUserModel.fromJson(eu.data).userId == userId,
         orElse: () {
           print('Could not find expense user for userId: $userId');
-          print('Available expense users: ${expenseUsers.map((eu) => ExpenseUserModel.fromJson(eu.data).userId).toList()}');
+          print(
+              'Available expense users: ${expenseUsers.map((eu) => ExpenseUserModel.fromJson(eu.data).userId).toList()}');
           throw Exception('Expense user not found');
         },
       );
@@ -462,7 +561,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         'settledAt': now,
       };
       print('Updating expense user with data: $updateExpenseUserData');
-      final expenseUserResult = await _expenseRepository.updateExpenseUser(updateExpenseUserData);
+      final expenseUserResult =
+          await _expenseRepository.updateExpenseUser(updateExpenseUserData);
       expenseUserResult.fold(
         (l) {
           print('Error updating expense user: ${l.message}');
@@ -476,7 +576,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
 
       // Check if all users have settled
       print('Checking if all users have settled');
-      final allExpenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
+      final allExpenseUsers =
+          await _expenseRepository.getExpenseUsers(expenseId);
       final allSettled = allExpenseUsers.every(
         (eu) => ExpenseUserModel.fromJson(eu.data).isSettled == true,
       );
@@ -490,7 +591,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
           'isSettled': true,
           'settledAt': now,
         };
-        final expenseResult = await _expenseRepository.updateExpense(updateExpenseData);
+        final expenseResult =
+            await _expenseRepository.updateExpense(updateExpenseData);
         expenseResult.fold(
           (l) {
             print('Error updating expense: ${l.message}');
@@ -512,10 +614,10 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       // Notify the UI to refresh
       print('Notifying listeners to refresh UI');
       ref.notifyListeners();
-      
+
       // Invalidate related providers to force refresh on all clients
       ref.invalidateSelf();
-      
+
       // Explicitly clear cache for this expense
       await _expenseRepository.clearCacheForExpense(expenseId);
       await _expenseRepository.clearCacheForExpenseUsers(expenseId);
@@ -527,27 +629,29 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     }
   }
 
-  Future<void> cancelSettleUpExpenseUser(String expenseId, String userId) async {
+  Future<void> cancelSettleUpExpenseUser(
+      String expenseId, String userId) async {
     state = const AsyncValue.loading(); // Set loading state immediately
-    
+
     try {
       print('Starting cancel settle up for expense: $expenseId, user: $userId');
-      
+
       // Get the expense details first with cache disabled
       final expense = await _expenseRepository.getExpenseDetail(expenseId);
       final expenseModel = ExpenseModel.fromJson(expense.data);
       print('Found expense: ${expenseModel.id}');
-      
+
       // Get expense users with cache disabled
       final expenseUsers = await _expenseRepository.getExpenseUsers(expenseId);
       print('Found ${expenseUsers.length} expense users');
-      
+
       // Update the specific expense user as not settled
       final expenseUser = expenseUsers.firstWhere(
         (eu) => ExpenseUserModel.fromJson(eu.data).userId == userId,
         orElse: () {
           print('Could not find expense user for userId: $userId');
-          print('Available expense users: ${expenseUsers.map((eu) => ExpenseUserModel.fromJson(eu.data).userId).toList()}');
+          print(
+              'Available expense users: ${expenseUsers.map((eu) => ExpenseUserModel.fromJson(eu.data).userId).toList()}');
           throw Exception('Expense user not found');
         },
       );
@@ -559,7 +663,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         'settledAt': null,
       };
       print('Updating expense user with data: $updateExpenseUserData');
-      final expenseUserResult = await _expenseRepository.updateExpenseUser(updateExpenseUserData);
+      final expenseUserResult =
+          await _expenseRepository.updateExpenseUser(updateExpenseUserData);
       expenseUserResult.fold(
         (l) {
           print('Error updating expense user: ${l.message}');
@@ -578,7 +683,8 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         'settledAt': null,
       };
       print('Updating expense with data: $updateExpenseData');
-      final expenseResult = await _expenseRepository.updateExpense(updateExpenseData);
+      final expenseResult =
+          await _expenseRepository.updateExpense(updateExpenseData);
       expenseResult.fold(
         (l) {
           print('Error updating expense: ${l.message}');
@@ -599,10 +705,10 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       // Notify the UI to refresh
       print('Notifying listeners to refresh UI');
       ref.notifyListeners();
-      
+
       // Invalidate related providers to force refresh on all clients
       ref.invalidateSelf();
-      
+
       // Explicitly clear cache for this expense
       await _expenseRepository.clearCacheForExpense(expenseId);
       await _expenseRepository.clearCacheForExpenseUsers(expenseId);
@@ -617,7 +723,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   Future<void> settleUpExpense(ExpenseModel expenseModel) async {
     try {
       final now = DateTime.now().toIso8601String();
-      
+
       // Mark the expense as settled
       final updateData = {
         '\$id': expenseModel.id,
@@ -631,8 +737,9 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         (l) => throw Exception(l.message),
         (_) async {
           // Get all expense users
-          final expenseUsers = await _expenseRepository.getExpenseUsers(expenseModel.id!);
-          
+          final expenseUsers =
+              await _expenseRepository.getExpenseUsers(expenseModel.id!);
+
           // Update each expense user as settled
           for (var expenseUser in expenseUsers) {
             final updateExpenseUserData = {
@@ -669,17 +776,17 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   Future<void> refreshExpenseData(String expenseId, String boxId) async {
     try {
       print('Performing manual refresh of expense data');
-      
+
       // Clear cache for expense and expense users
       await _expenseRepository.clearCacheForExpense(expenseId);
       await _expenseRepository.clearCacheForExpenseUsers(expenseId);
-      
+
       // Fetch fresh data
       final updatedExpenses = await getExpensesInBox(boxId);
-      
+
       // Update state with fresh data
       state = AsyncValue.data(updatedExpenses);
-      
+
       // Notify listeners
       ref.notifyListeners();
     } catch (e, st) {
@@ -689,20 +796,21 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
   }
 
   // Update the method for fixing truncated/invalid user IDs
-  Future<ExpenseModel?> fixTruncatedExpenseUserIds(ExpenseModel expenseModel) async {
+  Future<ExpenseModel?> fixTruncatedExpenseUserIds(
+      ExpenseModel expenseModel) async {
     try {
       print('Checking for invalid user IDs in expense: ${expenseModel.id}');
-      
+
       if (expenseModel.expenseUsers.isEmpty) {
         print('No expense users to check');
         return expenseModel;
       }
-      
+
       // First, try to fetch each user to see if they exist
       print('Validating expense users: ${expenseModel.expenseUsers}');
       List<String> validUserIds = [];
       List<String> invalidUserIds = [];
-      
+
       // Try to fetch each user - this helps us identify which IDs are invalid
       for (final userId in expenseModel.expenseUsers) {
         try {
@@ -714,67 +822,72 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
           invalidUserIds.add(userId);
         }
       }
-      
+
       if (invalidUserIds.isEmpty) {
         print('All user IDs are valid, no need to fix');
         return expenseModel;
       }
-      
+
       // We have invalid IDs - fetch all users to find potential matches
-      print('Found ${invalidUserIds.length} invalid user IDs, fetching all users to find matches');
+      print(
+          'Found ${invalidUserIds.length} invalid user IDs, fetching all users to find matches');
       final allUserDocs = await _expenseRepository.getAllUsers();
-      final allUsers = allUserDocs.map((doc) => UserModel.fromJson(doc.data)).toList();
-      
+      final allUsers =
+          allUserDocs.map((doc) => UserModel.fromJson(doc.data)).toList();
+
       print('Fetched ${allUsers.length} users to match against invalid IDs');
-      
+
       // For each invalid ID, try to find a matching user
       List<String> fixedUserIds = [...validUserIds]; // Start with valid IDs
-      
+
       for (final invalidId in invalidUserIds) {
         bool foundMatch = false;
-        
+
         // Try prefix matching - most likely case for truncated IDs
         for (final user in allUsers) {
           if (user.id == null) continue;
-          
+
           // Check if the user ID starts with the invalid ID or vice versa
-          if (user.id!.startsWith(invalidId) || invalidId.startsWith(user.id!)) {
+          if (user.id!.startsWith(invalidId) ||
+              invalidId.startsWith(user.id!)) {
             print('Found prefix match for invalid ID $invalidId: ${user.id}');
             fixedUserIds.add(user.id!);
             foundMatch = true;
             break;
           }
         }
-        
+
         // If no prefix match, try some fuzzy matching or other heuristics
         if (!foundMatch && allUsers.isNotEmpty) {
           // As a fallback, just add some valid users from the database
           // This is better than having no users at all
           final userToAdd = allUsers.first.id;
           if (userToAdd != null && !fixedUserIds.contains(userToAdd)) {
-            print('No match found for invalid ID $invalidId, adding a valid user as fallback: $userToAdd');
+            print(
+                'No match found for invalid ID $invalidId, adding a valid user as fallback: $userToAdd');
             fixedUserIds.add(userToAdd);
           }
         }
       }
-      
+
       // If we didn't fix anything, return original model
-      if (fixedUserIds.isEmpty || 
-          (fixedUserIds.length == expenseModel.expenseUsers.length && 
-           fixedUserIds.every((id) => expenseModel.expenseUsers.contains(id)))) {
+      if (fixedUserIds.isEmpty ||
+          (fixedUserIds.length == expenseModel.expenseUsers.length &&
+              fixedUserIds
+                  .every((id) => expenseModel.expenseUsers.contains(id)))) {
         print('No IDs were fixed, returning original expense model');
         return expenseModel;
       }
-      
+
       // Update the expense with the fixed user IDs
       final updateData = {
         '\$id': expenseModel.id,
         'expenseUsers': fixedUserIds,
       };
-      
+
       print('Updating expense with fixed user IDs: $fixedUserIds');
       final result = await _expenseRepository.updateExpense(updateData);
-      
+
       return result.fold(
         (l) {
           print('Error updating expense with fixed IDs: ${l.message}');

@@ -54,7 +54,7 @@ class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
             ref.read(boxNotifierProvider(widget.groupModel.id!).notifier);
         final users =
             await boxController.getUsersInBox(widget.boxModel.boxUsers);
-        
+
         print('Loaded box users: ${users.map((u) => u.id).toList()}');
 
         // Only update providers if the widget is still mounted
@@ -102,7 +102,7 @@ class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
               final latestExpense = expenses.first;
               showSnackBar(context, content: "Successfully Created!!");
               // Navigate to expense detail page
-              context.push(
+              context.pushReplacement(
                 RouteName.expenseDetail,
                 extra: {"expenseId": latestExpense.id},
               );

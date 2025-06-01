@@ -3,6 +3,7 @@ import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constants/color_config.dart';
+import '../../../../core/constants/font_config.dart';
 import '../../../../shared/utilities/helpers/snackbar_helper.dart';
 import '../../../../shared/widgets/appbar/sliver_appbar.dart';
 import '../../../../shared/widgets/error/error.dart';
@@ -42,7 +43,22 @@ class ExpenseDetailPage extends ConsumerWidget {
         error: (error, stackTrace) => ErrorTextWidget(error),
         data: (data) {
           return SliverAppBarWidget(
-            appbarTitle: UserInfoExpenseDetail(creatorId: data?.creatorId ?? ''),
+            appbarTitle: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: Text(
+                    data?.title ?? '',
+                    style: FontConfig.h5().copyWith(
+                      color: ColorConfig.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             child: ListView(
               padding: EdgeInsets.zero,
               shrinkWrap: true,
