@@ -23,7 +23,63 @@ import '../../../user/domain/models/user_model.dart';
 class HomeExpenseSummery extends ConsumerWidget {
   const HomeExpenseSummery({super.key});
 
-  _totalExpenseCard() {
+  (double, double, double) _calculateTotals(List<RecentTransactionModel> transactions, String? currentUserId) {
+    double totalExpense = 0;
+    double totalIncome = 0;
+    double totalOutcome = 0;
+
+    if (currentUserId == null) return (0.0, 0.0, 0.0);
+
+    print('Current User ID: $currentUserId');
+    print('Total transactions to process: ${transactions.length}');
+
+    for (var transaction in transactions) {
+      final isPayer = transaction.payerId == currentUserId;
+      final isExpenseUser = transaction.expenseUsers.contains(currentUserId);
+      
+      print('\nTransaction: ${transaction.title} - ${transaction.cost}');
+      print('Payer ID: ${transaction.payerId}');
+      print('Expense Users: ${transaction.expenseUsers}');
+      print('Is Payer: $isPayer, Is Expense User: $isExpenseUser');
+      
+      if (isPayer && isExpenseUser) {
+        // User is both payer and in expense users (paid for themselves and others)
+        final perPersonAmount = transaction.cost / transaction.expenseUsers.length;
+        print('User is both payer and expense user');
+        print('Per person amount: $perPersonAmount');
+        print('Number of expense users: ${transaction.expenseUsers.length}');
+        
+        // The user's own share is an outcome
+        totalOutcome += perPersonAmount;
+        // The rest is paid for others (not an outcome for the user)
+        final paidForOthers = (transaction.expenseUsers.length - 1) * perPersonAmount;
+        totalOutcome += paidForOthers;
+        print('Added to outcome: ${perPersonAmount + paidForOthers}');
+      } else if (isPayer) {
+        // User is only the payer (paid for others)
+        print('User is only the payer');
+        totalOutcome += transaction.cost.toDouble();
+        print('Added full amount to outcome: ${transaction.cost}');
+      } else if (isExpenseUser) {
+        // User is only in expense users (someone else paid for them)
+        final perPersonAmount = transaction.cost / transaction.expenseUsers.length;
+        print('User is only in expense users');
+        print('Adding to income: $perPersonAmount');
+        totalIncome += perPersonAmount;
+      }
+    }
+
+    totalExpense = totalOutcome - totalIncome;
+
+    print('\nFinal Totals:');
+    print('Total Outcome: $totalOutcome');
+    print('Total Income: $totalIncome');
+    print('Total Expense: $totalExpense');
+
+    return (totalExpense, totalIncome, totalOutcome);
+  }
+
+  _totalExpenseCard(double amount) {
     return AspectRatio(
       aspectRatio: 1,
       child: Container(
@@ -72,7 +128,7 @@ class HomeExpenseSummery extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "\$140.00",
+                  "\$${amount.toStringAsFixed(2)}",
                   style: FontConfig.h4().copyWith(
                     color: ColorConfig.white,
                   ),
@@ -92,7 +148,7 @@ class HomeExpenseSummery extends ConsumerWidget {
     );
   }
 
-  _incomeCard() {
+  _incomeCard(double amount) {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.only(bottom: 5),
@@ -131,7 +187,7 @@ class HomeExpenseSummery extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "\$140.00",
+                  "\$${amount.toStringAsFixed(2)}",
                   style: FontConfig.h6().copyWith(
                     color: ColorConfig.white,
                   ),
@@ -149,7 +205,7 @@ class HomeExpenseSummery extends ConsumerWidget {
     );
   }
 
-  _outcomeCard() {
+  _outcomeCard(double amount) {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.only(top: 5),
@@ -188,7 +244,7 @@ class HomeExpenseSummery extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "\$140.00",
+                  "\$${amount.toStringAsFixed(2)}",
                   style: FontConfig.h6().copyWith(
                     color: ColorConfig.white,
                   ),
@@ -208,24 +264,39 @@ class HomeExpenseSummery extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Row(
-        children: [
-          Expanded(child: _totalExpenseCard()),
-          Expanded(
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: Column(
-                children: [
-                  _incomeCard(),
-                  _outcomeCard(),
-                ],
-              ),
-            ),
-          )
-        ],
+    final transactionsProvider = ref.watch(homeTransactionsProvider);
+    final currentUser = ref.watch(currentUserProvider);
+    
+    return transactionsProvider.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) => Center(
+        child: Text('Error loading transactions: $error'),
       ),
+      data: (transactions) {
+        final (totalExpense, totalIncome, totalOutcome) = _calculateTotals(transactions, currentUser?.id);
+        
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Row(
+            children: [
+              Expanded(child: _totalExpenseCard(totalExpense.abs())),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Column(
+                    children: [
+                      _incomeCard(totalIncome),
+                      const SizedBox(height: 12),
+                      _outcomeCard(totalOutcome),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }
