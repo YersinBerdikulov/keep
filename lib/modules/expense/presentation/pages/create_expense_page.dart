@@ -10,6 +10,7 @@ import '../../../box/domain/models/box_model.dart';
 import '../../../group/domain/models/group_model.dart';
 import '../../../box/domain/di/box_controller_di.dart';
 import '../../domain/di/expense_controller_di.dart';
+import '../../domain/di/category_controller_di.dart';
 import '../widgets/create_expense_widget.dart';
 import '../../../../core/router/router_names.dart';
 
@@ -50,9 +51,11 @@ class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
         ref.read(splitUserProvider.notifier).state = [];
         ref.read(userSharesProvider.notifier).state = {};
         ref.read(expensePayerIdProvider.notifier).state = null;
-
-        // Set the selected category if provided
-        if (widget.selectedCategory != null) {
+        // Reset category providers unless a category was explicitly selected
+        if (widget.selectedCategory == null) {
+          ref.read(selectedCategoryProvider.notifier).state = null;
+          ref.read(expenseCategoryIdProvider.notifier).state = null;
+        } else {
           ref.read(expenseCategoryIdProvider.notifier).state =
               widget.selectedCategory;
         }

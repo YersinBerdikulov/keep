@@ -524,7 +524,7 @@ class CategoryListBoxDetail extends ConsumerWidget {
                   }
                 },
                 child: Container(
-                  width: 80,
+                  width: 100,
                   margin: EdgeInsets.only(
                     right: index != _temporaryCategories.length - 1 ? 12 : 0,
                   ),
@@ -548,23 +548,24 @@ class CategoryListBoxDetail extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: isSelected
                               ? Colors.white.withOpacity(0.2)
-                              : category['color'].withOpacity(0.1),
+                              : Colors.white,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          category['icon'],
+                          category['icon'] as IconData,
                           color: isSelected ? Colors.white : category['color'],
                           size: 24,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        category['name'],
-                        style: FontConfig.caption().copyWith(
-                          color:
-                              isSelected ? Colors.white : ColorConfig.midnight,
-                          fontWeight: FontWeight.w500,
+                        category['name'] as String,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : category['color'],
+                          fontSize: 12,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -593,10 +594,14 @@ class ExpenseListBoxDetail extends ConsumerStatefulWidget {
       _ExpenseListBoxDetailState();
 }
 
-class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
+class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail>
+    with AutomaticKeepAliveClientMixin {
   List<ExpenseModel>? _expenses;
   bool _isLoading = true;
   String? _error;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -606,7 +611,6 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
 
   @override
   void dispose() {
-    // Cancel any pending operations
     _isLoading = false;
     super.dispose();
   }
@@ -652,6 +656,8 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     // Watch the expense provider to trigger refresh when it changes
     ref.listen(expenseNotifierProvider, (previous, next) {
       if (mounted) {
@@ -666,7 +672,6 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
     final filteredExpenses = selectedCategory != null && _expenses != null
         ? _expenses!.where((e) {
             if (e.categoryId == null) return false;
-            // Extract the category name from the ID (remove timestamp prefix)
             final expenseCategoryName = e.categoryId!.contains('_')
                 ? e.categoryId!.split('_').sublist(1).join('_')
                 : e.categoryId!;

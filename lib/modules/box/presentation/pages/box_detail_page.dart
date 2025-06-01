@@ -34,6 +34,7 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
   BoxModel? _boxModel;
   bool _isLoading = true;
   String? _error;
+  final _refreshKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
@@ -42,6 +43,8 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
   }
 
   Future<void> _fetchBoxDetail() async {
+    if (!mounted) return;
+
     setState(() {
       _isLoading = true;
       _error = null;
@@ -54,83 +57,85 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
       // Fetch box details directly from repository
       final boxResult = await boxRepository.getBoxDetail(widget.boxId);
 
-      // Handle the repository response based on its structure
-      if (boxResult != null) {
-        if (mounted) {
-          setState(() {
-            _boxModel = BoxModel.fromJson(boxResult.data);
-            _isLoading = false;
-          });
-        }
-      } else {
-        if (mounted) {
-          setState(() {
-            _error = "Failed to load box details";
-            _isLoading = false;
-          });
-        }
+      if (!mounted) return;
+
+      setState(() {
+        _boxModel = BoxModel.fromJson(boxResult.data);
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _handleRefresh() async {
+    try {
+      // Fetch fresh box details
+      await _fetchBoxDetail();
+
+      // Notify expense list to refresh
+      if (mounted) {
+        ref.invalidate(expenseNotifierProvider);
       }
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _error = e.toString();
-          _isLoading = false;
-        });
+        showSnackBar(context, content: 'Error refreshing: ${e.toString()}');
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Watch the box provider to get real-time updates
-    final boxesState = ref.watch(boxNotifierProvider(widget.groupModel.id!));
-
-    // Update local state when boxes change
-    boxesState.whenData((boxes) {
-      final updatedBox = boxes.firstWhere(
-        (box) => box.id == widget.boxId,
-        orElse: () => _boxModel!,
-      );
-      if (updatedBox.id == widget.boxId && updatedBox != _boxModel) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            setState(() {
-              _boxModel = updatedBox;
-            });
-          }
-        });
-      }
-    });
-
     if (_isLoading) {
-      return const LoadingWidget();
+      return const Scaffold(
+        body: Center(
+          child: LoadingWidget(),
+        ),
+      );
     }
 
     if (_error != null) {
-      return ErrorTextWidget(_error!);
+      return Scaffold(
+        body: Center(
+          child: ErrorTextWidget(_error!),
+        ),
+      );
     }
 
     if (_boxModel == null) {
-      return const ErrorTextWidget("Box not found");
+      return const Scaffold(
+        body: Center(
+          child: ErrorTextWidget('Box not found'),
+        ),
+      );
     }
 
     return Scaffold(
-      body: SliverAppBarWidget(
-        image: _boxModel!.image,
-        height: 200,
-        appbarTitle: BoxTitleHeader(_boxModel!),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            const CategoryListBoxDetail(),
-            FriendListBoxDetail(_boxModel!),
-            ExpenseListBoxDetail(
-              boxModel: _boxModel!,
-              groupModel: widget.groupModel,
-            ),
-          ],
+      body: RefreshIndicator(
+        key: _refreshKey,
+        onRefresh: _handleRefresh,
+        child: SliverAppBarWidget(
+          image: _boxModel!.image,
+          height: 200,
+          appbarTitle: BoxTitleHeader(_boxModel!),
+          child: ListView(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              const CategoryListBoxDetail(),
+              FriendListBoxDetail(_boxModel!),
+              ExpenseListBoxDetail(
+                boxModel: _boxModel!,
+                groupModel: widget.groupModel,
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FABWidget(

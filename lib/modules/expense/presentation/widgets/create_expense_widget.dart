@@ -689,10 +689,14 @@ class CreateExpenseCreateButton extends ConsumerWidget {
     final hasMultipleMembers = boxModel.boxUsers.length > 1;
     final selectedSplitOption = ref.watch(selectedSplitOptionProvider);
     final advancedMethod = ref.watch(advancedSplitMethodProvider);
+    final selectedCategory = ref.watch(expenseCategoryIdProvider);
 
     // Check if a split method is selected
     final hasSplitMethod = selectedSplitOption >= 0 ||
         (advancedMethod != null && advancedMethod.isNotEmpty);
+
+    // Check if category is selected
+    final hasCategory = selectedCategory != null;
 
     return SafeArea(
       child: Padding(
@@ -702,9 +706,16 @@ class CreateExpenseCreateButton extends ConsumerWidget {
                 loading: () => true,
                 orElse: () => false,
               ),
-          onPressed: (!hasMultipleMembers || !hasSplitMethod)
+          onPressed: (!hasMultipleMembers || !hasSplitMethod || !hasCategory)
               ? null
               : () {
+                  if (!hasCategory) {
+                    showSnackBar(
+                      context,
+                      content: 'Please select a category',
+                    );
+                    return;
+                  }
                   if (formKey.currentState!.validate()) {
                     // Debug prints before creating expense
                     print('Creating expense with:');
@@ -730,7 +741,9 @@ class CreateExpenseCreateButton extends ConsumerWidget {
               ? "Need more members to create expense"
               : !hasSplitMethod
                   ? "Select split method first"
-                  : "Create",
+                  : !hasCategory
+                      ? "Select a category first"
+                      : "Create",
           textColor: ColorConfig.secondary,
         ),
       ),
