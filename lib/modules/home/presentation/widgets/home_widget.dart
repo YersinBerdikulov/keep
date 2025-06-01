@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:intl/intl.dart';
 
 import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
@@ -593,7 +594,9 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
       List<RecentTransactionModel> transactions) {
     // Get the current date
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     print('Current date and time: ${now.toString()}');
+    print('Current weekday: ${now.weekday}'); // 1=Monday, 7=Sunday
 
     // Calculate start of week (Monday)
     // If today is Monday (weekday = 1), startOfWeek is today
@@ -603,15 +606,27 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
 
     print('Generating chart data from ${transactions.length} transactions');
     print('Current date: ${now.toString()}');
+    print('Today (date only): ${today.toString()}');
     print('Start of week (Monday): ${startOfWeek.toString()}');
+
+    // Print all transactions for debugging
+    print('All transactions:');
+    for (var i = 0; i < transactions.length; i++) {
+      final t = transactions[i];
+      print('[$i] Title: ${t.title}, Date: ${t.createdAt}, Amount: ${t.cost}');
+    }
 
     // Initialize a map to hold daily totals
     final Map<String, double> dailyTotals = {};
 
     // Initialize with all days of the week with zero values (Monday to Sunday)
     final dayOrder = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+    final weekDays = <DateTime>[];
+
+    // Create DateTime objects for each day of the week
     for (int i = 0; i < 7; i++) {
       final day = startOfWeek.add(Duration(days: i));
+      weekDays.add(day);
       final dayName = _getDayName(day);
       dailyTotals[dayName] = 0.0;
       print('Initialized day: $dayName for ${day.toString()}');
@@ -625,28 +640,39 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
         try {
           final transactionDate = DateTime.parse(transaction.createdAt);
           print(
-              'Transaction date: ${transactionDate.toString()}, Amount: ${transaction.cost}');
+              'Transaction date: ${transactionDate.toString()}, Weekday: ${transactionDate.weekday}, Amount: ${transaction.cost}');
 
           // Calculate the transaction day without time component
           final transactionDay = DateTime(
               transactionDate.year, transactionDate.month, transactionDate.day);
 
-          // Calculate days since start of week
-          final daysSinceStartOfWeek =
-              transactionDay.difference(startOfWeek).inDays;
-
-          // Check if the transaction is from the current week (0-6 days from start of week)
-          if (daysSinceStartOfWeek >= 0 && daysSinceStartOfWeek < 7) {
-            final dayName = _getDayName(transactionDay);
+          // Check if this is today's transaction
+          final isToday = transactionDay.isAtSameMomentAs(today);
+          if (isToday) {
             print(
-                'Transaction day: $dayName, Days since start of week: $daysSinceStartOfWeek');
+                'Found TODAY\'S transaction: ${transaction.title}, Amount: ${transaction.cost}');
+          }
+
+          // Find which day of the week this transaction belongs to
+          int dayIndex = -1;
+          for (int i = 0; i < weekDays.length; i++) {
+            if (transactionDay.year == weekDays[i].year &&
+                transactionDay.month == weekDays[i].month &&
+                transactionDay.day == weekDays[i].day) {
+              dayIndex = i;
+              break;
+            }
+          }
+
+          if (dayIndex >= 0) {
+            final dayName = dayOrder[dayIndex];
+            print('Transaction matches week day $dayIndex: $dayName');
             dailyTotals[dayName] =
                 (dailyTotals[dayName] ?? 0) + transaction.cost.toDouble();
             print(
                 'Added to $dayName: ${transaction.cost}, new total: ${dailyTotals[dayName]}');
           } else {
-            print(
-                'Transaction outside current week range: $daysSinceStartOfWeek days from start of week');
+            print('Transaction does not match any day in current week');
           }
         } catch (e) {
           print('Error parsing date: ${transaction.createdAt}, Error: $e');
@@ -684,9 +710,17 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
     // Find the date for the selected day
     final dayOrder = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
     final dayIndex = dayOrder.indexOf(dayName);
-    final selectedDate = startOfWeek.add(Duration(days: dayIndex));
+    if (dayIndex < 0) {
+      print('Invalid day name: $dayName');
+      return [];
+    }
 
+    final selectedDate = startOfWeek.add(Duration(days: dayIndex));
     print('Getting transactions for $dayName (${selectedDate.toString()})');
+
+    // Create a date-only version of the selected date for comparison
+    final selectedDay =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
 
     // Filter transactions for the selected day
     final result = allTransactions.where((transaction) {
@@ -698,10 +732,10 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
           final transactionDay = DateTime(
               transactionDate.year, transactionDate.month, transactionDate.day);
 
-          final selectedDay =
-              DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
-
-          final isSameDay = transactionDay.isAtSameMomentAs(selectedDay);
+          // Use direct comparison of year, month, and day
+          final isSameDay = transactionDay.year == selectedDay.year &&
+              transactionDay.month == selectedDay.month &&
+              transactionDay.day == selectedDay.day;
 
           if (isSameDay) {
             print(
@@ -721,6 +755,23 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
     return result;
   }
 
+  // Helper method to check if a transaction is from today
+  bool _isTransactionFromToday(RecentTransactionModel transaction) {
+    if (transaction.createdAt.isEmpty) return false;
+
+    try {
+      final transactionDate = DateTime.parse(transaction.createdAt);
+      final now = DateTime.now();
+
+      return transactionDate.year == now.year &&
+          transactionDate.month == now.month &&
+          transactionDate.day == now.day;
+    } catch (e) {
+      print('Error checking if transaction is from today: ${e.toString()}');
+      return false;
+    }
+  }
+
   chartWidget(
       List<ChartData> chartData, List<RecentTransactionModel> allTransactions) {
     // Find the maximum expense value for the Y-axis
@@ -728,16 +779,51 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
     for (var data in chartData) {
       if (data.y > maxExpense) maxExpense = data.y;
     }
-    // Round up to the nearest 10 for a cleaner Y-axis
-    maxExpense = ((maxExpense / 10).ceil() * 10).toDouble();
+
+    // Print all chart data values for debugging
+    print('Chart data values:');
+    for (var data in chartData) {
+      print('${data.x}: ${data.y}');
+    }
+
+    // Check if we have extremely large values that might cause scaling issues
+    if (maxExpense > 10000) {
+      print('Warning: Very large expense value detected: $maxExpense');
+    }
+
+    // Round up to the nearest appropriate unit based on the size of maxExpense
+    double interval;
+    if (maxExpense <= 100) {
+      // For small values, round to nearest 10
+      maxExpense = ((maxExpense / 10).ceil() * 10).toDouble();
+      interval = maxExpense / 2;
+    } else if (maxExpense <= 1000) {
+      // For medium values, round to nearest 100
+      maxExpense = ((maxExpense / 100).ceil() * 100).toDouble();
+      interval = maxExpense / 4;
+    } else if (maxExpense <= 10000) {
+      // For large values, round to nearest 1000
+      maxExpense = ((maxExpense / 1000).ceil() * 1000).toDouble();
+      interval = maxExpense / 5;
+    } else {
+      // For very large values, round to nearest 10000
+      maxExpense = ((maxExpense / 10000).ceil() * 10000).toDouble();
+      interval = maxExpense / 5;
+    }
+
     // Ensure minimum scale
     maxExpense = maxExpense < 10 ? 10 : maxExpense;
+    interval = interval < 5 ? 5 : interval;
 
-    print('Max expense for chart: $maxExpense');
+    print('Max expense for chart: $maxExpense, interval: $interval');
 
     // Get current day name to highlight it
-    final currentDayName = _getDayName(DateTime.now());
-    print('Current day name: $currentDayName');
+    final now = DateTime.now();
+    final currentDayName = _getDayName(now);
+    print('Current day name for highlighting: $currentDayName');
+
+    // Create number formatter for Y-axis labels
+    final NumberFormat numberFormat = NumberFormat.compact();
 
     return SfCartesianChart(
       margin: const EdgeInsets.fromLTRB(32, 32, 32, 16),
@@ -753,7 +839,8 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
         opposedPosition: true,
         minimum: 0,
         maximum: maxExpense,
-        interval: maxExpense > 0 ? maxExpense / 2 : 5,
+        interval: interval,
+        numberFormat: numberFormat,
         labelFormat: '\${value}',
         labelStyle: FontConfig.overline().copyWith(
           color: ColorConfig.primarySwatch50,
@@ -780,6 +867,9 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
           spacing: 0.2,
           width: 0.8,
           pointColorMapper: (ChartData data, _) {
+            print(
+                'Checking bar color for day: ${data.x}, isCurrentDay: ${data.x == currentDayName}, value: ${data.y}');
+
             // Highlight selected day first, then current day, then default color
             if (data.x == selectedDay) {
               return ColorConfig.primarySwatch;
@@ -926,6 +1016,16 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
                         ],
                       ),
                     );
+                  }
+
+                  // Check specifically for today's transactions
+                  final todaysTransactions =
+                      transactions.where(_isTransactionFromToday).toList();
+                  print(
+                      'Found ${todaysTransactions.length} transactions for today:');
+                  for (var t in todaysTransactions) {
+                    print(
+                        'Today\'s transaction: ${t.title}, Date: ${t.createdAt}, Amount: ${t.cost}');
                   }
 
                   final chartData = _generateChartData(transactions);
@@ -1122,7 +1222,7 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "\$${weeklyTotal.toStringAsFixed(2)}",
+                            "\$${NumberFormat.compact().format(weeklyTotal)}",
                             style: FontConfig.h6().copyWith(
                               color: ColorConfig.error,
                               fontWeight: FontWeight.bold,
@@ -1154,7 +1254,7 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "\$${dailyAverage.toStringAsFixed(2)}",
+                            "\$${NumberFormat.compact().format(dailyAverage)}",
                             style: FontConfig.h6().copyWith(
                               color: ColorConfig.secondary,
                               fontWeight: FontWeight.bold,

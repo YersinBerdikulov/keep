@@ -81,9 +81,21 @@ class HomeTransactionsNotifier
       // Convert to transaction models and sort by creation date (newest first)
       final transactions = expenses.map((expense) {
         final expenseModel = ExpenseModel.fromJson(expense.data);
+
+        // Print debug info for createdAt field
+        print('Transaction date from DB: ${expenseModel.createdAt}');
+
         return RecentTransactionModel.fromExpense(expenseModel);
       }).toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      // Print all transactions for debugging
+      print('All transactions after sorting:');
+      for (var i = 0; i < transactions.length; i++) {
+        final t = transactions[i];
+        print(
+            '[$i] Title: ${t.title}, Date: ${t.createdAt}, Amount: ${t.cost}');
+      }
 
       return transactions;
     } catch (e) {
