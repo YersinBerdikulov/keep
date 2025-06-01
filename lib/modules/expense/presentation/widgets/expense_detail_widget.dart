@@ -753,18 +753,18 @@ class _SplitDetailsCardState extends ConsumerState<SplitDetailsCard> {
                         leading: CircleAvatar(
                           radius: 20,
                           backgroundColor: ColorConfig.primarySwatch.withOpacity(0.1),
-                          child: user.profileImage != null
-                              ? Image.network(
-                                  user.profileImage!,
-                                  fit: BoxFit.cover,
-                                )
-                              : Text(
+                          backgroundImage: user.profileImage != null
+                              ? NetworkImage(user.profileImage!)
+                              : null,
+                          child: user.profileImage == null
+                              ? Text(
                                   (user.userName ?? user.email ?? "?")[0].toUpperCase(),
                                   style: FontConfig.body1().copyWith(
                                     color: ColorConfig.primarySwatch,
                                     fontWeight: FontWeight.w600,
                                   ),
-                                ),
+                                )
+                              : null,
                         ),
                         titleString: user.userName ?? user.email ?? "Unknown",
                         subtitleString: isLoading ? "Updating status..." : subtitle,
