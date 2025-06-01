@@ -25,7 +25,7 @@ class AdvancedSplitPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: ColorConfig.white,
-      appBar: AppBarWidget(title: "Advanced Split"),
+      appBar: AppBarWidget(title: "Advanced Split", showDrawer: false),
       body: Column(
         children: [
           _buildSplitMethodTabs(ref),

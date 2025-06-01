@@ -12,7 +12,7 @@ class MadeByPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBarWidget(title: "Expense made by"),
+      appBar: AppBarWidget(title: "Expense made by", showDrawer: false),
       body: Column(
         children: [
           const Expanded(child: MadeByFriendListWidget()),

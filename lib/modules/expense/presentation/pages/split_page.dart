@@ -128,7 +128,7 @@ class SplitPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: ColorConfig.white,
-      appBar: AppBarWidget(title: "Split Expense"),
+      appBar: AppBarWidget(title: "Split Expense", showDrawer: false),
       body: Column(
         children: [
           Expanded(

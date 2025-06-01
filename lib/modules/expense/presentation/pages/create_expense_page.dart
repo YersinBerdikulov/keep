@@ -123,7 +123,7 @@ class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
     return Scaffold(
       resizeToAvoidBottomInset:
           true, // Ensure the screen resizes when keyboard appears
-      appBar: AppBarWidget(title: "Create Expense"),
+      appBar: AppBarWidget(title: "Create Expense", showDrawer: false),
       body: Form(
         key: formKey,
         child: Column(
