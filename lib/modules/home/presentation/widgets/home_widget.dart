@@ -566,6 +566,8 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
 
   // Helper method to get the week day name from a date
   String _getDayName(DateTime date) {
+    print(
+        'Getting day name for date: ${date.toString()}, weekday: ${date.weekday}');
     switch (date.weekday) {
       case DateTime.monday:
         return "MON";
@@ -589,19 +591,25 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
   // Generate chart data from transactions
   List<ChartData> _generateChartData(
       List<RecentTransactionModel> transactions) {
-    // Get the current date and calculate the start of the week (Sunday)
+    // Get the current date
     final now = DateTime.now();
-    // Calculate start of week (Sunday)
-    final startOfWeek = DateTime(now.year, now.month, now.day - now.weekday);
+    print('Current date and time: ${now.toString()}');
+
+    // Calculate start of week (Monday)
+    // If today is Monday (weekday = 1), startOfWeek is today
+    // Otherwise, go back to the most recent Monday
+    final startOfWeek =
+        DateTime(now.year, now.month, now.day - (now.weekday - 1));
 
     print('Generating chart data from ${transactions.length} transactions');
     print('Current date: ${now.toString()}');
-    print('Start of week: ${startOfWeek.toString()}');
+    print('Start of week (Monday): ${startOfWeek.toString()}');
 
     // Initialize a map to hold daily totals
     final Map<String, double> dailyTotals = {};
 
-    // Initialize with all days of the week with zero values
+    // Initialize with all days of the week with zero values (Monday to Sunday)
+    final dayOrder = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
     for (int i = 0; i < 7; i++) {
       final day = startOfWeek.add(Duration(days: i));
       final dayName = _getDayName(day);
@@ -619,15 +627,19 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
           print(
               'Transaction date: ${transactionDate.toString()}, Amount: ${transaction.cost}');
 
-          // Calculate the start of the transaction's week
+          // Calculate the transaction day without time component
           final transactionDay = DateTime(
               transactionDate.year, transactionDate.month, transactionDate.day);
+
+          // Calculate days since start of week
           final daysSinceStartOfWeek =
               transactionDay.difference(startOfWeek).inDays;
 
           // Check if the transaction is from the current week (0-6 days from start of week)
           if (daysSinceStartOfWeek >= 0 && daysSinceStartOfWeek < 7) {
             final dayName = _getDayName(transactionDay);
+            print(
+                'Transaction day: $dayName, Days since start of week: $daysSinceStartOfWeek');
             dailyTotals[dayName] =
                 (dailyTotals[dayName] ?? 0) + transaction.cost.toDouble();
             print(
@@ -647,13 +659,9 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
     print('Final daily totals: $dailyTotals');
 
     // Convert to chart data format
-    final chartData = dailyTotals.entries
-        .map((entry) => ChartData(x: entry.key, y: entry.value))
+    final chartData = dayOrder
+        .map((day) => ChartData(x: day, y: dailyTotals[day] ?? 0.0))
         .toList();
-
-    // Sort by day of week
-    final dayOrder = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-    chartData.sort((a, b) => dayOrder.indexOf(a.x!) - dayOrder.indexOf(b.x!));
 
     print('Chart data points: ${chartData.length}');
     for (var data in chartData) {
@@ -666,13 +674,15 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
   // Get transactions for a specific day
   List<RecentTransactionModel> _getTransactionsForDay(
       List<RecentTransactionModel> allTransactions, String dayName) {
-    // Get the current date and calculate the start of the week (Sunday)
+    // Get the current date
     final now = DateTime.now();
-    // Calculate start of week (Sunday)
-    final startOfWeek = DateTime(now.year, now.month, now.day - now.weekday);
+
+    // Calculate start of week (Monday)
+    final startOfWeek =
+        DateTime(now.year, now.month, now.day - (now.weekday - 1));
 
     // Find the date for the selected day
-    final dayOrder = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    final dayOrder = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
     final dayIndex = dayOrder.indexOf(dayName);
     final selectedDate = startOfWeek.add(Duration(days: dayIndex));
 
@@ -683,9 +693,15 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
       if (transaction.createdAt.isNotEmpty) {
         try {
           final transactionDate = DateTime.parse(transaction.createdAt);
-          final isSameDay = transactionDate.year == selectedDate.year &&
-              transactionDate.month == selectedDate.month &&
-              transactionDate.day == selectedDate.day;
+
+          // Compare year, month, and day only (ignore time)
+          final transactionDay = DateTime(
+              transactionDate.year, transactionDate.month, transactionDate.day);
+
+          final selectedDay =
+              DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+
+          final isSameDay = transactionDay.isAtSameMomentAs(selectedDay);
 
           if (isSameDay) {
             print(
@@ -750,6 +766,8 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
         labelStyle: FontConfig.overline().copyWith(
           color: ColorConfig.primarySwatch50,
         ),
+        // Ensure the days are displayed in order from Monday to Sunday
+        arrangeByIndex: true,
       ),
       series: <CartesianSeries<ChartData, String>>[
         ColumnSeries<ChartData, String>(
@@ -761,17 +779,23 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
           borderRadius: BorderRadius.circular(50),
           spacing: 0.2,
           width: 0.8,
-          pointColorMapper: (ChartData data, _) => data.x == selectedDay
-              ? ColorConfig.primarySwatch
-              : data.x == currentDayName
-                  ? ColorConfig.secondary
-                  : ColorConfig.secondary.withOpacity(0.3),
+          pointColorMapper: (ChartData data, _) {
+            // Highlight selected day first, then current day, then default color
+            if (data.x == selectedDay) {
+              return ColorConfig.primarySwatch;
+            } else if (data.x == currentDayName) {
+              return ColorConfig.secondary;
+            } else {
+              return ColorConfig.secondary.withOpacity(0.3);
+            }
+          },
           onPointTap: (pointInteractionDetails) {
             final pointIndex = pointInteractionDetails.pointIndex;
             if (pointIndex != null &&
                 pointIndex >= 0 &&
                 pointIndex < chartData.length) {
               final tappedDay = chartData[pointIndex].x;
+              print('Tapped on day: $tappedDay at index $pointIndex');
               setState(() {
                 // Toggle selection
                 selectedDay = selectedDay == tappedDay ? null : tappedDay;
@@ -1043,7 +1067,9 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
           data: (transactions) {
             // Calculate weekly summary
             final now = DateTime.now();
-            final startOfWeek = now.subtract(Duration(days: now.weekday % 7));
+            // Calculate start of week (Monday)
+            final startOfWeek =
+                DateTime(now.year, now.month, now.day - (now.weekday - 1));
 
             double weeklyTotal = 0;
             int transactionCount = 0;
@@ -1051,20 +1077,32 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
             // Sum up transactions for the week
             for (var transaction in transactions) {
               if (transaction.createdAt.isNotEmpty) {
-                final transactionDate = DateTime.parse(transaction.createdAt);
-                if (transactionDate.isAfter(startOfWeek) &&
-                    transactionDate
-                        .isBefore(now.add(const Duration(days: 1)))) {
-                  weeklyTotal += transaction.cost.toDouble();
-                  transactionCount++;
+                try {
+                  final transactionDate = DateTime.parse(transaction.createdAt);
+                  final transactionDay = DateTime(transactionDate.year,
+                      transactionDate.month, transactionDate.day);
+
+                  // Calculate days since start of week
+                  final daysSinceStartOfWeek =
+                      transactionDay.difference(startOfWeek).inDays;
+
+                  // Check if the transaction is from the current week (0-6 days from start of week)
+                  if (daysSinceStartOfWeek >= 0 && daysSinceStartOfWeek < 7) {
+                    weeklyTotal += transaction.cost.toDouble();
+                    transactionCount++;
+                  }
+                } catch (e) {
+                  print(
+                      'Error parsing date in weekly summary: ${e.toString()}');
                 }
               }
             }
 
             // Calculate average daily expense
-            final daysInWeek =
-                DateTime.now().weekday == 0 ? 7 : DateTime.now().weekday;
-            final dailyAverage = daysInWeek > 0 ? weeklyTotal / daysInWeek : 0;
+            // Calculate how many days have passed in the current week
+            final daysPassedInWeek = now.weekday; // Monday=1, Sunday=7
+            final dailyAverage =
+                daysPassedInWeek > 0 ? weeklyTotal / daysPassedInWeek : 0;
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
