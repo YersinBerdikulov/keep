@@ -22,6 +22,7 @@ import '../../modules/auth/presentation/pages/sign_up_otp_input_page.dart';
 import '../../modules/auth/presentation/pages/sign_up_set_password_page.dart';
 import '../../modules/box/presentation/pages/box_detail_page.dart';
 import '../../modules/box/presentation/pages/create_box_page.dart';
+import '../../modules/box/presentation/pages/update_box_page.dart';
 import '../../modules/expense/presentation/pages/create_expense_page.dart';
 import '../../modules/expense/presentation/pages/expense_detail_page.dart';
 import '../../modules/expense/presentation/pages/update_expense_page.dart';
@@ -146,6 +147,13 @@ final goRouterProvider = Provider<GoRouter>(
           builder: (context, state) {
             Map extra = state.extra as Map<String, dynamic>;
             return CreateBoxPage(groupModel: extra["groupModel"]);
+          },
+        ),
+        GoRoute(
+          path: RouteName.updateBox,
+          builder: (context, state) {
+            Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
+            return UpdateBoxPage(boxModel: extra["boxModel"]);
           },
         ),
         GoRoute(
