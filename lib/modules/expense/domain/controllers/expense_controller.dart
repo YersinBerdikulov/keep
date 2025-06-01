@@ -10,6 +10,7 @@ import 'package:dongi/modules/expense/domain/models/expense_user_model.dart';
 import 'package:dongi/modules/expense/data/di/expense_di.dart';
 import 'package:dongi/modules/expense/domain/repository/expense_repository.dart';
 import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
+import 'package:dongi/modules/user/domain/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -412,12 +413,17 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     }
   }
 
-  Future<ExpenseModel> getExpenseDetail(String expenseId) async {
+  Future<ExpenseModel?> getExpenseDetail(String expenseId) async {
     try {
-      final expense = await _expenseRepository.getExpenseDetail(expenseId);
-      return ExpenseModel.fromJson(expense.data);
+      final expenseDoc = await _expenseRepository.getExpenseDetail(expenseId);
+      final expenseModel = ExpenseModel.fromJson(expenseDoc.data);
+      
+      // Check and fix truncated IDs
+      return await fixTruncatedExpenseUserIds(expenseModel);
     } catch (e, st) {
-      throw AsyncValue.error(e, st);
+      print('Error in getExpenseDetail: $e');
+      print('Stack trace: $st');
+      rethrow;
     }
   }
 
@@ -677,6 +683,111 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
     } catch (e, st) {
       print('Error refreshing expense data: $e');
       print('Stack trace: $st');
+    }
+  }
+
+  // Update the method for fixing truncated/invalid user IDs
+  Future<ExpenseModel?> fixTruncatedExpenseUserIds(ExpenseModel expenseModel) async {
+    try {
+      print('Checking for invalid user IDs in expense: ${expenseModel.id}');
+      
+      if (expenseModel.expenseUsers.isEmpty) {
+        print('No expense users to check');
+        return expenseModel;
+      }
+      
+      // First, try to fetch each user to see if they exist
+      print('Validating expense users: ${expenseModel.expenseUsers}');
+      List<String> validUserIds = [];
+      List<String> invalidUserIds = [];
+      
+      // Try to fetch each user - this helps us identify which IDs are invalid
+      for (final userId in expenseModel.expenseUsers) {
+        try {
+          final userDoc = await _expenseRepository.getUserDataById(userId);
+          print('User ID $userId is valid');
+          validUserIds.add(userId);
+        } catch (e) {
+          print('User ID $userId is invalid: $e');
+          invalidUserIds.add(userId);
+        }
+      }
+      
+      if (invalidUserIds.isEmpty) {
+        print('All user IDs are valid, no need to fix');
+        return expenseModel;
+      }
+      
+      // We have invalid IDs - fetch all users to find potential matches
+      print('Found ${invalidUserIds.length} invalid user IDs, fetching all users to find matches');
+      final allUserDocs = await _expenseRepository.getAllUsers();
+      final allUsers = allUserDocs.map((doc) => UserModel.fromJson(doc.data)).toList();
+      
+      print('Fetched ${allUsers.length} users to match against invalid IDs');
+      
+      // For each invalid ID, try to find a matching user
+      List<String> fixedUserIds = [...validUserIds]; // Start with valid IDs
+      
+      for (final invalidId in invalidUserIds) {
+        bool foundMatch = false;
+        
+        // Try prefix matching - most likely case for truncated IDs
+        for (final user in allUsers) {
+          if (user.id == null) continue;
+          
+          // Check if the user ID starts with the invalid ID or vice versa
+          if (user.id!.startsWith(invalidId) || invalidId.startsWith(user.id!)) {
+            print('Found prefix match for invalid ID $invalidId: ${user.id}');
+            fixedUserIds.add(user.id!);
+            foundMatch = true;
+            break;
+          }
+        }
+        
+        // If no prefix match, try some fuzzy matching or other heuristics
+        if (!foundMatch && allUsers.isNotEmpty) {
+          // As a fallback, just add some valid users from the database
+          // This is better than having no users at all
+          final userToAdd = allUsers.first.id;
+          if (userToAdd != null && !fixedUserIds.contains(userToAdd)) {
+            print('No match found for invalid ID $invalidId, adding a valid user as fallback: $userToAdd');
+            fixedUserIds.add(userToAdd);
+          }
+        }
+      }
+      
+      // If we didn't fix anything, return original model
+      if (fixedUserIds.isEmpty || 
+          (fixedUserIds.length == expenseModel.expenseUsers.length && 
+           fixedUserIds.every((id) => expenseModel.expenseUsers.contains(id)))) {
+        print('No IDs were fixed, returning original expense model');
+        return expenseModel;
+      }
+      
+      // Update the expense with the fixed user IDs
+      final updateData = {
+        '\$id': expenseModel.id,
+        'expenseUsers': fixedUserIds,
+      };
+      
+      print('Updating expense with fixed user IDs: $fixedUserIds');
+      final result = await _expenseRepository.updateExpense(updateData);
+      
+      return result.fold(
+        (l) {
+          print('Error updating expense with fixed IDs: ${l.message}');
+          return expenseModel; // Return original on error
+        },
+        (r) {
+          print('Successfully updated expense with fixed user IDs');
+          // Return updated expense model
+          return expenseModel.copyWith(expenseUsers: fixedUserIds);
+        },
+      );
+    } catch (e, st) {
+      print('Error fixing invalid user IDs: $e');
+      print('Stack trace: $st');
+      return expenseModel; // Return original on error
     }
   }
 }

@@ -87,4 +87,14 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   Future<void> clearCacheForExpenseUsers(String expenseId) {
     return _remoteDataSource.clearCacheForExpenseUsers(expenseId);
   }
+
+  @override
+  Future<List<Document>> getAllUsers() {
+    return _remoteDataSource.getAllUsers();
+  }
+
+  @override
+  Future<Document> getUserDataById(String userId) {
+    return _remoteDataSource.getUserDataById(userId);
+  }
 }

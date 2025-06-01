@@ -571,16 +571,16 @@ class CreateExpenseAction extends ConsumerWidget {
           icon: Icons.group,
           iconColor: ColorConfig.primarySwatch,
           onTap: () {
-            if (users.length > 2) {
-              // For 3+ users, go directly to advanced split
-              context.push(
-                RouteName.expenseAdvancedSplit,
-                extra: {"expenseCost": expenseCost},
-              );
-            } else {
+            if (users.length == 2) {
               // For 2 users, show basic split options
               context.push(
                 RouteName.expenseSplit,
+                extra: {"expenseCost": expenseCost},
+              );
+            } else {
+              // For 3+ users, go directly to advanced split
+              context.push(
+                RouteName.expenseAdvancedSplit,
                 extra: {"expenseCost": expenseCost},
               );
             }

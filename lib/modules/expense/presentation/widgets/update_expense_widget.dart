@@ -18,6 +18,7 @@ import '../../../../shared/widgets/list_tile/list_tile_card.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
 import '../../domain/di/expense_controller_di.dart';
 import '../../../box/domain/di/box_controller_di.dart';
+import '../pages/advanced_split_page.dart';
 
 class UpdateExpenseAmount extends ConsumerWidget {
   final TextEditingController expenseCost;
@@ -164,10 +165,22 @@ class UpdateExpenseAction extends ConsumerWidget {
             title: "split between",
             subtitle: "Splitting method",
             icon: Icons.call_split,
-            onTap: () => context.push(
-              RouteName.expenseSplit,
-              extra: {"expenseCost": expenseCost},
-            ),
+            onTap: () {
+              // Check the number of users to decide which split page to navigate to
+              if (users.length == 2) {
+                // For 2 users, show basic split options
+                context.push(
+                  RouteName.expenseSplit,
+                  extra: {"expenseCost": expenseCost},
+                );
+              } else {
+                // For 3+ users, go directly to advanced split
+                context.push(
+                  RouteName.expenseAdvancedSplit,
+                  extra: {"expenseCost": expenseCost},
+                );
+              }
+            },
           ),
         ],
       ),

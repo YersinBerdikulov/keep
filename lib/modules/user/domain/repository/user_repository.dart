@@ -15,4 +15,7 @@ abstract class UserRepository {
     required String userId,
     required String username,
   });
+  
+  /// Get multiple users by their IDs
+  Future<List<UserModel>> getUsersByIds(List<String> userIds);
 }

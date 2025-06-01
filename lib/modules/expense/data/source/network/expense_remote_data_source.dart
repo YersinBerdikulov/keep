@@ -394,4 +394,36 @@ class ExpenseRemoteDataSource {
       print('Note: Error in cache refresh operation: $e');
     }
   }
+  
+  Future<List<Document>> getAllUsers() async {
+    try {
+      print('Fetching all users from database');
+      final documents = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.usersCollection,
+        queries: [Query.limit(100)], // Use Query.limit instead of limit parameter
+      );
+      
+      print('Found ${documents.documents.length} users in database');
+      return documents.documents;
+    } catch (e) {
+      print('Error fetching all users: $e');
+      return [];
+    }
+  }
+  
+  Future<Document> getUserDataById(String userId) async {
+    try {
+      print('Fetching user data for ID: $userId');
+      final document = await _db.getDocument(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.usersCollection,
+        documentId: userId,
+      );
+      return document;
+    } catch (e) {
+      print('Error fetching user with ID $userId: $e');
+      rethrow; // Rethrow to let the caller handle the error
+    }
+  }
 }

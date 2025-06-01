@@ -13,6 +13,7 @@ import '../../../../shared/widgets/card/card.dart';
 import '../../../../shared/widgets/text_field/text_field.dart';
 import '../../domain/di/expense_controller_di.dart';
 import '../widgets/update_expense_widget.dart';
+import '../../../box/domain/di/box_controller_di.dart';
 
 class UpdateExpensePage extends StatefulHookConsumerWidget {
   final ExpenseModel expenseModel;
@@ -34,13 +35,64 @@ class UpdateExpensePage extends StatefulHookConsumerWidget {
 class _UpdateExpensePageState extends ConsumerState<UpdateExpensePage> {
   final _formKey = GlobalKey<FormState>();
 
-  //@override
-  //void initState() {
-  //  ref
-  //      .read(splitUserProvider.notifier)
-  //      .addAll(widget.expenseModel.expenseUsers);
-  //  super.initState();
-  //}
+  @override
+  void initState() {
+    super.initState();
+    
+    // Initialize providers for update
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        print('Initializing update expense page...');
+        // Reset all providers first to prevent "No element" error
+        ref.read(userInBoxStoreProvider.notifier).state = [];
+        ref.read(selectedSplitOptionProvider.notifier).state = -1;
+        ref.read(advancedSplitMethodProvider.notifier).state = null;
+        ref.read(customSplitAmountsProvider.notifier).state = {};
+        ref.read(customSplitPercentagesProvider.notifier).state = {};
+        ref.read(splitUserProvider.notifier).state = [];
+        ref.read(userSharesProvider.notifier).state = {};
+        
+        // Set the payer ID
+        ref.read(expensePayerIdProvider.notifier).state = widget.expenseModel.payerId;
+
+        // Load box members
+        final boxController = ref.read(boxNotifierProvider(widget.groupModel.id!).notifier);
+        
+        // Combine box users and expense users to ensure all are loaded
+        final allUserIds = [...widget.boxModel.boxUsers];
+        
+        // Add any expense users that might not be in the box users list
+        for (final userId in widget.expenseModel.expenseUsers) {
+          if (!allUserIds.contains(userId)) {
+            allUserIds.add(userId);
+          }
+        }
+        
+        final users = await boxController.getUsersInBox(allUserIds);
+        
+        print('Loaded all users for expense: ${users.map((u) => u.id).toList()}');
+
+        if (mounted) {
+          // Update the user store with all users
+          ref.read(userInBoxStoreProvider.notifier).state = users;
+          
+          // Set the split users to match the expense users
+          ref.read(splitUserProvider.notifier).state = widget.expenseModel.expenseUsers;
+          
+          // Initialize shares with 1 for each user
+          if (users.isNotEmpty) {
+            final initialShares = Map<String, int>.fromEntries(
+              users.where((user) => user.id != null)
+                  .map((user) => MapEntry(user.id!, 1))
+            );
+            ref.read(userSharesProvider.notifier).state = initialShares;
+          }
+        }
+      } catch (e) {
+        print('Error initializing update expense page: $e');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

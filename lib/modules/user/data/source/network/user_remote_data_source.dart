@@ -151,19 +151,28 @@ class UserRemoteDataSource implements UserRepositoryImpl {
     }
 
     try {
-      final document = await _db.listDocuments(
-        databaseId: AppwriteConfig.databaseId,
-        collectionId: AppwriteConfig.usersCollection,
-        queries: [
-          Query.equal('\$id', userIds),
-        ],
-      );
-
-      return document.documents
-          .map((user) => UserModel.fromJson(user.data))
-          .toList();
+      // Fetch users one by one since Appwrite doesn't support querying multiple IDs with equality
+      List<UserModel> users = [];
+      
+      for (String userId in userIds) {
+        try {
+          final document = await _db.getDocument(
+            databaseId: AppwriteConfig.databaseId,
+            collectionId: AppwriteConfig.usersCollection,
+            documentId: userId,
+          );
+          
+          users.add(UserModel.fromJson(document.data));
+        } catch (e) {
+          print('Error fetching user with ID $userId: $e');
+          // Continue with next user
+        }
+      }
+      
+      print('Found ${users.length} users out of ${userIds.length} requested');
+      return users;
     } catch (e) {
-      print('Error fetching users: $e');
+      print('Error in getUsersListData: $e');
       return [];
     }
   }
@@ -229,25 +238,79 @@ class UserRemoteDataSource implements UserRepositoryImpl {
   }
 
   @override
-  FutureEitherVoid updateUsername(
-      {required String userId, required String username}) async {
+  FutureEitherVoid updateUsername({
+    required String userId,
+    required String username,
+  }) async {
     try {
-      await _db.updateDocument(
+      final document = await _db.updateDocument(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.usersCollection,
         documentId: userId,
-        data: {'username': username},
+        data: {
+          'userName': username,
+        },
       );
+
       return right(null);
     } on AppwriteException catch (e, st) {
-      return left(
-        Failure(
-          e.message ?? 'Some unexpected error occurred',
-          st,
-        ),
-      );
+      print('Error updating username: $e');
+      return left(Failure(e.message ?? 'Unknown error', st));
     } catch (e, st) {
+      print('Unexpected error updating username: $e');
       return left(Failure(e.toString(), st));
+    }
+  }
+
+  @override
+  Future<List<UserModel>> getUsersByIds(List<String> userIds) async {
+    // Check if the user IDs might be truncated
+    if (userIds.isNotEmpty && userIds.any((id) => id.length < 30)) {
+      print('Detected potentially truncated IDs. Trying to find matching users...');
+      return _getUsersByTruncatedIds(userIds);
+    }
+    
+    // Reuse the getUsersListData method for full IDs
+    return getUsersListData(userIds);
+  }
+  
+  // Method to handle truncated user IDs by fetching all users and matching by prefix
+  Future<List<UserModel>> _getUsersByTruncatedIds(List<String> truncatedIds) async {
+    try {
+      // Fetch all users (limit to 100 for performance)
+      final document = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.usersCollection,
+        queries: [Query.limit(100)],
+      );
+      
+      if (document.documents.isEmpty) {
+        print('No users found in database');
+        return [];
+      }
+      
+      // Convert to UserModel objects
+      final allUsers = document.documents.map((doc) => UserModel.fromJson(doc.data)).toList();
+      print('Found ${allUsers.length} total users in database');
+      
+      // Filter users whose IDs start with any of the truncated IDs
+      final matchedUsers = allUsers.where((user) {
+        if (user.id == null) return false;
+        
+        return truncatedIds.any((truncatedId) {
+          final isMatch = user.id!.startsWith(truncatedId);
+          if (isMatch) {
+            print('Found matching user for truncated ID $truncatedId: ${user.id}');
+          }
+          return isMatch;
+        });
+      }).toList();
+      
+      print('Matched ${matchedUsers.length} users out of ${truncatedIds.length} truncated IDs');
+      return matchedUsers;
+    } catch (e) {
+      print('Error in _getUsersByTruncatedIds: $e');
+      return [];
     }
   }
 }

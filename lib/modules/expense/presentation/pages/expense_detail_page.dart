@@ -42,15 +42,18 @@ class ExpenseDetailPage extends ConsumerWidget {
         error: (error, stackTrace) => ErrorTextWidget(error),
         data: (data) {
           return SliverAppBarWidget(
-            appbarTitle: UserInfoExpenseDetail(creatorId: data.creatorId),
+            appbarTitle: UserInfoExpenseDetail(creatorId: data?.creatorId ?? ''),
             child: ListView(
               padding: EdgeInsets.zero,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                InfoExpenseDetail(expenseModel: data),
-                SplitDetailsCard(expenseModel: data),
-                const SizedBox(height: 20),
+                if (data != null) ...[
+                  InfoExpenseDetail(expenseModel: data),
+                  SplitDetailsCard(expenseModel: data),
+                  const SizedBox(height: 20),
+                ] else
+                  const Center(child: Text('Expense data not available')),
               ],
             ),
           );

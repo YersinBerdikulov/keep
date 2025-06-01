@@ -20,6 +20,12 @@ abstract class ExpenseRepository {
   FutureEither<bool> deleteExpenseUser(String id);
   FutureEither<bool> updateExpenseUser(Map updateExpenseUserData);
   
+  // Get all users from the database (for ID matching)
+  Future<List<Document>> getAllUsers();
+  
+  // Get a user by ID to validate if it exists
+  Future<Document> getUserDataById(String userId);
+  
   // Add cache clearing methods
   Future<void> clearCacheForExpense(String expenseId);
   Future<void> clearCacheForExpenseUsers(String expenseId);

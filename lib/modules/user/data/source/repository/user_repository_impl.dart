@@ -49,4 +49,9 @@ class UserRepositoryImpl implements UserRepository {
       {required String userId, required String username}) {
     return _remoteDataSource.updateUsername(userId: userId, username: username);
   }
+
+  @override
+  Future<List<UserModel>> getUsersByIds(List<String> userIds) {
+    return _remoteDataSource.getUsersListData(userIds);
+  }
 }
