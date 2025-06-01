@@ -105,6 +105,126 @@ class InfoExpenseDetail extends ConsumerWidget {
 
   const InfoExpenseDetail({super.key, required this.expenseModel});
 
+  String _extractCategoryNameFromId(String? categoryId) {
+    print('\n=== Category Name Extraction ===');
+    print('Input category ID: $categoryId');
+
+    if (categoryId == null) {
+      print('Category ID is null, returning "others"');
+      return 'others';
+    }
+
+    // If the ID contains an underscore, it's a generated ID (timestamp_category_name)
+    if (categoryId.contains('_')) {
+      print('Category ID contains underscore, splitting: $categoryId');
+      final parts = categoryId.split('_');
+      print('Split parts: $parts');
+      if (parts.length > 1) {
+        // Skip the timestamp (first part) and join the rest
+        final result =
+            parts.sublist(1).join('_').replaceAll('_', ' ').toLowerCase();
+        print('Extracted category name: $result');
+        return result;
+      }
+    }
+
+    // If we can't extract a proper name, return the ID as is
+    print('Using category ID as is: $categoryId');
+    return categoryId.toLowerCase();
+  }
+
+  IconData _getCategoryIcon(String categoryId) {
+    print('\n=== Getting Category Icon ===');
+    final categoryName = _extractCategoryNameFromId(categoryId)
+        .toLowerCase()
+        .replaceAll(' ', '_');
+    print('Looking up icon for category name: $categoryName');
+
+    IconData icon;
+    switch (categoryName) {
+      case 'food':
+        icon = Icons.restaurant;
+        break;
+      case 'transportation':
+        icon = Icons.directions_car;
+        break;
+      case 'entertainment':
+        icon = Icons.movie;
+        break;
+      case 'shopping':
+        icon = Icons.shopping_bag;
+        break;
+      case 'bills':
+        icon = Icons.receipt;
+        break;
+      case 'health':
+        icon = Icons.medical_services;
+        break;
+      case 'travel':
+        icon = Icons.flight;
+        break;
+      case 'education':
+        icon = Icons.school;
+        break;
+      default:
+        print('No matching icon found for category: $categoryName');
+        icon = Icons.category_outlined;
+    }
+    print('Selected icon: $icon');
+    return icon;
+  }
+
+  String _getCategoryName(String categoryId) {
+    print('\n=== Getting Category Display Name ===');
+    final categoryName = _extractCategoryNameFromId(categoryId).toLowerCase();
+    print('Looking up display name for category: $categoryName');
+
+    String displayName;
+    switch (categoryName) {
+      case 'food':
+        displayName = 'Food';
+        break;
+      case 'transportation':
+        displayName = 'Transportation';
+        break;
+      case 'entertainment':
+        displayName = 'Entertainment';
+        break;
+      case 'shopping':
+        displayName = 'Shopping';
+        break;
+      case 'bills':
+        displayName = 'Bills';
+        break;
+      case 'health':
+        displayName = 'Health';
+        break;
+      case 'travel':
+        displayName = 'Travel';
+        break;
+      case 'education':
+        displayName = 'Education';
+        break;
+      default:
+        // Only return 'Others' if the category is actually 'others'
+        if (categoryName == 'others') {
+          print('Category is actually Others');
+          displayName = 'Others';
+        } else {
+          // Otherwise capitalize the extracted name
+          displayName = categoryName
+              .split(' ')
+              .map((word) => word.isEmpty
+                  ? ''
+                  : '${word[0].toUpperCase()}${word.substring(1)}')
+              .join(' ');
+          print('Using extracted name: $displayName');
+        }
+    }
+    print('Final display name: $displayName');
+    return displayName;
+  }
+
   String _formatDate(String? dateStr) {
     if (dateStr == null) return 'Unknown date';
     try {
@@ -275,6 +395,13 @@ class InfoExpenseDetail extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print(
+        'InfoExpenseDetail - Expense model category ID: ${expenseModel.categoryId}'); // Debug log
+
+    final categoryId = expenseModel.categoryId ?? 'others';
+    final categoryName = _getCategoryName(categoryId);
+    final categoryIcon = _getCategoryIcon(categoryId);
+
     return Column(
       children: [
         Padding(
@@ -325,13 +452,61 @@ class InfoExpenseDetail extends ConsumerWidget {
                 Icons.account_balance_wallet_outlined,
                 ColorConfig.primarySwatch,
               ),
+              const SizedBox(height: 10),
+              Container(
+                decoration: BoxDecoration(
+                  color: ColorConfig.grey,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: ColorConfig.primarySwatch25,
+                    width: 1,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: ColorConfig.secondary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          categoryIcon,
+                          color: ColorConfig.secondary,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Category",
+                              style: FontConfig.overline().copyWith(
+                                color: ColorConfig.primarySwatch50,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              categoryName,
+                              style: FontConfig.body1().copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: ColorConfig.midnight,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
-        if (expenseModel.categoryId != null) ...[
-          const SizedBox(height: 16),
-          CategoryInfoCard(categoryId: expenseModel.categoryId!),
-        ],
       ],
     );
   }
@@ -938,22 +1113,73 @@ class CategoryInfoCard extends ConsumerWidget {
 
   const CategoryInfoCard({super.key, required this.categoryId});
 
-  Map<String, IconData> getCategoryIcon() {
+  Map<String, Map<String, dynamic>> getCategoryInfo() {
     return {
-      'food': Icons.restaurant,
-      'transportation': Icons.directions_car,
-      'entertainment': Icons.movie,
-      'shopping': Icons.shopping_bag,
-      'bills': Icons.receipt,
-      'health': Icons.medical_services,
-      'travel': Icons.flight,
-      'education': Icons.school,
-      'others': Icons.category_outlined,
+      'food': {
+        'icon': Icons.restaurant,
+        'name': 'Food',
+        'color': ColorConfig.secondary,
+      },
+      'transportation': {
+        'icon': Icons.directions_car,
+        'name': 'Transportation',
+        'color': ColorConfig.secondary,
+      },
+      'entertainment': {
+        'icon': Icons.movie,
+        'name': 'Entertainment',
+        'color': ColorConfig.secondary,
+      },
+      'shopping': {
+        'icon': Icons.shopping_bag,
+        'name': 'Shopping',
+        'color': ColorConfig.secondary,
+      },
+      'bills': {
+        'icon': Icons.receipt,
+        'name': 'Bills',
+        'color': ColorConfig.secondary,
+      },
+      'health': {
+        'icon': Icons.medical_services,
+        'name': 'Health',
+        'color': ColorConfig.secondary,
+      },
+      'travel': {
+        'icon': Icons.flight,
+        'name': 'Travel',
+        'color': ColorConfig.secondary,
+      },
+      'education': {
+        'icon': Icons.school,
+        'name': 'Education',
+        'color': ColorConfig.secondary,
+      },
+      'others': {
+        'icon': Icons.category_outlined,
+        'name': 'Others',
+        'color': ColorConfig.secondary,
+      },
     };
+  }
+
+  String getCategoryNameFromId(String id) {
+    // The category ID should be directly usable as the category name
+    return id.toLowerCase();
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final categoryInfo = getCategoryInfo();
+    final categoryName = getCategoryNameFromId(categoryId);
+    // Always provide a default value to ensure categoryData is not null
+    final categoryData = categoryInfo[categoryName] ??
+        {
+          'icon': Icons.category_outlined,
+          'name': categoryName.toUpperCase(),
+          'color': ColorConfig.secondary,
+        };
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Container(
@@ -976,7 +1202,7 @@ class CategoryInfoCard extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  Icons.category,
+                  categoryData['icon'] as IconData,
                   color: ColorConfig.secondary,
                   size: 20,
                 ),
@@ -994,7 +1220,7 @@ class CategoryInfoCard extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      categoryId,
+                      categoryData['name'] as String,
                       style: FontConfig.body1().copyWith(
                         fontWeight: FontWeight.w600,
                         color: ColorConfig.midnight,

@@ -16,8 +16,8 @@ final expenseNotifierProvider =
   ExpenseNotifier.new,
 );
 
-final getExpensesInBoxProvider =
-    FutureProvider.family.autoDispose<List<ExpenseModel>, String>((ref, boxId) async {
+final getExpensesInBoxProvider = FutureProvider.family
+    .autoDispose<List<ExpenseModel>, String>((ref, boxId) async {
   final expenseController = ref.watch(expenseNotifierProvider.notifier);
   return expenseController.getExpensesInBox(boxId);
 });
@@ -29,14 +29,16 @@ final getExpensesDetailProvider =
 });
 
 // New provider for fetching expense users
-final getExpenseUsersProvider = FutureProvider.family<List<UserModel>, List<String>>((ref, userIds) async {
+final getExpenseUsersProvider =
+    FutureProvider.family<List<UserModel>, List<String>>((ref, userIds) async {
   if (userIds.isEmpty) return [];
-  
+
   final userController = ref.watch(userNotifierProvider.notifier);
   final users = await Future.wait(
-    userIds.map((uid) => userController.getUserData(uid).catchError((e) => null)),
+    userIds
+        .map((uid) => userController.getUserData(uid).catchError((e) => null)),
   );
-  
+
   // Filter out null values (users that weren't found) and return the list
   return users.whereType<UserModel>().toList();
 });
@@ -98,32 +100,36 @@ final expenseAvailableCurrenciesProvider = Provider<List<String>>((ref) => [
       'JPY',
     ]);
 
-final expenseDetailsProvider = FutureProvider.autoDispose.family<ExpenseModel, String>((ref, expenseId) async {
+final expenseDetailsProvider = FutureProvider.autoDispose
+    .family<ExpenseModel, String>((ref, expenseId) async {
   final expenseRepository = ref.watch(expenseRepositoryProvider);
   final expenseDoc = await expenseRepository.getExpenseDetail(expenseId);
   return ExpenseModel.fromJson(expenseDoc.data);
 });
 
-final getExpenseUsersForExpenseProvider = FutureProvider.family<List<Document>, String>((ref, expenseId) async {
+final getExpenseUsersForExpenseProvider =
+    FutureProvider.family<List<Document>, String>((ref, expenseId) async {
   final expenseRepository = ref.watch(expenseRepositoryProvider);
   final expenseUsers = await expenseRepository.getExpenseUsers(expenseId);
   return expenseUsers;
 });
 
 // Optimized provider to track a single expense user's settlement status with caching
-final expenseUserSettlementStatusProvider = FutureProvider.family<bool, Map<String, String>>((ref, params) async {
+final expenseUserSettlementStatusProvider =
+    FutureProvider.family<bool, Map<String, String>>((ref, params) async {
   final expenseId = params['expenseId'];
   final userId = params['userId'];
-  
+
   if (expenseId == null || userId == null) {
     throw Exception('Invalid params: expenseId and userId are required');
   }
-  
+
   print('Checking settlement status for expense: $expenseId, user: $userId');
-  
+
   // Use the cached expense users if available
-  final allExpenseUsersAsync = ref.watch(getExpenseUsersForExpenseProvider(expenseId));
-  
+  final allExpenseUsersAsync =
+      ref.watch(getExpenseUsersForExpenseProvider(expenseId));
+
   // If we already have the expense users loaded, use them
   if (allExpenseUsersAsync.hasValue) {
     try {
@@ -131,7 +137,7 @@ final expenseUserSettlementStatusProvider = FutureProvider.family<bool, Map<Stri
       final expenseUser = expenseUsers.firstWhere(
         (eu) => ExpenseUserModel.fromJson(eu.data).userId == userId,
       );
-      
+
       final isSettled = ExpenseUserModel.fromJson(expenseUser.data).isSettled;
       print('Settlement status for user $userId: $isSettled (from cache)');
       return isSettled;
@@ -140,16 +146,16 @@ final expenseUserSettlementStatusProvider = FutureProvider.family<bool, Map<Stri
       // Fall through to direct fetch if cache lookup fails
     }
   }
-  
+
   // Direct fetch if not in cache
   final repository = ref.read(expenseRepositoryProvider);
   final expenseUsers = await repository.getExpenseUsers(expenseId);
-  
+
   try {
     final expenseUser = expenseUsers.firstWhere(
       (eu) => ExpenseUserModel.fromJson(eu.data).userId == userId,
     );
-    
+
     final isSettled = ExpenseUserModel.fromJson(expenseUser.data).isSettled;
     print('Settlement status for user $userId: $isSettled (direct fetch)');
     return isSettled;
@@ -158,3 +164,6 @@ final expenseUserSettlementStatusProvider = FutureProvider.family<bool, Map<Stri
     return false;
   }
 });
+
+// Provider for category filtering in box detail page
+final selectedCategoryFilterProvider = StateProvider<String?>((ref) => null);

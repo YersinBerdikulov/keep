@@ -16,10 +16,12 @@ import '../../../../core/router/router_names.dart';
 class CreateExpensePage extends ConsumerStatefulWidget {
   final GroupModel groupModel;
   final BoxModel boxModel;
+  final String? selectedCategory;
   const CreateExpensePage({
     super.key,
     required this.groupModel,
     required this.boxModel,
+    this.selectedCategory,
   });
 
   @override
@@ -48,6 +50,12 @@ class _CreateExpensePageState extends ConsumerState<CreateExpensePage> {
         ref.read(splitUserProvider.notifier).state = [];
         ref.read(userSharesProvider.notifier).state = {};
         ref.read(expensePayerIdProvider.notifier).state = null;
+
+        // Set the selected category if provided
+        if (widget.selectedCategory != null) {
+          ref.read(expenseCategoryIdProvider.notifier).state =
+              widget.selectedCategory;
+        }
 
         // Load box members
         final boxController =

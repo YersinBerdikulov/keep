@@ -417,32 +417,63 @@ class CategoryListBoxDetail extends ConsumerWidget {
         {
           'icon': Icons.restaurant,
           'name': 'Food',
+          'id': 'food',
           'color': const Color(0xFFFF6B6B),
         },
         {
           'icon': Icons.directions_car,
           'name': 'Transport',
+          'id': 'transportation',
           'color': const Color(0xFF4ECDC4),
         },
         {
           'icon': Icons.shopping_bag,
           'name': 'Shopping',
+          'id': 'shopping',
           'color': const Color(0xFFFFBE0B),
         },
         {
           'icon': Icons.movie,
           'name': 'Entertainment',
+          'id': 'entertainment',
           'color': const Color(0xFF845EC2),
         },
         {
           'icon': Icons.home,
           'name': 'Bills',
+          'id': 'bills',
           'color': const Color(0xFF00B8A9),
+        },
+        {
+          'icon': Icons.medical_services,
+          'name': 'Health',
+          'id': 'health',
+          'color': const Color(0xFF4D8076),
+        },
+        {
+          'icon': Icons.flight,
+          'name': 'Travel',
+          'id': 'travel',
+          'color': const Color(0xFFFF9671),
+        },
+        {
+          'icon': Icons.school,
+          'name': 'Education',
+          'id': 'education',
+          'color': const Color(0xFF00C9A7),
+        },
+        {
+          'icon': Icons.category_outlined,
+          'name': 'Others',
+          'id': 'others',
+          'color': const Color(0xFF4B4453),
         },
       ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedCategory = ref.watch(selectedCategoryFilterProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -480,43 +511,63 @@ class CategoryListBoxDetail extends ConsumerWidget {
             itemCount: _temporaryCategories.length,
             itemBuilder: (context, index) {
               final category = _temporaryCategories[index];
-              return Container(
-                width: 80,
-                margin: EdgeInsets.only(
-                  right: index != _temporaryCategories.length - 1 ? 12 : 0,
-                ),
-                decoration: BoxDecoration(
-                  color: category['color'].withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: category['color'].withOpacity(0.2),
-                    width: 1,
+              final isSelected = selectedCategory == category['id'];
+
+              return GestureDetector(
+                onTap: () {
+                  if (isSelected) {
+                    ref.read(selectedCategoryFilterProvider.notifier).state =
+                        null;
+                  } else {
+                    ref.read(selectedCategoryFilterProvider.notifier).state =
+                        category['id'];
+                  }
+                },
+                child: Container(
+                  width: 80,
+                  margin: EdgeInsets.only(
+                    right: index != _temporaryCategories.length - 1 ? 12 : 0,
                   ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: category['color'].withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        category['icon'],
-                        color: category['color'],
-                        size: 24,
-                      ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? category['color']
+                        : category['color'].withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected
+                          ? category['color']
+                          : category['color'].withOpacity(0.2),
+                      width: 1,
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      category['name'],
-                      style: FontConfig.caption().copyWith(
-                        color: ColorConfig.midnight,
-                        fontWeight: FontWeight.w500,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Colors.white.withOpacity(0.2)
+                              : category['color'].withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          category['icon'],
+                          color: isSelected ? Colors.white : category['color'],
+                          size: 24,
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      Text(
+                        category['name'],
+                        style: FontConfig.caption().copyWith(
+                          color:
+                              isSelected ? Colors.white : ColorConfig.midnight,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -608,23 +659,68 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
       }
     });
 
+    // Watch the category filter
+    final selectedCategory = ref.watch(selectedCategoryFilterProvider);
+
+    // Filter expenses by category if one is selected
+    final filteredExpenses = selectedCategory != null && _expenses != null
+        ? _expenses!.where((e) => e.categoryId == selectedCategory).toList()
+        : _expenses;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 25, 16, 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Expenses',
-            style: FontConfig.body1(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Expenses',
+                style: FontConfig.body1(),
+              ),
+              if (selectedCategory != null)
+                GestureDetector(
+                  onTap: () {
+                    ref.read(selectedCategoryFilterProvider.notifier).state =
+                        null;
+                  },
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: ColorConfig.secondary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Clear Filter",
+                          style: FontConfig.caption().copyWith(
+                            color: ColorConfig.secondary,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.close,
+                          size: 16,
+                          color: ColorConfig.secondary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 10),
-          _buildExpenseList(),
+          _buildExpenseList(filteredExpenses),
         ],
       ),
     );
   }
 
-  Widget _buildExpenseList() {
+  Widget _buildExpenseList(List<ExpenseModel>? expenses) {
     if (_isLoading) {
       return const LoadingWidget();
     }
@@ -633,7 +729,7 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
       return ErrorTextWidget(_error!);
     }
 
-    if (_expenses == null || _expenses!.isEmpty) {
+    if (expenses == null || expenses.isEmpty) {
       return Container(
         margin: const EdgeInsets.only(top: 20),
         padding: const EdgeInsets.all(24),
@@ -686,10 +782,10 @@ class _ExpenseListBoxDetailState extends ConsumerState<ExpenseListBoxDetail> {
         padding: const EdgeInsets.only(top: 10),
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: _expenses!.length,
+        itemCount: expenses.length,
         itemBuilder: (context, index) {
           return ExpenseCardItem(
-            expenseModel: _expenses![index],
+            expenseModel: expenses[index],
             boxModel: widget.boxModel,
             groupModel: widget.groupModel,
           );
@@ -717,65 +813,116 @@ class ExpenseCardItem extends ConsumerStatefulWidget {
 
 class _ExpenseCardItemState extends ConsumerState<ExpenseCardItem> {
   bool _isDeleting = false;
+  Key key = UniqueKey();
 
-  Future<void> _deleteExpense() async {
-    if (_isDeleting) return;
-
-    setState(() {
-      _isDeleting = true;
-    });
-
-    try {
-      await ref.read(expenseNotifierProvider.notifier).deleteExpense(
-          expenseModel: widget.expenseModel, boxModel: widget.boxModel);
-
-      if (mounted) {
-        showSnackBar(context, content: "Expense deleted successfully!!");
-
-        // Instead of refreshing, navigate back if this was the last expense
-        if (widget.boxModel.expenseIds.length <= 1) {
-          if (context.mounted) {
-            context.pop();
-          }
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        showSnackBar(context,
-            content: "Failed to delete expense: ${e.toString()}");
-        setState(() {
-          _isDeleting = false;
-        });
-      }
-    }
+  Map<String, Map<String, dynamic>> getCategoryInfo() {
+    return {
+      'food': {
+        'icon': Icons.restaurant,
+        'name': 'Food',
+        'color': ColorConfig.secondary,
+      },
+      'transportation': {
+        'icon': Icons.directions_car,
+        'name': 'Transportation',
+        'color': ColorConfig.secondary,
+      },
+      'entertainment': {
+        'icon': Icons.movie,
+        'name': 'Entertainment',
+        'color': ColorConfig.secondary,
+      },
+      'shopping': {
+        'icon': Icons.shopping_bag,
+        'name': 'Shopping',
+        'color': ColorConfig.secondary,
+      },
+      'bills': {
+        'icon': Icons.receipt,
+        'name': 'Bills',
+        'color': ColorConfig.secondary,
+      },
+      'health': {
+        'icon': Icons.medical_services,
+        'name': 'Health',
+        'color': ColorConfig.secondary,
+      },
+      'travel': {
+        'icon': Icons.flight,
+        'name': 'Travel',
+        'color': ColorConfig.secondary,
+      },
+      'education': {
+        'icon': Icons.school,
+        'name': 'Education',
+        'color': ColorConfig.secondary,
+      },
+      'others': {
+        'icon': Icons.category_outlined,
+        'name': 'Others',
+        'color': ColorConfig.secondary,
+      },
+    };
   }
+
+  List<PopupMenuEntry> get menuItems => [
+        PopupMenuItem(
+          child: const Text('Edit'),
+          onTap: () => context.push(
+            RouteName.updateExpense,
+            extra: {
+              "expenseModel": widget.expenseModel,
+              "boxModel": widget.boxModel,
+              "groupModel": widget.groupModel,
+            },
+          ),
+        ),
+        if (ref.read(currentUserProvider)?.id ==
+                widget.expenseModel.creatorId ||
+            ref.watch(isCurrentUserAdminProvider(widget.groupModel.id!)))
+          PopupMenuItem(
+            child: const Text('Delete'),
+            onTap: () async {
+              setState(() {
+                _isDeleting = true;
+              });
+
+              try {
+                await ref.read(expenseNotifierProvider.notifier).deleteExpense(
+                      expenseModel: widget.expenseModel,
+                      boxModel: widget.boxModel,
+                    );
+
+                if (!mounted) return;
+
+                showSnackBar(
+                  context,
+                  content: 'Expense deleted successfully',
+                );
+              } catch (e) {
+                if (!mounted) return;
+
+                showSnackBar(
+                  context,
+                  content: e.toString(),
+                );
+              } finally {
+                if (mounted) {
+                  setState(() {
+                    _isDeleting = false;
+                  });
+                }
+              }
+            },
+          ),
+      ];
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey key = GlobalKey();
-
-    List<PopupMenuEntry> menuItems = [
-      PopupMenuItem(
-        child: const Text('Edit'),
-        onTap: () => context.push(
-          RouteName.updateExpense,
-          extra: {
-            "expenseModel": widget.expenseModel,
-            "boxModel": widget.boxModel,
-            "groupModel": widget.groupModel,
-          },
-        ),
-      ),
-    ];
-
-    // Conditionally add delete option
-    if (ref.read(currentUserProvider)?.id == widget.expenseModel.creatorId ||
-        ref.watch(isCurrentUserAdminProvider(widget.groupModel.id!))) {
-      menuItems.add(PopupMenuItem(
-        onTap: _deleteExpense,
-        child: const Text('Delete'),
-      ));
-    }
+    final categoryInfo = getCategoryInfo();
+    final currentCategory = widget.expenseModel.categoryId?.toLowerCase();
+    final categoryData =
+        currentCategory != null ? categoryInfo[currentCategory] : null;
 
     return Column(
       children: [
@@ -813,24 +960,50 @@ class _ExpenseCardItemState extends ConsumerState<ExpenseCardItem> {
                 endActionPane: ActionPane(
                   extentRatio: 0.25,
                   motion: const ScrollMotion(),
-                  dismissible: DismissiblePane(
-                    onDismissed: _deleteExpense,
-                  ),
                   children: [
-                    DeleteButtonWrapper(
-                      groupId: widget.groupModel.id!,
-                      creatorId: widget.expenseModel.creatorId,
-                      child: SlidableAction(
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
-                        ),
-                        onPressed: (context) => _deleteExpense(),
-                        backgroundColor: const Color(0xFFFE4A49),
-                        foregroundColor: Colors.white,
-                        icon: Icons.delete,
-                        label: 'Delete',
+                    SlidableAction(
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
                       ),
+                      onPressed: (context) async {
+                        setState(() {
+                          _isDeleting = true;
+                        });
+
+                        try {
+                          await ref
+                              .read(expenseNotifierProvider.notifier)
+                              .deleteExpense(
+                                expenseModel: widget.expenseModel,
+                                boxModel: widget.boxModel,
+                              );
+
+                          if (!mounted) return;
+
+                          showSnackBar(
+                            context,
+                            content: 'Expense deleted successfully',
+                          );
+                        } catch (e) {
+                          if (!mounted) return;
+
+                          showSnackBar(
+                            context,
+                            content: e.toString(),
+                          );
+                        } finally {
+                          if (mounted) {
+                            setState(() {
+                              _isDeleting = false;
+                            });
+                          }
+                        }
+                      },
+                      backgroundColor: const Color(0xFFFE4A49),
+                      foregroundColor: Colors.white,
+                      icon: Icons.delete,
+                      label: 'Delete',
                     ),
                   ],
                 ),
@@ -844,23 +1017,51 @@ class _ExpenseCardItemState extends ConsumerState<ExpenseCardItem> {
                     titleString: widget.expenseModel.title,
                     trailing: Text("\$${widget.expenseModel.cost}"),
                     visualDensity: const VisualDensity(vertical: -2),
-                    subtitleString: widget.expenseModel.createdAt!.toTimeAgo(),
-                    leading: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: widget.expenseModel.isSettled
-                            ? ColorConfig.success.withOpacity(0.1)
-                            : const Color(0xFFFE4A49).withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        widget.expenseModel.isSettled
-                            ? Icons.check_circle
-                            : Icons.currency_exchange,
-                        size: 16,
-                        color: widget.expenseModel.isSettled
-                            ? ColorConfig.success
-                            : const Color(0xFFFE4A49),
+                    subtitleString: categoryData != null
+                        ? categoryData['name']
+                        : widget.expenseModel.createdAt!.toTimeAgo(),
+                    leading: GestureDetector(
+                      onTap: () {
+                        if (widget.expenseModel.categoryId != null) {
+                          // Toggle category filter
+                          final currentFilter =
+                              ref.read(selectedCategoryFilterProvider);
+                          if (currentFilter == widget.expenseModel.categoryId) {
+                            // If current category is selected, clear filter
+                            ref
+                                .read(selectedCategoryFilterProvider.notifier)
+                                .state = null;
+                          } else {
+                            // Otherwise set to this category
+                            ref
+                                .read(selectedCategoryFilterProvider.notifier)
+                                .state = widget.expenseModel.categoryId;
+                          }
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: categoryData != null
+                              ? ColorConfig.secondary.withOpacity(0.1)
+                              : (widget.expenseModel.isSettled
+                                  ? ColorConfig.success.withOpacity(0.1)
+                                  : const Color(0xFFFE4A49).withOpacity(0.1)),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          categoryData != null
+                              ? categoryData['icon']
+                              : (widget.expenseModel.isSettled
+                                  ? Icons.check_circle
+                                  : Icons.currency_exchange),
+                          size: 16,
+                          color: categoryData != null
+                              ? ColorConfig.secondary
+                              : (widget.expenseModel.isSettled
+                                  ? ColorConfig.success
+                                  : const Color(0xFFFE4A49)),
+                        ),
                       ),
                     ),
                   ),

@@ -5,23 +5,20 @@ import 'package:collection/collection.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/box/domain/di/box_usecase_di.dart';
 import 'package:dongi/modules/box/domain/usecases/update_box_usecase.dart';
-import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
-import 'package:dongi/modules/expense/domain/models/expense_user_model.dart';
 import 'package:dongi/modules/expense/data/di/expense_di.dart';
+import 'package:dongi/modules/expense/domain/di/category_controller_di.dart';
+import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
+import 'package:dongi/modules/expense/domain/models/expense_model.dart';
+import 'package:dongi/modules/expense/domain/models/expense_user_model.dart';
 import 'package:dongi/modules/expense/domain/repository/expense_repository.dart';
+import 'package:dongi/modules/expense/presentation/pages/advanced_split_page.dart';
 import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
+import 'package:dongi/modules/group/domain/models/group_model.dart';
 import 'package:dongi/modules/user/domain/models/user_model.dart';
+import 'package:dongi/shared/types/failure.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import 'package:dongi/shared/utilities/extensions/date_extension.dart';
-import 'package:dongi/modules/user/domain/di/user_controller_di.dart';
-import 'package:dongi/shared/widgets/card/grey_card.dart';
-import 'package:dongi/shared/widgets/list_tile/list_tile.dart';
-import 'package:dongi/shared/widgets/list_tile/list_tile_card.dart';
-import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
-import 'package:dongi/modules/box/domain/controllers/box_controller.dart';
-import 'package:dongi/modules/expense/presentation/pages/advanced_split_page.dart'; // Import for SplitMethod enum
 
 import '../../../box/domain/models/box_model.dart';
 import '../models/expense_model.dart';
@@ -60,17 +57,30 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
       final userShares = ref.read(userSharesProvider);
 
       // Debug prints
-      print('Starting expense creation...');
+      print('\n=== Starting Expense Creation ===');
       print('Current user: ${currentUser?.id}');
       print('Payer user ID: $payerUserId');
-      print('Category ID: $categoryId');
+      print('Raw Category ID from provider: $categoryId');
       print('Split method: $splitMethod');
+
+      // Get the selected category for more detailed debugging
+      final selectedCategory = ref.read(selectedCategoryProvider);
+      print('\n=== Selected Category Details ===');
+      print('- Name: ${selectedCategory?.name}');
+      print('- Icon: ${selectedCategory?.icon}');
+      print('- ID: ${selectedCategory?.id}');
+
+      // Ensure we have a valid category ID
+      final finalCategoryId = selectedCategory?.id ?? categoryId ?? 'others';
+      print('\n=== Final Category ID ===');
+      print('Using category ID: $finalCategoryId');
 
       final expenseId = ID.custom(const Uuid().v4().substring(0, 32));
       final convertedCost = num.parse(expenseCost.text.replaceAll(',', ''));
       var splitUsersList = ref.read(splitUserProvider);
 
       // Debug prints
+      print('\n=== Split Users ===');
       print('Initial split users list: $splitUsersList');
 
       if (splitUsersList.isEmpty) {
@@ -179,7 +189,7 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         cost: convertedCost,
         creatorId: currentUser!.id,
         payerId: payerUserId ?? currentUser.id,
-        categoryId: categoryId,
+        categoryId: finalCategoryId,
         groupId: groupModel.id!,
         boxId: boxModel.id!,
         expenseUsers: userIds,
@@ -187,12 +197,17 @@ class ExpenseNotifier extends AsyncNotifier<List<ExpenseModel>> {
         equal: splitMethod == SplitMethod.equal,
       );
 
-      print('Creating expense model: ${expenseModel.toJson()}');
+      print('\n=== Expense Model ===');
+      print('Creating expense model with data:');
+      print('- Title: ${expenseModel.title}');
+      print('- Category ID: ${expenseModel.categoryId}');
+      print('- Cost: ${expenseModel.cost}');
 
       final res = await _expenseRepository.addExpense(expenseModel,
           customId: expenseId);
 
-      print('Expense creation result: $res');
+      print('\n=== Expense Creation Result ===');
+      print('Result: $res');
 
       res.fold(
         (l) => throw Exception(l.message),

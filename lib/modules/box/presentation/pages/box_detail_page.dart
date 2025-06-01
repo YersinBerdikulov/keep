@@ -14,6 +14,7 @@ import '../../../../shared/widgets/error/error.dart';
 import '../../../../shared/widgets/floating_action_button/floating_action_button.dart';
 import '../../../../shared/widgets/loading/loading.dart';
 import '../widgets/box_detail_widget.dart';
+import 'package:dongi/modules/expense/domain/di/expense_controller_di.dart';
 
 // Convert to StatefulWidget to prevent infinite refreshes
 class BoxDetailPage extends ConsumerStatefulWidget {
@@ -134,10 +135,19 @@ class _BoxDetailPageState extends ConsumerState<BoxDetailPage> {
       ),
       floatingActionButton: FABWidget(
         title: 'Expense',
-        onPressed: () => context.push(
-          RouteName.createExpense,
-          extra: {"boxModel": _boxModel, "groupModel": widget.groupModel},
-        ),
+        onPressed: () {
+          // Get the selected category from the filter
+          final selectedCategory = ref.read(selectedCategoryFilterProvider);
+          // Pass it to the create expense page
+          context.push(
+            RouteName.createExpense,
+            extra: {
+              "boxModel": _boxModel,
+              "groupModel": widget.groupModel,
+              "selectedCategory": selectedCategory,
+            },
+          );
+        },
       ),
     );
   }

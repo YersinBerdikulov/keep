@@ -211,17 +211,59 @@ class CreateExpenseCategory extends ConsumerWidget {
                                   Icon(icon, color: ColorConfig.primarySwatch),
                               title: Text(category.name),
                               onTap: () {
-                                // Update both the category model and the ID
-                                ref
-                                    .read(selectedCategoryProvider.notifier)
-                                    .state = category;
-                                ref
-                                    .read(expenseCategoryIdProvider.notifier)
-                                    .state = category.id;
+                                // Debug prints for category selection
+                                print('\n=== Category Selection ===');
+                                print('Category selected:');
+                                print('- Name: ${category.name}');
+                                print('- Icon: ${category.icon}');
+                                print('- ID: ${category.id}');
 
-                                // Debug prints
-                                print('Selected category: ${category.name}');
-                                print('Category ID: ${category.id}');
+                                // Ensure we have a valid category ID
+                                if (category.id == null) {
+                                  print(
+                                      'Warning: Category has no ID, generating one');
+                                  final customId = DateTime.now()
+                                          .millisecondsSinceEpoch
+                                          .toString() +
+                                      '_${category.name.toLowerCase().replaceAll(' ', '_')}';
+                                  print('Generated ID: $customId');
+
+                                  // Create a new category with the generated ID
+                                  final categoryWithId = Category(
+                                    id: customId,
+                                    name: category.name,
+                                    icon: category.icon,
+                                  );
+
+                                  // Update both providers with the new category
+                                  ref
+                                      .read(selectedCategoryProvider.notifier)
+                                      .state = categoryWithId;
+                                  ref
+                                      .read(expenseCategoryIdProvider.notifier)
+                                      .state = customId;
+                                } else {
+                                  // Update both the category model and the ID
+                                  ref
+                                      .read(selectedCategoryProvider.notifier)
+                                      .state = category;
+                                  ref
+                                      .read(expenseCategoryIdProvider.notifier)
+                                      .state = category.id;
+                                }
+
+                                // Debug prints for provider states
+                                print(
+                                    '\n=== Provider States After Selection ===');
+                                print('Selected category:');
+                                print(
+                                    '- Name: ${ref.read(selectedCategoryProvider)?.name}');
+                                print(
+                                    '- Icon: ${ref.read(selectedCategoryProvider)?.icon}');
+                                print(
+                                    '- ID: ${ref.read(selectedCategoryProvider)?.id}');
+                                print(
+                                    'Category ID in provider: ${ref.read(expenseCategoryIdProvider)}');
 
                                 Navigator.pop(context);
                               },
@@ -245,7 +287,20 @@ class CreateExpenseCategory extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCategory = ref.watch(selectedCategoryProvider);
+    final categoryId = ref.watch(expenseCategoryIdProvider);
     final iconMap = getCategoryIcon();
+
+    // If we have a categoryId but no selected category, try to find the category
+    if (categoryId != null && selectedCategory == null) {
+      ref.watch(categoryNotifierProvider).whenData((categories) {
+        final category = categories.firstWhere(
+          (c) => c.id == categoryId,
+          orElse: () => Category(name: 'Category', icon: 'others'),
+        );
+        ref.read(selectedCategoryProvider.notifier).state = category;
+      });
+    }
+
     final icon = selectedCategory != null
         ? iconMap[selectedCategory.icon.toLowerCase()] ??
             Icons.category_outlined
@@ -651,6 +706,16 @@ class CreateExpenseCreateButton extends ConsumerWidget {
               ? null
               : () {
                   if (formKey.currentState!.validate()) {
+                    // Debug prints before creating expense
+                    print('Creating expense with:');
+                    print(
+                        '- Category ID: ${ref.read(expenseCategoryIdProvider)}');
+                    final selectedCat = ref.read(selectedCategoryProvider);
+                    print('- Selected category:');
+                    print('  - Name: ${selectedCat?.name}');
+                    print('  - Icon: ${selectedCat?.icon}');
+                    print('  - ID: ${selectedCat?.id}');
+
                     ref.read(expenseNotifierProvider.notifier).addExpense(
                           expenseTitle: expenseTitle,
                           expenseDescription: expenseDescription,
@@ -659,10 +724,6 @@ class CreateExpenseCreateButton extends ConsumerWidget {
                           boxModel:
                               boxModel.copyWith(currency: selectedCurrency),
                         );
-
-                    // Reset the category selection
-                    ref.read(selectedCategoryProvider.notifier).state = null;
-                    ref.read(expenseCategoryIdProvider.notifier).state = null;
                   }
                 },
           title: !hasMultipleMembers
