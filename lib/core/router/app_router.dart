@@ -2,6 +2,7 @@ import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/core/router/router_notifier.dart';
 import 'package:dongi/modules/auth/presentation/pages/enter_name_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/advanced_split_page.dart';
+import 'package:dongi/modules/expense/presentation/pages/all_transactions_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/made_by_page.dart';
 import 'package:dongi/modules/expense/presentation/pages/split_page.dart';
 import 'package:dongi/modules/user/presentation/pages/profile_page.dart';
@@ -224,6 +225,9 @@ final goRouterProvider = Provider<GoRouter>(
               Map extra = state.extra as Map<String, dynamic>;
               return ExpenseDetailPage(expenseId: extra["expenseId"]);
             }),
+        GoRoute(
+            path: RouteName.allTransactions,
+            builder: (context, state) => const AllTransactionsPage()),
       ],
     );
   },

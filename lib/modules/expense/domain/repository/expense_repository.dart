@@ -20,6 +20,9 @@ abstract class ExpenseRepository {
   FutureEither<bool> deleteExpenseUser(String id);
   FutureEither<bool> updateExpenseUser(Map updateExpenseUserData);
   
+  // Get recent expenses for a user (for home page)
+  Future<List<Document>> getRecentExpenses(String uid);
+  
   // Get all users from the database (for ID matching)
   Future<List<Document>> getAllUsers();
   

@@ -3,30 +3,31 @@ class RouteName {
 
   static String home = '/';
   static String splash = '/splash';
-  static String signin = '/signin';
+  static String signin = '/auth/signin';
   static String authHome = '/auth';
-  static String signupEmail = '/signup/email';
-  static String signupOTPInput = '/signup/otp';
-  static String setPassword = '/set-password';
+  static String signupEmail = '/auth/signup/email';
+  static String signupOTPInput = '/auth/signup/otp';
+  static String setPassword = '/auth/signup/password';
   static String onboarding = '/onboarding';
-  static String groupList = '/group';
-  static String createGroup = '/group/create';
-  static String updateGroup = '/group/update';
-  static String addGroupMember = '/group/add-member';
-  static String manageGroupMembers = '/group/manage-members';
-  static String createBox = '/box/create';
+  static String groupList = '/groups';
+  static String createGroup = '/groups/create';
+  static String updateGroup = '/groups/update';
+  static String addGroupMember = '/groups/members/add';
+  static String manageGroupMembers = '/groups/members/manage';
+  static String createBox = '/boxes/create';
   static String updateBox = '/box/update';
-  static String addBoxMember = '/box/add-member';
-  static String friendList = '/friend/list';
-  static String addFriend = '/friend/add';
-  static String createExpense = '/expense/create';
-  static String updateExpense = '/expense/update';
-  static String expenseMadeBy = '/expense/madeBy';
-  static String expenseSplit = '/expense/split';
-  static String expenseAdvancedSplit = '/expense/split/advanced';
-  static String expenseDetail = '/expense/detail';
+  static String addBoxMember = '/boxes/members/add';
+  static String friendList = '/friends';
+  static String addFriend = '/friends/add';
+  static String createExpense = '/e expenseUserCollectionxpenses/create';
+  static String updateExpense = '/expenses/update';
+  static String expenseMadeBy = '/expenses/made-by';
+  static String expenseSplit = '/expenses/split';
+  static String expenseAdvancedSplit = '/expenses/split/advanced';
+  static String expenseDetail = '/expenses/detail';
+  static String allTransactions = '/transactions/all';
   static String profile = '/profile';
-  static String enterName = '/auth/enter-name';
+  static String enterName = '/auth/name';
   static String group = '/group';
   static String box = '/box';
   static String expense = '/expense';
@@ -43,8 +44,9 @@ class RouteName {
   static String report = '/report';
   static String error = '/error';
   static String notFound = '/404';
+  static String settleUp = '/settle-up';
 
   static String groupDetail(String? groupId) =>
-      '/group/${groupId ?? ":groupId"}';
-  static String boxDetail(String? boxId) => '/box/${boxId ?? ":boxId"}';
+      '/groups/${groupId ?? ':groupId'}';
+  static String boxDetail(String? boxId) => '/boxes/${boxId ?? ':boxId'}';
 }

@@ -323,6 +323,28 @@ class ExpenseRemoteDataSource {
     }
   }
 
+  Future<List<Document>> getRecentExpenses(String uid) async {
+    try {
+      print('Fetching recent expenses for user: $uid');
+      // Get expenses where the user is either the creator or in the expense users list
+      final document = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.expenseCollection,
+        queries: [
+          Query.orderDesc('\$createdAt'),  // Sort by creation date (newest first)
+          Query.limit(10),                 // Limit to 10 most recent
+          Query.equal('creatorId', uid),   // User is the creator
+        ],
+      );
+      
+      print('Found ${document.documents.length} recent expenses');
+      return document.documents;
+    } catch (e) {
+      print('Error fetching recent expenses: $e');
+      return [];
+    }
+  }
+
   FutureEither<bool> updateExpenseUser(Map updateExpenseUserData) async {
     try {
       print('Updating expense user in Appwrite:');

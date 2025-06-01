@@ -6,6 +6,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
 import 'package:dongi/modules/box/domain/di/box_controller_di.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
@@ -673,7 +674,7 @@ class HomeWeeklyAnalytic extends StatelessWidget {
 class HomeRecentTransaction extends ConsumerWidget {
   const HomeRecentTransaction({super.key});
 
-  _recentTransactionsTitle() {
+  _recentTransactionsTitle(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 10, 10),
       child: Row(
@@ -684,27 +685,33 @@ class HomeRecentTransaction extends ConsumerWidget {
             style: FontConfig.h6(),
           ),
           const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: ColorConfig.secondary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                Text(
-                  "View All",
-                  style: FontConfig.caption().copyWith(
+          InkWell(
+            onTap: () {
+              // Navigate to the AllTransactionsPage
+              context.push(RouteName.allTransactions);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: ColorConfig.secondary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    "View All",
+                    style: FontConfig.caption().copyWith(
+                      color: ColorConfig.secondary,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
                     color: ColorConfig.secondary,
+                    size: 12,
                   ),
-                ),
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: ColorConfig.secondary,
-                  size: 12,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -712,117 +719,152 @@ class HomeRecentTransaction extends ConsumerWidget {
     );
   }
 
-  _recentTransactionsCardList(context) {
-    return SizedBox(
-      height: 120,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          const SizedBox(width: 16),
-          _recentTransactionsCard(
-            context,
-            title: "Trip to Bali",
-            amount: 150.0,
-            isExpense: true,
-            icon: Icons.flight_takeoff_rounded,
-          ),
-          _recentTransactionsCard(
-            context,
-            title: "Salary",
-            amount: 3000.0,
-            isExpense: false,
-            icon: Icons.work_rounded,
-          ),
-          _recentTransactionsCard(
-            context,
-            title: "Groceries",
-            amount: 85.5,
-            isExpense: true,
-            icon: Icons.shopping_cart_rounded,
-          ),
-          _recentTransactionsCard(
-            context,
-            title: "Freelance",
-            amount: 500.0,
-            isExpense: false,
-            icon: Icons.computer_rounded,
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
-    );
-  }
-
-  _recentTransactionsCard(
-    context, {
-    required String title,
-    required double amount,
-    required bool isExpense,
-    required IconData icon,
-  }) {
-    return SizedBox(
-      width: 160,
-      child: CardWidget(
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.only(right: 10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(title, style: FontConfig.body2()),
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: isExpense
-                        ? ColorConfig.error.withOpacity(0.1)
-                        : ColorConfig.secondary.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    icon,
-                    color:
-                        isExpense ? ColorConfig.error : ColorConfig.secondary,
-                    size: 16,
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isExpense ? "You spent" : "You received",
-                  style: FontConfig.overline().copyWith(
-                    color: ColorConfig.midnight.withOpacity(0.5),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "\$${amount.toStringAsFixed(2)}",
-                  style: FontConfig.body1().copyWith(
-                    color:
-                        isExpense ? ColorConfig.error : ColorConfig.secondary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+  IconData _getCategoryIcon(String? categoryId) {
+    // Map category IDs to appropriate icons
+    // This would ideally come from a categories provider
+    switch (categoryId) {
+      case 'food':
+        return Icons.restaurant;
+      case 'transportation':
+        return Icons.directions_car;
+      case 'entertainment':
+        return Icons.movie;
+      case 'shopping':
+        return Icons.shopping_cart;
+      case 'bills':
+        return Icons.receipt;
+      case 'health':
+        return Icons.medical_services;
+      case 'travel':
+        return Icons.flight;
+      case 'education':
+        return Icons.school;
+      default:
+        return Icons.account_balance_wallet;
+    }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final transactionsProvider = ref.watch(homeTransactionsProvider);
+
     return Column(
       children: [
-        _recentTransactionsTitle(),
-        _recentTransactionsCardList(context),
+        _recentTransactionsTitle(context),
+        transactionsProvider.when(
+          loading: () => const Center(
+            child: SizedBox(
+              height: 120,
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          error: (error, stack) => Center(
+            child: SizedBox(
+              height: 120,
+              child: Text('Error: $error'),
+            ),
+          ),
+          data: (transactions) {
+            // Get only the most recent 5 transactions
+            final recentTransactions = ref.read(homeTransactionsProvider.notifier).getRecentTransactions();
+            
+            if (recentTransactions.isEmpty) {
+              return const SizedBox(
+                height: 120,
+                child: Center(
+                  child: Text('No recent transactions'),
+                ),
+              );
+            }
+            
+            return SizedBox(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: recentTransactions.length,
+                itemBuilder: (context, index) {
+                  final transaction = recentTransactions[index];
+                  return SizedBox(
+                    width: 160,
+                    child: CardWidget(
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(right: 10),
+                      child: InkWell(
+                        onTap: () {
+                          // Navigate to expense detail page when clicked
+                          if (transaction.id.isNotEmpty) {
+                            // Pass expense ID as an extra parameter rather than in the URL path
+                            context.push(
+                              RouteName.expenseDetail,
+                              extra: {'expenseId': transaction.id},
+                            );
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    transaction.title,
+                                    style: FontConfig.body2(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: ColorConfig.secondary.withOpacity(0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    _getCategoryIcon(transaction.categoryId),
+                                    color: ColorConfig.secondary,
+                                    size: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  transaction.creatorId == (ref.read(currentUserProvider)?.id ?? '')
+                                      ? "You paid"
+                                      : "You owe",
+                                  style: FontConfig.overline().copyWith(
+                                    color: ColorConfig.midnight.withOpacity(0.5),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "\$${transaction.cost.toStringAsFixed(2)}",
+                                  style: FontConfig.body1().copyWith(
+                                    color: transaction.creatorId == (ref.read(currentUserProvider)?.id ?? '')
+                                        ? ColorConfig.error
+                                        : ColorConfig.secondary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          }
+        ),
       ],
     );
   }
