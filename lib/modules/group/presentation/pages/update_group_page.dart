@@ -72,7 +72,7 @@ class UpdateGroupPage extends HookConsumerWidget {
                     groupDescription: groupDescription,
                     formKey: _formKey,
                   ),
-                  const UpdateGroupAddFriendCard(),
+                  UpdateGroupAddFriendCard(groupModel: groupModel),
                   // Add padding at the bottom to prevent overlap with the update button
                   SizedBox(height: bottomPadding),
                 ],

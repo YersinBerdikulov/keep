@@ -1,9 +1,15 @@
 import 'dart:io';
 
 import 'package:dongi/modules/group/domain/models/group_model.dart';
+import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
+import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
+import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
+import 'package:dongi/core/router/router_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../../../core/constants/color_config.dart';
 import '../../../../core/constants/font_config.dart';
@@ -122,49 +128,179 @@ class UpdateGroupInfoCard extends ConsumerWidget {
   }
 }
 
-class UpdateGroupAddFriendCard extends StatelessWidget {
-  const UpdateGroupAddFriendCard({super.key});
+class UpdateGroupAddFriendCard extends HookConsumerWidget {
+  final GroupModel groupModel;
+
+  const UpdateGroupAddFriendCard({
+    super.key,
+    required this.groupModel,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final friendList = ref.watch(friendNotifierProvider);
+    final currentUserId = ref.read(currentUserProvider)!.id;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 30, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Add Member',
-            style: FontConfig.body1(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Add Member',
+                style: FontConfig.body1().copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  context.push(
+                    RouteName.addGroupMember,
+                    extra: groupModel,
+                  );
+                },
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  backgroundColor: ColorConfig.secondary.withOpacity(0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.person_add,
+                      size: 16,
+                      color: ColorConfig.secondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      "Add Friends",
+                      style: FontConfig.caption().copyWith(
+                        color: ColorConfig.secondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           Container(
-            padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
+            padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
             width: SizeConfig.width(context),
             decoration: BoxDecoration(
               color: ColorConfig.grey,
               borderRadius: BorderRadius.circular(15),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GridView.builder(
+            child: friendList.when(
+              data: (data) {
+                final groupMembers = data
+                    .where(
+                      (element) =>
+                          element.status == FriendRequestStatus.accepted &&
+                          groupModel.groupUsers.contains(
+                            element.receiveRequestUserId == currentUserId
+                                ? element.sendRequestUserId
+                                : element.receiveRequestUserId,
+                          ),
+                    )
+                    .toList();
+
+                if (groupMembers.isEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 30, horizontal: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: ColorConfig.primarySwatch.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.people_outline,
+                            size: 32,
+                            color: ColorConfig.primarySwatch,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No Members Yet',
+                          style: FontConfig.h6().copyWith(
+                            color: ColorConfig.midnight,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Click "Add Friends" to invite members to the group',
+                          textAlign: TextAlign.center,
+                          style: FontConfig.body2().copyWith(
+                            color: ColorConfig.primarySwatch50,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 6,
+                  itemCount: groupMembers.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 4,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
+                    childAspectRatio: 0.9,
                   ),
                   itemBuilder: (context, i) {
-                    return i != 5
-                        ? FriendWidget(
-                            backgroundColor: ColorConfig.white,
-                          )
-                        : FriendWidget.add();
+                    final member = groupMembers[i];
+                    return Column(
+                      children: [
+                        FriendWidget(
+                          image: member.sendRequestUserId == currentUserId
+                              ? member.receiveRequestProfilePic
+                              : member.sendRequestProfilePic,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          member.sendRequestUserId == currentUserId
+                              ? member.receiveRequestUserName ??
+                                  member.receiveRequestUserId
+                              : member.sendRequestUserName ??
+                                  member.sendRequestUserId,
+                          style: FontConfig.caption().copyWith(
+                            color: ColorConfig.midnight,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    );
                   },
+                );
+              },
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              error: (error, stackTrace) => Center(
+                child: Text(
+                  'Error loading members',
+                  style: FontConfig.body2().copyWith(
+                    color: ColorConfig.error,
+                  ),
                 ),
-              ],
+              ),
             ),
           ),
         ],
@@ -208,7 +344,7 @@ class UpgradeGroupCreateButton extends ConsumerWidget {
                 );
           }
         },
-        title: 'update',
+        title: 'Update',
         textColor: ColorConfig.secondary,
       ),
     );
