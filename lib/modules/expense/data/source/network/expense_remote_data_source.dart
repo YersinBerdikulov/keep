@@ -332,22 +332,46 @@ class ExpenseRemoteDataSource {
 
   Future<List<Document>> getRecentExpenses(String uid) async {
     try {
-      print('Fetching recent expenses for user: $uid');
-      // Get expenses where the user is either the creator or in the expense users list
-      final document = await _db.listDocuments(
+      print('Fetching all expenses for user: $uid');
+      
+      // First, get all expenses where the user is the creator
+      final creatorExpenses = await _db.listDocuments(
         databaseId: AppwriteConfig.databaseId,
         collectionId: AppwriteConfig.expenseCollection,
         queries: [
           Query.orderDesc('\$createdAt'),  // Sort by creation date (newest first)
-          Query.limit(10),                 // Limit to 10 most recent
           Query.equal('creatorId', uid),   // User is the creator
         ],
       );
       
-      print('Found ${document.documents.length} recent expenses');
-      return document.documents;
+      // Then, get all expenses where the user is a participant (in expenseUsers array)
+      final participantExpenses = await _db.listDocuments(
+        databaseId: AppwriteConfig.databaseId,
+        collectionId: AppwriteConfig.expenseCollection,
+        queries: [
+          Query.orderDesc('\$createdAt'),  // Sort by creation date (newest first)
+          Query.search('expenseUsers', uid),  // User is in the expense users list
+        ],
+      );
+      
+      // Combine both sets of expenses, removing duplicates
+      final allExpenses = [...creatorExpenses.documents];
+      
+      // Add participant expenses that aren't already in the list (avoid duplicates)
+      for (var expense in participantExpenses.documents) {
+        if (!allExpenses.any((e) => e.$id == expense.$id)) {
+          allExpenses.add(expense);
+        }
+      }
+      
+      // Sort all expenses by creation date (newest first)
+      allExpenses.sort((a, b) => 
+        (b.data['\$createdAt'] ?? '').compareTo(a.data['\$createdAt'] ?? ''));
+      
+      print('Found ${allExpenses.length} total expenses for user');
+      return allExpenses;
     } catch (e) {
-      print('Error fetching recent expenses: $e');
+      print('Error fetching expenses: $e');
       return [];
     }
   }
