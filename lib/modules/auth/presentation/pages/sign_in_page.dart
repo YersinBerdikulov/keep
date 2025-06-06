@@ -24,8 +24,6 @@ class SignInPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final emailController = useTextEditingController(text: email);
-    final passwordController = useTextEditingController();
-    final isPasswordMode = useState(true);
 
     /// Listen for sign-in actions and handle errors
     ref.listen<AsyncValue<void>>(
@@ -123,67 +121,6 @@ class SignInPage extends HookConsumerWidget {
 
                   const SizedBox(height: 24),
 
-                  // Toggle Between Password or OTP Mode
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () => isPasswordMode.value = true,
-                        child: Column(
-                          children: [
-                            Text(
-                              "With Password",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: isPasswordMode.value
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: isPasswordMode.value
-                                    ? ColorConfig.midnight
-                                    : Colors.grey,
-                              ),
-                            ),
-                            if (isPasswordMode.value)
-                              Container(
-                                height: 2,
-                                width: 120,
-                                color: ColorConfig.midnight,
-                                margin: const EdgeInsets.only(top: 4),
-                              ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      GestureDetector(
-                        onTap: () => isPasswordMode.value = false,
-                        child: Column(
-                          children: [
-                            Text(
-                              "Without Password",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: !isPasswordMode.value
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: !isPasswordMode.value
-                                    ? ColorConfig.midnight
-                                    : Colors.grey,
-                              ),
-                            ),
-                            if (!isPasswordMode.value)
-                              Container(
-                                height: 2,
-                                width: 120,
-                                color: ColorConfig.midnight,
-                                margin: const EdgeInsets.only(top: 4),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-
                   Form(
                     key: _formKey,
                     child: Column(
@@ -196,56 +133,31 @@ class SignInPage extends HookConsumerWidget {
                               .validateEmail,
                         ),
 
-                        if (isPasswordMode.value) ...[
-                          const SizedBox(height: 16),
-                          TextFieldWidget(
-                            hintText: "Password",
-                            controller: passwordController,
-                            obscureText: true,
-                          ),
-                        ],
-
                         const SizedBox(height: 24),
 
-                        // Action Buttons
+                        // Action Button
                         ButtonWidget(
-                          title: isPasswordMode.value ? "Sign In" : "Send OTP",
+                          title: "Send OTP",
                           isLoading: isLoading,
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              if (isPasswordMode.value) {
-                                await ref
-                                    .read(authControllerProvider.notifier)
-                                    .signIn(
-                                      email: emailController.text,
-                                      password: passwordController.text,
-                                    );
+                              final isUserAvailable = await ref
+                                  .read(authControllerProvider.notifier)
+                                  .isUserSignedUp(emailController.text);
 
-                                if (context.mounted) {
-                                  // Refresh home data after sign in
-                                  ref.refresh(homeNotifierProvider);
-                                  context.go(RouteName.setPassword);
-                                }
-                              } else {
-                                final isUserAvailable = await ref
-                                    .read(authControllerProvider.notifier)
-                                    .isUserSignedUp(emailController.text);
+                              if (!isUserAvailable) {
+                                return;
+                              }
 
-                                if (!isUserAvailable) {
-                                  return;
-                                }
+                              final result = await ref
+                                  .read(authControllerProvider.notifier)
+                                  .sendOTP(email: emailController.text);
 
-                                final result = await ref
-                                    .read(authControllerProvider.notifier)
-                                    .sendOTP(email: emailController.text);
-
-                                if (result != null && context.mounted) {
-                                  context
-                                      .push(RouteName.signupOTPInput, extra: {
-                                    'userId': result,
-                                    'email': emailController.text,
-                                  });
-                                }
+                              if (result != null && context.mounted) {
+                                context.push(RouteName.signupOTPInput, extra: {
+                                  'userId': result,
+                                  'email': emailController.text,
+                                });
                               }
                             }
                           },
