@@ -96,12 +96,16 @@ class UpdateGroupInfoCard extends ConsumerWidget {
     return Form(
       key: formKey,
       child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        padding: const EdgeInsets.all(15),
+        margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        padding: const EdgeInsets.all(20),
         width: SizeConfig.width(context),
         decoration: BoxDecoration(
-          color: ColorConfig.grey,
+          color: canEdit ? ColorConfig.grey : ColorConfig.grey.withOpacity(0.7),
           borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+            color: canEdit ? Colors.transparent : Colors.grey[300]!,
+            width: 1,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +117,7 @@ class UpdateGroupInfoCard extends ConsumerWidget {
                   oldGroupImage: oldGroupImage,
                   isEnabled: canEdit,
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 16),
                 Expanded(
                   child: SizedBox(
                     height: 50,
@@ -130,7 +134,7 @@ class UpdateGroupInfoCard extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             TextFieldWidget(
               hintText: 'Description',
               fillColor: ColorConfig.white,
@@ -350,28 +354,28 @@ class UpgradeGroupCreateButton extends ConsumerWidget {
     final isAdmin = ref.watch(isCurrentUserAdminProvider(groupModel.id ?? ''));
     final canEdit = isCreator || isAdmin;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
-      child: ButtonWidget(
-        isLoading: ref.watch(groupNotifierProvider).maybeWhen(
-              loading: () => true,
-              orElse: () => false,
-            ),
-        onPressed: canEdit
-            ? () {
-                if (formKey.currentState!.validate()) {
-                  ref.read(groupNotifierProvider.notifier).updateGroup(
-                        image: newGroupImage,
-                        groupTitle: groupTitle,
-                        groupDescription: groupDescription,
-                        groupModel: groupModel,
-                      );
-                }
+    final isLoading = ref.watch(groupNotifierProvider).maybeWhen(
+          loading: () => true,
+          orElse: () => false,
+        );
+
+    return ButtonWidget(
+      isLoading: isLoading,
+      onPressed: canEdit
+          ? () {
+              if (formKey.currentState!.validate()) {
+                ref.read(groupNotifierProvider.notifier).updateGroup(
+                      image: newGroupImage,
+                      groupTitle: groupTitle,
+                      groupDescription: groupDescription,
+                      groupModel: groupModel,
+                    );
               }
-            : null, // Disable button if user can't edit
-        title: 'Update',
-        textColor: ColorConfig.secondary,
-      ),
+            }
+          : null, // Disable button if user can't edit
+      title: 'Update',
+      textColor: canEdit ? ColorConfig.secondary : Colors.grey[400],
+      backgroundColor: canEdit ? null : Colors.grey[200],
     );
   }
 }

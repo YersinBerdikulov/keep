@@ -79,71 +79,99 @@ class UpdateGroupPage extends HookConsumerWidget {
         showDrawer: false,
         automaticallyImplyLeading: true,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Permission indicator
-          if (!canEdit)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              color: ColorConfig.error.withOpacity(0.1),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: ColorConfig.error,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      "Only group admins can update group information",
-                      style: FontConfig.body2().copyWith(
-                        color: ColorConfig.error,
-                      ),
+          // Main content
+          Column(
+            children: [
+              // Permission indicator - styled version
+              if (!canEdit)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: ColorConfig.error.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: ColorConfig.error.withOpacity(0.3),
+                      width: 1,
                     ),
                   ),
-                ],
-              ),
-            ),
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  UpdateGroupInfoCard(
-                    newGroupImage: newGroupImage,
-                    oldGroupImage: oldGroupImage,
-                    groupTitle: groupTitle,
-                    groupDescription: groupDescription,
-                    formKey: _formKey,
-                    groupModel: groupModel,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: ColorConfig.error,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          "Only group admins can update group information",
+                          style: FontConfig.body2().copyWith(
+                            color: ColorConfig.error,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  // Add padding at the bottom to prevent overlap with the update button
-                  SizedBox(height: bottomPadding),
+                ),
+
+              // Add some spacing after the warning
+              if (!canEdit) const SizedBox(height: 16),
+
+              // Main scrollable content
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      UpdateGroupInfoCard(
+                        newGroupImage: newGroupImage,
+                        oldGroupImage: oldGroupImage,
+                        groupTitle: groupTitle,
+                        groupDescription: groupDescription,
+                        formKey: _formKey,
+                        groupModel: groupModel,
+                      ),
+                      // Add padding at the bottom to prevent overlap with the update button
+                      SizedBox(height: bottomPadding),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // Fixed position button at the bottom
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: ColorConfig.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: ColorConfig.primarySwatch.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
                 ],
               ),
-            ),
-          ),
-          // Fixed position button at the bottom
-          Container(
-            decoration: BoxDecoration(
-              color: ColorConfig.white,
-              boxShadow: [
-                BoxShadow(
-                  color: ColorConfig.primarySwatch.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, -5),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            child: UpgradeGroupCreateButton(
-              formKey: _formKey,
-              newGroupImage: newGroupImage,
-              groupTitle: groupTitle,
-              groupDescription: groupDescription,
-              groupModel: groupModel,
+              padding: EdgeInsets.fromLTRB(
+                  16, 16, 16, 16 + MediaQuery.of(context).padding.bottom),
+              child: UpgradeGroupCreateButton(
+                formKey: _formKey,
+                newGroupImage: newGroupImage,
+                groupTitle: groupTitle,
+                groupDescription: groupDescription,
+                groupModel: groupModel,
+              ),
             ),
           ),
         ],
