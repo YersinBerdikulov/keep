@@ -78,7 +78,7 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
         (l) => AsyncValue.error(l.message, StackTrace.current),
         (document) async {
           final createdGroup = GroupModel.fromJson(document.data);
-          
+
           // Create group user records - creator as admin, others as members
           await _groupRepository.addGroupUser(GroupUserModel(
             userId: currentUser.id!,
@@ -96,7 +96,7 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
               role: "member",
             ));
           }
-          
+
           final currentGroups = state.value ?? [];
           // Invalidate homeNotifierProvider to refresh homepage
           ref.invalidate(homeNotifierProvider);
@@ -119,15 +119,19 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
     try {
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) throw Exception('User not logged in');
-      
+
       // Check if user is creator or admin
       final isCreator = groupModel.creatorId == currentUser.id;
       final isAdmin = await _isUserAdmin(currentUser.id!, groupModel.id!);
-      
+
       if (!isCreator && !isAdmin) {
-        throw Exception('Only the group creator or admin can update the group');
+        // Instead of throwing an exception, set the state to error
+        state = AsyncValue.error(
+            'Only group admins can update group information',
+            StackTrace.current);
+        return;
       }
-      
+
       // Start with the complete existing group data
       Map<String, dynamic> updateData = groupModel.toJson();
 
@@ -178,21 +182,21 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
     try {
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) throw Exception('User not logged in');
-      
+
       // Check if user is creator or admin
       final isCreator = groupModel.creatorId == currentUser.id;
       final isAdmin = await _isUserAdmin(currentUser.id!, groupModel.id!);
-      
+
       if (!isCreator && !isAdmin) {
         throw Exception('Only the group creator or admin can delete the group');
       }
-      
+
       // Delete all group users first
       final groupUsers = await _groupRepository.getGroupUsers(groupModel.id!);
       for (final user in groupUsers) {
         await _groupRepository.deleteGroupUser(user.$id);
       }
-      
+
       await _groupRepository.deleteGroup(groupModel.id!);
 
       if (groupModel.image != null && groupModel.image!.isNotEmpty) {
@@ -247,7 +251,7 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
         (l) => AsyncValue.error(l.message, StackTrace.current),
         (document) async {
           final updatedGroup = GroupModel.fromJson(document.data);
-          
+
           // Create group user records for new members
           for (final memberId in newMemberIds) {
             await _groupRepository.addGroupUser(GroupUserModel(
@@ -257,7 +261,7 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
               role: "member",
             ));
           }
-          
+
           final currentGroups = state.value ?? [];
           final updatedGroups = currentGroups.map((group) {
             if (group.id == updatedGroup.id) {
@@ -283,22 +287,23 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
     try {
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) throw Exception('User not logged in');
-      
+
       // Check if user is creator, admin, or deleting themselves
       final isCreator = groupModel.creatorId == currentUser.id;
       final isAdmin = await _isUserAdmin(currentUser.id!, groupModel.id!);
       final isDeletingSelf = currentUser.id == memberIdToDelete;
-      
+
       // Check if member to delete is the creator
       if (memberIdToDelete == groupModel.creatorId && !isDeletingSelf) {
         throw Exception('Cannot remove the group creator');
       }
-      
+
       // Only allow if user is creator, admin, or deleting themselves
       if (!isCreator && !isAdmin && !isDeletingSelf) {
-        throw Exception('Only the group creator, admin, or the user themselves can remove a member');
+        throw Exception(
+            'Only the group creator, admin, or the user themselves can remove a member');
       }
-      
+
       // Find and delete the group user record
       final groupUsers = await _groupRepository.getGroupUsers(groupModel.id!);
       for (final user in groupUsers) {
@@ -311,7 +316,9 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
 
       // Remove the member from the group
       final updatedGroupModel = groupModel.copyWith(
-        groupUsers: groupModel.groupUsers.where((id) => id != memberIdToDelete).toList(),
+        groupUsers: groupModel.groupUsers
+            .where((id) => id != memberIdToDelete)
+            .toList(),
       );
 
       final result = await _groupRepository.updateGroup(updatedGroupModel);
@@ -335,7 +342,7 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
       state = AsyncValue.error(e, st);
     }
   }
-  
+
   Future<void> promoteToAdmin({
     required GroupModel groupModel,
     required String memberIdToPromote,
@@ -344,15 +351,15 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
     try {
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) throw Exception('User not logged in');
-      
+
       // Check if current user is creator or admin
       final isCreator = groupModel.creatorId == currentUser.id;
       final isAdmin = await _isUserAdmin(currentUser.id!, groupModel.id!);
-      
+
       if (!isCreator && !isAdmin) {
         throw Exception('Only the group creator or admin can promote members');
       }
-      
+
       // Find and update the group user record
       final groupUsers = await _groupRepository.getGroupUsers(groupModel.id!);
       for (final user in groupUsers) {
@@ -363,17 +370,16 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
           break;
         }
       }
-      
+
       // No need to update the group model itself
       // Refresh the state to reflect changes
       final updatedGroups = await _fetchGroups();
       state = AsyncValue.data(updatedGroups);
-      
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
   }
-  
+
   Future<void> demoteToMember({
     required GroupModel groupModel,
     required String memberIdToDemote,
@@ -382,20 +388,20 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
     try {
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) throw Exception('User not logged in');
-      
+
       // Check if current user is creator
       final isCreator = groupModel.creatorId == currentUser.id;
-      
+
       // Only allow creator to demote admins
       if (!isCreator) {
         throw Exception('Only the group creator can demote admins');
       }
-      
+
       // Check if trying to demote creator (which is not allowed)
       if (memberIdToDemote == groupModel.creatorId) {
         throw Exception('Cannot demote the group creator');
       }
-      
+
       // Find and update the group user record
       final groupUsers = await _groupRepository.getGroupUsers(groupModel.id!);
       for (final user in groupUsers) {
@@ -406,17 +412,16 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
           break;
         }
       }
-      
+
       // No need to update the group model itself
       // Refresh the state to reflect changes
       final updatedGroups = await _fetchGroups();
       state = AsyncValue.data(updatedGroups);
-      
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
   }
-  
+
   Future<bool> _isUserAdmin(String userId, String groupId) async {
     try {
       final groupUsers = await _groupRepository.getGroupUsers(groupId);
@@ -431,31 +436,32 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
       return false;
     }
   }
-  
+
   Future<String> getUserRole(String userId, String groupId) async {
     try {
       // Get all group users
       final groupUsers = await _groupRepository.getGroupUsers(groupId);
-      
+
       // Find the user record for this specific group using manual search
       for (final doc in groupUsers) {
         if (doc.data['userId'] == userId && doc.data['groupId'] == groupId) {
           return doc.data['role'] as String;
         }
       }
-      
+
       throw Exception('User is not a member of this group');
     } catch (e) {
       // Default to "member" if not found or error
       return "member";
     }
   }
-  
-  Future<bool> canUserDeleteItem(String userId, String groupId, String creatorId) async {
+
+  Future<bool> canUserDeleteItem(
+      String userId, String groupId, String creatorId) async {
     try {
       // Creator can always delete their own items
       if (userId == creatorId) return true;
-      
+
       // Admin can delete any item
       final role = await getUserRole(userId, groupId);
       return role == "admin";
@@ -466,62 +472,68 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
 
   // Method to update a user's role in a group
   Future<void> updateUserRole({
-    required String groupId, 
-    required String memberId, 
+    required String groupId,
+    required String memberId,
     required String newRole,
   }) async {
     state = const AsyncLoading();
     try {
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) throw Exception('User not logged in');
-      
+
       // Get all group users for this group
       final groupUsers = await _groupRepository.getGroupUsers(groupId);
-      print('DEBUG: Found ${groupUsers.length} group user records for group $groupId');
-      
+      print(
+          'DEBUG: Found ${groupUsers.length} group user records for group $groupId');
+
       // Get the group details to check if current user is creator or admin
       final group = await getGroupDetail(groupId);
-      print('DEBUG: Group details - creatorId: ${group.creatorId}, current user: ${currentUser.id}');
+      print(
+          'DEBUG: Group details - creatorId: ${group.creatorId}, current user: ${currentUser.id}');
       print('DEBUG: Group members: ${group.groupUsers}');
-      
+
       // Only creator can change roles (optionally allow admins too)
       final isCreator = group.creatorId == currentUser.id;
       if (!isCreator) {
         throw Exception('Only the group creator can change user roles');
       }
-      
+
       // Verify the member is in the group
       if (!group.groupUsers.contains(memberId)) {
         throw Exception('User is not a member of this group');
       }
-      
+
       // Find the specific user record - fix the filtering logic
       Document? userRecordToUpdate;
-      print('DEBUG: Looking for user record with userId=$memberId and groupId=$groupId');
-      
+      print(
+          'DEBUG: Looking for user record with userId=$memberId and groupId=$groupId');
+
       for (final doc in groupUsers) {
-        print('DEBUG: Checking record - userId: ${doc.data['userId']}, groupId: ${doc.data['groupId']}');
+        print(
+            'DEBUG: Checking record - userId: ${doc.data['userId']}, groupId: ${doc.data['groupId']}');
         if (doc.data['userId'] == memberId && doc.data['groupId'] == groupId) {
           userRecordToUpdate = doc;
           break;
         }
       }
-      
+
       // If user doesn't have a group_user record yet, create one
       if (userRecordToUpdate == null) {
         print('DEBUG: No matching user record found, creating a new one');
-        
+
         // Create a new group user record
         final newGroupUserModel = GroupUserModel(
           userId: memberId,
           groupId: groupId,
-          status: "accepted", // Assume they're already accepted since they're in the group
+          status:
+              "accepted", // Assume they're already accepted since they're in the group
           role: newRole,
         );
-        
+
         // Add some debug output to see what fields are being sent
-        print('DEBUG: Creating group user with fields: ${newGroupUserModel.toJson()}');
-        
+        print(
+            'DEBUG: Creating group user with fields: ${newGroupUserModel.toJson()}');
+
         final result = await _groupRepository.addGroupUser(newGroupUserModel);
         result.fold(
           (l) => throw Exception('Failed to create user record: ${l.message}'),
@@ -530,17 +542,18 @@ class GroupNotifier extends AsyncNotifier<List<GroupModel>> {
       } else {
         // Update the role
         print('DEBUG: Found user record, updating role to $newRole');
-        final groupUserModel = GroupUserModel.fromJson(userRecordToUpdate.data).copyWith(
+        final groupUserModel =
+            GroupUserModel.fromJson(userRecordToUpdate.data).copyWith(
           id: userRecordToUpdate.$id,
           role: newRole,
         );
-        
+
         await _groupRepository.updateGroupUser(groupUserModel);
       }
-      
+
       // Refresh state (no need to modify group list as the role change doesn't affect it)
       ref.invalidate(homeNotifierProvider);
-      
+
       // Force refresh the current state
       state = AsyncValue.data(await _fetchGroups());
     } catch (e, st) {

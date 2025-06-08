@@ -27,6 +27,7 @@ class UpdateGroupInfoCard extends ConsumerWidget {
   final ValueNotifier<File?> newGroupImage;
   final ValueNotifier<String?> oldGroupImage;
   final GlobalKey<FormState> formKey;
+  final GroupModel groupModel;
 
   const UpdateGroupInfoCard({
     required this.groupTitle,
@@ -34,17 +35,21 @@ class UpdateGroupInfoCard extends ConsumerWidget {
     required this.newGroupImage,
     required this.oldGroupImage,
     required this.formKey,
+    required this.groupModel,
     super.key,
   });
 
   _addPhotoButton({
     required ValueNotifier<File?> newGroupImage,
     required ValueNotifier<String?> oldGroupImage,
+    required bool isEnabled,
   }) {
     return InkWell(
-      onTap: () async {
-        newGroupImage.value = await pickImage();
-      },
+      onTap: isEnabled
+          ? () async {
+              newGroupImage.value = await pickImage();
+            }
+          : null,
       child: Container(
         width: 50,
         height: 50,
@@ -70,6 +75,9 @@ class UpdateGroupInfoCard extends ConsumerWidget {
                 child: SvgPicture.asset(
                   'assets/svg/add_photo_icon.svg',
                   height: 14,
+                  colorFilter: isEnabled
+                      ? null
+                      : const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
                 ),
               )
             : null,
@@ -79,6 +87,12 @@ class UpdateGroupInfoCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Check if current user is admin or creator
+    final currentUser = ref.watch(currentUserProvider);
+    final isCreator = currentUser?.id == groupModel.creatorId;
+    final isAdmin = ref.watch(isCurrentUserAdminProvider(groupModel.id ?? ''));
+    final canEdit = isCreator || isAdmin;
+
     return Form(
       key: formKey,
       child: Container(
@@ -97,6 +111,7 @@ class UpdateGroupInfoCard extends ConsumerWidget {
                 _addPhotoButton(
                   newGroupImage: newGroupImage,
                   oldGroupImage: oldGroupImage,
+                  isEnabled: canEdit,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -106,6 +121,7 @@ class UpdateGroupInfoCard extends ConsumerWidget {
                       hintText: 'Group Title',
                       fillColor: ColorConfig.white,
                       controller: groupTitle,
+                      enabled: canEdit,
                       validator: ref
                           .read(formValidatorProvider.notifier)
                           .validateTitle,
@@ -119,6 +135,7 @@ class UpdateGroupInfoCard extends ConsumerWidget {
               hintText: 'Description',
               fillColor: ColorConfig.white,
               controller: groupDescription,
+              enabled: canEdit,
               maxLines: 3,
             ),
           ],
@@ -327,6 +344,12 @@ class UpgradeGroupCreateButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Check if current user is admin or creator
+    final currentUser = ref.watch(currentUserProvider);
+    final isCreator = currentUser?.id == groupModel.creatorId;
+    final isAdmin = ref.watch(isCurrentUserAdminProvider(groupModel.id ?? ''));
+    final canEdit = isCreator || isAdmin;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
       child: ButtonWidget(
@@ -334,16 +357,18 @@ class UpgradeGroupCreateButton extends ConsumerWidget {
               loading: () => true,
               orElse: () => false,
             ),
-        onPressed: () {
-          if (formKey.currentState!.validate()) {
-            ref.read(groupNotifierProvider.notifier).updateGroup(
-                  image: newGroupImage,
-                  groupTitle: groupTitle,
-                  groupDescription: groupDescription,
-                  groupModel: groupModel,
-                );
-          }
-        },
+        onPressed: canEdit
+            ? () {
+                if (formKey.currentState!.validate()) {
+                  ref.read(groupNotifierProvider.notifier).updateGroup(
+                        image: newGroupImage,
+                        groupTitle: groupTitle,
+                        groupDescription: groupDescription,
+                        groupModel: groupModel,
+                      );
+                }
+              }
+            : null, // Disable button if user can't edit
         title: 'Update',
         textColor: ColorConfig.secondary,
       ),

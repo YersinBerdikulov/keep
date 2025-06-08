@@ -8,7 +8,10 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/color_config.dart';
+import '../../../../core/constants/font_config.dart';
+import '../../../../core/router/router_names.dart';
 import '../../../../shared/widgets/appbar/appbar.dart';
+import '../../../auth/domain/di/auth_controller_di.dart';
 import '../../domain/di/group_controller_di.dart';
 import '../widgets/update_group_widget.dart';
 
@@ -26,20 +29,38 @@ class UpdateGroupPage extends HookConsumerWidget {
     final newGroupImage = useState<File?>(null);
     final oldGroupImage = useState<String?>(groupModel.image);
 
+    // Check if current user is admin or creator
+    final currentUser = ref.watch(currentUserProvider);
+    final isCreator = currentUser?.id == groupModel.creatorId;
+    final isAdmin = ref.watch(isCurrentUserAdminProvider(groupModel.id ?? ''));
+    final canEdit = isCreator || isAdmin;
+
     /// by using listen we are not gonna rebuild our app
     ref.listen<AsyncValue<List<GroupModel>>>(
       groupNotifierProvider,
       (previous, next) {
         next.when(
           data: (_) {
-            showSnackBar(context, content: "Successfully Updated!!");
+            showSnackBar(
+              context,
+              content: "Successfully Updated!",
+              type: SnackBarType.success,
+            );
             context.pop();
           },
           loading: () {
             // Optionally handle loading state if needed
           },
           error: (error, stackTrace) {
-            showSnackBar(context, content: error.toString());
+            // Show user-friendly message instead of the raw exception
+            showSnackBar(
+              context,
+              content: error.toString(),
+              type: SnackBarType.error,
+            );
+
+            // Important: Don't pop here - let the user navigate back manually
+            // This prevents the error page from showing
           },
         );
       },
@@ -60,6 +81,31 @@ class UpdateGroupPage extends HookConsumerWidget {
       ),
       body: Column(
         children: [
+          // Permission indicator
+          if (!canEdit)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              color: ColorConfig.error.withOpacity(0.1),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: ColorConfig.error,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "Only group admins can update group information",
+                      style: FontConfig.body2().copyWith(
+                        color: ColorConfig.error,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -71,6 +117,7 @@ class UpdateGroupPage extends HookConsumerWidget {
                     groupTitle: groupTitle,
                     groupDescription: groupDescription,
                     formKey: _formKey,
+                    groupModel: groupModel,
                   ),
                   // Add padding at the bottom to prevent overlap with the update button
                   SizedBox(height: bottomPadding),
