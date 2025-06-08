@@ -4,10 +4,12 @@ import 'package:dongi/core/router/router_names.dart';
 import 'package:dongi/modules/auth/domain/di/auth_controller_di.dart';
 import 'package:dongi/modules/expense/domain/controllers/category_controller.dart';
 import 'package:dongi/modules/expense/domain/di/category_controller_di.dart';
+import 'package:dongi/modules/export/domain/di/export_service_di.dart';
 import 'package:dongi/modules/home/domain/controllers/home_transactions_controller.dart';
 import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 import 'package:dongi/shared/widgets/appbar/appbar.dart';
 import 'package:dongi/shared/widgets/card/card.dart';
+import 'package:dongi/shared/widgets/dialog/dialog_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -31,6 +33,151 @@ class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
     });
   }
 
+  // Show export options dialog
+  void _showExportOptions(
+      List<RecentTransactionModel> transactions, List<Category> categories) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Export Transactions',
+              style: FontConfig.h5().copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: ColorConfig.baseGrey,
+                ),
+                child: Icon(
+                  Icons.picture_as_pdf,
+                  color: ColorConfig.midnight,
+                  size: 20,
+                ),
+              ),
+              title: Text(
+                'Export as PDF',
+                style: FontConfig.body1().copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onTap: () async {
+                Navigator.pop(context);
+                _exportTransactions(transactions, categories, 'pdf');
+              },
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: ColorConfig.baseGrey,
+                ),
+                child: Icon(
+                  Icons.table_chart,
+                  color: ColorConfig.midnight,
+                  size: 20,
+                ),
+              ),
+              title: Text(
+                'Export as CSV',
+                style: FontConfig.body1().copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onTap: () async {
+                Navigator.pop(context);
+                _exportTransactions(transactions, categories, 'csv');
+              },
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: ColorConfig.baseGrey,
+                ),
+                child: Icon(
+                  Icons.insert_drive_file,
+                  color: ColorConfig.midnight,
+                  size: 20,
+                ),
+              ),
+              title: Text(
+                'Export as Excel',
+                style: FontConfig.body1().copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onTap: () async {
+                Navigator.pop(context);
+                _exportTransactions(transactions, categories, 'excel');
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Export transactions based on the selected format
+  Future<void> _exportTransactions(List<RecentTransactionModel> transactions,
+      List<Category> categories, String format) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      final exportService = ref.read(exportServiceProvider);
+
+      // Skip the permission check and directly create and share the file
+      // Generate file based on selected format
+      final file = format == 'pdf'
+          ? await exportService.exportToPdf(transactions, categories)
+          : format == 'csv'
+              ? await exportService.exportToCsv(transactions, categories)
+              : await exportService.exportToExcel(transactions, categories);
+
+      if (mounted) Navigator.pop(context); // Dismiss loading indicator
+
+      if (file != null && mounted) {
+        // Share the file
+        await exportService.shareFile(file);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to create export file.'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Dismiss loading indicator
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error exporting file: ${e.toString()}'),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Use the full transactions list directly from the provider
@@ -43,6 +190,62 @@ class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
         title: 'Transaction History',
         automaticallyImplyLeading: true,
         showDrawer: false,
+        actions: [
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorConfig.baseGrey,
+              ),
+              child: Icon(
+                Icons.file_download,
+                color: ColorConfig.midnight,
+                size: 20,
+              ),
+            ),
+            onPressed: () {
+              transactionsProvider.when(
+                data: (transactions) {
+                  categoriesProvider.when(
+                    data: (categories) {
+                      if (transactions.isNotEmpty) {
+                        _showExportOptions(transactions, categories);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('No transactions to export.'),
+                          ),
+                        );
+                      }
+                    },
+                    loading: () => ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Loading categories...'),
+                      ),
+                    ),
+                    error: (_, __) =>
+                        ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Error loading categories.'),
+                      ),
+                    ),
+                  );
+                },
+                loading: () => ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Loading transactions...'),
+                  ),
+                ),
+                error: (_, __) => ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Error loading transactions.'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: transactionsProvider.when(
         loading: () => const Center(child: CircularProgressIndicator()),

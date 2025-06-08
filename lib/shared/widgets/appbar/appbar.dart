@@ -8,19 +8,23 @@ class AppBarWidget extends PreferredSize {
   final String? title;
   final bool showDrawer;
   final bool automaticallyImplyLeading;
-  
+  final List<Widget>? actions;
+
   AppBarWidget({
     super.key,
     this.title,
     this.showDrawer = true,
     this.automaticallyImplyLeading = false,
+    this.actions,
   }) : super(
           preferredSize: const Size.fromHeight(70),
-          child: appBarChild(title, showDrawer, automaticallyImplyLeading),
+          child: appBarChild(
+              title, showDrawer, automaticallyImplyLeading, actions),
         );
 }
 
-Widget appBarChild(String? title, bool showDrawer, bool automaticallyImplyLeading) {
+Widget appBarChild(String? title, bool showDrawer,
+    bool automaticallyImplyLeading, List<Widget>? actions) {
   return Consumer(
     builder: (context, ref, child) {
       // Check if user is authenticated
@@ -47,7 +51,9 @@ Widget appBarChild(String? title, bool showDrawer, bool automaticallyImplyLeadin
                 color: ColorConfig.baseGrey,
               ),
               child: Icon(
-                !showDrawer || automaticallyImplyLeading ? Icons.arrow_back : Icons.menu,
+                !showDrawer || automaticallyImplyLeading
+                    ? Icons.arrow_back
+                    : Icons.menu,
                 color: ColorConfig.midnight,
                 size: 20,
               ),
@@ -71,6 +77,7 @@ Widget appBarChild(String? title, bool showDrawer, bool automaticallyImplyLeadin
                 ),
               )
             : null,
+        actions: actions,
       );
     },
   );

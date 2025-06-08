@@ -190,6 +190,30 @@ class DrawerWidget extends ConsumerWidget {
                 Navigator.pop(context); // Close drawer
               },
             ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: ColorConfig.baseGrey,
+                ),
+                child: Icon(
+                  Icons.history,
+                  color: ColorConfig.midnight,
+                  size: 20,
+                ),
+              ),
+              title: Text(
+                'Transaction History',
+                style: FontConfig.body2().copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onTap: () {
+                context.push(RouteName.allTransactions);
+                Navigator.pop(context); // Close drawer
+              },
+            ),
             const Spacer(),
             // Logout Button
             ListTile(

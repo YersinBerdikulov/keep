@@ -61,6 +61,12 @@
 	<string>Main</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Main</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Access is needed to export transaction files</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 	    <dict>
