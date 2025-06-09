@@ -1346,7 +1346,7 @@ class _HomeWeeklyAnalyticState extends ConsumerState<HomeWeeklyAnalytic> {
               ),
             );
           },
-        ),
+        ),  
       ],
     );
   }

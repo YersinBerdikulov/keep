@@ -11,6 +11,10 @@ import 'package:dongi/shared/widgets/text_field/text_field.dart';
 import 'package:dongi/shared/utilities/extensions/validation_string.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:dongi/modules/friend/domain/di/friend_controller_di.dart';
+import 'package:dongi/modules/friend/domain/models/user_friend_model.dart';
+import 'package:dongi/modules/group/domain/di/group_controller_di.dart';
+import 'package:dongi/modules/home/domain/di/home_controller_di.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -19,6 +23,9 @@ class ProfilePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
     final userDataAsync = ref.watch(userNotifierProvider);
+    final friendListAsync = ref.watch(getFriendProvider);
+    final groupListAsync = ref.watch(groupNotifierProvider);
+    final transactionsAsync = ref.watch(homeTransactionsProvider);
 
     Future<void> handleImageUpload() async {
       final file = await pickImage();
@@ -137,9 +144,11 @@ class ProfilePage extends ConsumerWidget {
                   userData?.phoneNumber ?? currentUser?.phone ?? 'Not provided',
                   Icons.phone_outlined,
                   onEdit: () async {
-                    final TextEditingController phoneController = TextEditingController();
-                    phoneController.text = userData?.phoneNumber ?? currentUser?.phone ?? '';
-                    
+                    final TextEditingController phoneController =
+                        TextEditingController();
+                    phoneController.text =
+                        userData?.phoneNumber ?? currentUser?.phone ?? '';
+
                     await showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
@@ -207,21 +216,24 @@ class ProfilePage extends ConsumerWidget {
                                         .saveUser(updatedUser);
                                     if (context.mounted) {
                                       showSnackBar(context,
-                                          content: "Phone number updated successfully!");
+                                          content:
+                                              "Phone number updated successfully!");
                                       Navigator.pop(context);
                                     }
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
                                     showSnackBar(context,
-                                        content: "Failed to update phone number: $e");
+                                        content:
+                                            "Failed to update phone number: $e");
                                     Navigator.pop(context);
                                   }
                                 }
                               } else {
                                 if (context.mounted) {
                                   showSnackBar(context,
-                                      content: "Please enter a valid phone number");
+                                      content:
+                                          "Please enter a valid phone number");
                                 }
                               }
                             },
@@ -262,20 +274,42 @@ class ProfilePage extends ConsumerWidget {
                   style: FontConfig.h6(),
                 ),
                 const SizedBox(height: 16),
-                _buildStatTile(
-                  'Total Friends',
-                  userData?.userFriends.length.toString() ?? '0',
-                  Icons.people_outline,
+                friendListAsync.when(
+                  loading: () => _buildStatTile(
+                      'Total Friends', 'Loading...', Icons.people_outline),
+                  error: (_, __) => _buildStatTile(
+                      'Total Friends', 'Error loading', Icons.people_outline),
+                  data: (friendsList) => _buildStatTile(
+                    'Total Friends',
+                    friendsList
+                        .where((friend) =>
+                            friend.status == FriendRequestStatus.accepted)
+                        .length
+                        .toString(),
+                    Icons.people_outline,
+                  ),
                 ),
-                _buildStatTile(
-                  'Groups',
-                  userData?.groupIds.length.toString() ?? '0',
-                  Icons.group_work_outlined,
+                groupListAsync.when(
+                  loading: () => _buildStatTile(
+                      'Groups', 'Loading...', Icons.group_work_outlined),
+                  error: (_, __) => _buildStatTile(
+                      'Groups', 'Error loading', Icons.group_work_outlined),
+                  data: (groupsList) => _buildStatTile(
+                    'Groups',
+                    groupsList.length.toString(),
+                    Icons.group_work_outlined,
+                  ),
                 ),
-                _buildStatTile(
-                  'Total Transactions',
-                  userData?.transactions.length.toString() ?? '0',
-                  Icons.receipt_long_outlined,
+                transactionsAsync.when(
+                  loading: () => _buildStatTile('Total Transactions',
+                      'Loading...', Icons.receipt_long_outlined),
+                  error: (_, __) => _buildStatTile('Total Transactions',
+                      'Error loading', Icons.receipt_long_outlined),
+                  data: (transactionsList) => _buildStatTile(
+                    'Total Transactions',
+                    transactionsList.length.toString(),
+                    Icons.receipt_long_outlined,
+                  ),
                 ),
               ],
             ),
@@ -285,7 +319,8 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoTile(String title, String value, IconData icon, {VoidCallback? onEdit}) {
+  Widget _buildInfoTile(String title, String value, IconData icon,
+      {VoidCallback? onEdit}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
