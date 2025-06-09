@@ -180,12 +180,6 @@ class GroupDetailInfo extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(11, 0, 11, 16),
       child: Row(
         children: [
-          groupInfoCard(
-            "Total Balance",
-            "\$${groupModel.totalBalance.toStringAsFixed(2)}",
-            Icons.account_balance_wallet,
-            ColorConfig.secondary,
-          ),
           boxesInGroup.when(
             loading: () => groupInfoCard(
               "Boxes",
